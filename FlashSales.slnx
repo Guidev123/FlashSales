@@ -1,0 +1,48 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/API/">
+    <Project Path="src/API/FlashSales.Api/FlashSales.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Building Blocks/">
+    <Project Path="src/BuildingBlocks/FlashSales.Application/FlashSales.Application.csproj" />
+    <Project Path="src/BuildingBlocks/FlashSales.Domain/FlashSales.Domain.csproj" />
+    <Project Path="src/BuildingBlocks/FlashSales.Endpoints/FlashSales.Endpoints.csproj" />
+    <Project Path="src/BuildingBlocks/FlashSales.Infrastructure/FlashSales.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Catalog/">
+    <Project Path="src/Modules/Catalog/Modules.Catalog.Application/Modules.Catalog.Application.csproj" />
+    <Project Path="src/Modules/Catalog/Modules.Catalog.Domain/Modules.Catalog.Domain.csproj" />
+    <Project Path="src/Modules/Catalog/Modules.Catalog.Endpoints/Modules.Catalog.Endpoints.csproj" />
+    <Project Path="src/Modules/Catalog/Modules.Catalog.Infrastructure/Modules.Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Launches/">
+    <Project Path="src/Modules/Launches/Modules.Launches.Application/Modules.Launches.Application.csproj" />
+    <Project Path="src/Modules/Launches/Modules.Launches.Domain/Modules.Launches.Domain.csproj" />
+    <Project Path="src/Modules/Launches/Modules.Launches.Endpoints/Modules.Launches.Endpoints.csproj" />
+    <Project Path="src/Modules/Launches/Modules.Launches.Infrastructure/Modules.Launches.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Notifications/">
+    <Project Path="src/Modules/Notifications/Modules.Notifications.Core/Modules.Notifications.Core.csproj" />
+    <Project Path="src/Modules/Notifications/Modules.Notifications.Endpoints/Modules.Notifications.Endpoints.csproj" />
+    <Project Path="src/Modules/Notifications/Modules.Notifications.Infrastructure/Modules.Notifications.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Orders/">
+    <Project Path="src/Modules/Orders/Modules.Orders.Application/Modules.Orders.Application.csproj" />
+    <Project Path="src/Modules/Orders/Modules.Orders.Domain/Modules.Orders.Domain.csproj" />
+    <Project Path="src/Modules/Orders/Modules.Orders.Endpoints/Modules.Orders.Endpoints.csproj" />
+    <Project Path="src/Modules/Orders/Modules.Orders.Infrastructure/Modules.Orders.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Payments/">
+    <Project Path="src/Modules/Payments/Modules.Payments.Application/Modules.Payments.Application.csproj" />
+    <Project Path="src/Modules/Payments/Modules.Payments.Domain/Modules.Payments.Domain.csproj" />
+    <Project Path="src/Modules/Payments/Modules.Payments.Endpoints/Modules.Payments.Endpoints.csproj" />
+    <Project Path="src/Modules/Payments/Modules.Payments.Infrastructure/Modules.Payments.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Users/">
+    <Project Path="src/Modules/Users/Modules.Users.Application/Modules.Users.Application.csproj" />
+    <Project Path="src/Modules/Users/Modules.Users.Domain/Modules.Users.Domain.csproj" />
+    <Project Path="src/Modules/Users/Modules.Users.Endpoints/Modules.Users.Endpoints.csproj" />
+    <Project Path="src/Modules/Users/Modules.Users.Infrastructure/Modules.Users.Infrastructure.csproj" />
+  </Folder>
+</Solution>
