@@ -1,11 +1,12 @@
-﻿using Deliveryix.Commons.WebApi.Endpoints;
-using FlashSales.Domain.Results;
+﻿using FlashSales.Domain.Results;
+using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
+using Modules.Users.Application.AccessManagement.Permissions;
 using Modules.Users.Application.AccessManagement.UseCases.GetAllRoles;
 
 namespace Modules.Users.Endpoints.AccessManagement
@@ -26,7 +27,8 @@ namespace Modules.Users.Endpoints.AccessManagement
                     role => Results.Ok(role),
                     ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Get all roles");
+              .WithDescription("Get all roles")
+              .RequireAuthorization(UsersPermissions.Roles.Read);
         }
     }
 }

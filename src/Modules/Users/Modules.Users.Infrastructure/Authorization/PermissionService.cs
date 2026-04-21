@@ -13,7 +13,7 @@ namespace Modules.Users.Infrastructure.Authorization
             var result = await sender.SendAsync(new GetUserPermissionsQuery(identityId), cancellationToken);
             if (result.IsFailure)
             {
-                throw new FlashSalesException(nameof(GetUserPermissionsQuery), result.Error);
+                return new PermissionResponse(Guid.Empty, []);
             }
 
             var permissions = result.Value.Roles

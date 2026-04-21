@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Deliveryix.Commons.Application.Extensions
+namespace FlashSales.Application.Extensions
 {
     public static class JsonSerializerOptionsExtensions
     {

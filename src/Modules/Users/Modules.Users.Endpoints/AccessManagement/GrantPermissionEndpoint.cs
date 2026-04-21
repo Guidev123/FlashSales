@@ -1,11 +1,12 @@
-﻿using Deliveryix.Commons.WebApi.Endpoints;
-using FlashSales.Domain.Results;
+﻿using FlashSales.Domain.Results;
+using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
+using Modules.Users.Application.AccessManagement.Permissions;
 using Modules.Users.Application.AccessManagement.UseCases.GrantPermission;
 
 namespace Modules.Users.Endpoints.AccessManagement
@@ -24,7 +25,8 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(Results.Created, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Adds a permission for a role");
+              .WithDescription("Adds a permission for a role")
+              .RequireAuthorization(UsersPermissions.Permissions.Grant);
         }
     }
 }

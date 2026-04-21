@@ -1,9 +1,9 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Npgsql;
 
 namespace FlashSales.Infrastructure.Factories
 {
     public sealed class SqlConnectionFactory(string connectionString)
     {
-        public SqlConnection Create() => new(connectionString);
+        public NpgsqlConnection Create() => new(connectionString);
     }
 }

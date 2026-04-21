@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Modules.Users.Domain.Users.Entities;
 
-namespace Modules.Users.Domain.Users.Models
+namespace Modules.Users.Infrastructure.Database.Configurations
 {
     internal sealed class SellerProfileConfiguration : IEntityTypeConfiguration<SellerProfile>
     {

@@ -1,5 +1,5 @@
-﻿using Deliveryix.Commons.WebApi.Endpoints;
-using FlashSales.Domain.Results;
+﻿using FlashSales.Domain.Results;
+using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using FlashSales.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +21,8 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(() => Results.Ok(result.Value), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Get permissions of authenticated user");
+              .WithDescription("Get permissions of authenticated user")
+              .RequireAuthorization();
         }
     }
 }

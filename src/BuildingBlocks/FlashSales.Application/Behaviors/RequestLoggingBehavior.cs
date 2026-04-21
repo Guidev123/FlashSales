@@ -6,7 +6,7 @@ using MidR.Interfaces;
 using Serilog.Context;
 using System.Diagnostics;
 
-namespace Deliveryix.Commons.Application.Behaviors
+namespace FlashSales.Application.Behaviors
 {
     public sealed class RequestLoggingBehavior<TRequest, TResponse>(ILogger<RequestLoggingBehavior<TRequest, TResponse>> logger) : IRequestBehavior<TRequest, TResponse>
             where TRequest : IRequest<TResponse>
