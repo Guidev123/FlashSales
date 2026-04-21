@@ -75,10 +75,25 @@ services:
       retries: 10
     restart: unless-stopped
 
+  seq:
+    image: datalust/seq:2024.3
+    container_name: seq
+    environment:
+      ACCEPT_EULA: Y
+    ports:
+      - "5341:5341" # ingest (Serilog aponta aqui)
+      - "8081:80" # UI  →  http://localhost:8081
+    volumes:
+      - seq_data:/data
+    networks:
+      - backend
+    restart: unless-stopped
+
 volumes:
   keycloak_pgdata:
   app_pgdata:
   redis_data:
+  seq_data:
 
 networks:
   backend:

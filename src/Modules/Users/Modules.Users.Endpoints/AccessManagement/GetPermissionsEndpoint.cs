@@ -21,8 +21,7 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(() => Results.Ok(result.Value), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Get permissions of authenticated user")
-              .RequireAuthorization();
+              .WithDescription("Get permissions of authenticated user");
         }
     }
 }

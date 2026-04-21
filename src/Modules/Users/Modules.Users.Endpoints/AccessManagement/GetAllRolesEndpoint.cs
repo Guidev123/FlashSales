@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.Permissions;
 using Modules.Users.Application.AccessManagement.UseCases.GetAllRoles;
 
 namespace Modules.Users.Endpoints.AccessManagement
@@ -27,8 +26,7 @@ namespace Modules.Users.Endpoints.AccessManagement
                     role => Results.Ok(role),
                     ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Get all roles")
-              .RequireAuthorization(UsersPermissions.Roles.Read);
+              .WithDescription("Get all roles");
         }
     }
 }

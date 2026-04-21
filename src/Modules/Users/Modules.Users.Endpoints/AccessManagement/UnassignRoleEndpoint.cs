@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.Permissions;
 using Modules.Users.Application.AccessManagement.UseCases.UnassignRole;
 
 namespace Modules.Users.Endpoints.AccessManagement
@@ -24,8 +23,7 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(Results.NoContent, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Remove a role from an user")
-              .RequireAuthorization(UsersPermissions.Roles.Unassign);
+              .WithDescription("Remove a role from an user");
         }
     }
 }

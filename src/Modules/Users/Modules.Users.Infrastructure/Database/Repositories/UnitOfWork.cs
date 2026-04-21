@@ -1,10 +1,7 @@
 ﻿using FlashSales.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Text;
 
 namespace Modules.Users.Infrastructure.Database.Repositories
 {
@@ -32,10 +29,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         {
             try
             {
-                var affectedRows = await context.SaveChangesAsync(cancellationToken);
-
-                if (affectedRows == 0) return false;
-
+                await context.SaveChangesAsync(cancellationToken);
                 await context.Database.CurrentTransaction!.CommitAsync(cancellationToken);
                 return true;
             }

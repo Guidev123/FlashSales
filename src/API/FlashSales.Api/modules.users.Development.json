@@ -1,0 +1,11 @@
+{
+  "Users": {
+    "KeyCloak": {
+      "AdminUrl": "http://localhost:8080/admin/realms/",
+      "CurrentRealm": "flash-sales-dev",
+      "BaseUrl": "http://localhost:8080/realms/",
+      "ConfidentialClientId": "flash-sales-api",
+      "ConfidentialClientSecret": "sXfODzi94rNkTvmdmIPigb99FgfwTC7y"
+    }
+  }
+}

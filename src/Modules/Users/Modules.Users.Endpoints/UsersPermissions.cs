@@ -1,4 +1,4 @@
-namespace Modules.Users.Application.AccessManagement.Permissions
+namespace Modules.Users.Endpoints
 {
     public static class UsersPermissions
     {

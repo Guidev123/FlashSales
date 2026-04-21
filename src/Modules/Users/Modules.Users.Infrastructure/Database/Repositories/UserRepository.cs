@@ -1,7 +1,7 @@
 ﻿using Dapper;
-using FlashSales.Infrastructure.Factories;
+using FlashSales.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Modules.Users.Application.Users.Dtos;
 using Modules.Users.Application.Users.Repositories;
 using Modules.Users.Domain.Users.Entities;
 
@@ -9,7 +9,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 {
     internal sealed class UserRepository(
         UsersDbContext context,
-        SqlConnectionFactory sqlConnectionFactory
+        IUnitOfWork unitOfWork
         ) : IUserRepository
     {
         public Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -17,15 +17,27 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             return context.Users.AsNoTracking().AnyAsync(u => u.Id == userId, cancellationToken: cancellationToken);
         }
 
-        public Task<User?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+        public Task<bool> ExistsAsync(string email, CancellationToken cancellationToken = default)
         {
-            return context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+            return context.Users.AsNoTracking().AnyAsync(u => u.Email.Address == email.ToLower(), cancellationToken: cancellationToken);
+        }
+
+        public Task<UserResponse?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == id)
+                .Select(u => new UserResponse(
+                    u.Id,
+                    u.Name.FirstName,
+                    u.Name.LastName,
+                    u.Email.Address,
+                    u.Age.BirthDate)
+                ).FirstOrDefaultAsync(cancellationToken);
         }
 
         public Task<bool> IsSellerAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 SELECT EXISTS (
                     SELECT 1
@@ -35,7 +47,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 )
                 """;
 
-            return connection.ExecuteScalarAsync<bool>(
+            return unitOfWork.Connection.ExecuteScalarAsync<bool>(
                 new(sql, new
                 {
                     UserId = userId

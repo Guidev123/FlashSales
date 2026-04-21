@@ -1,31 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>6da91418-f73a-4df3-9942-f2543572b886</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>..\..\..</DockerfileContext>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>6da91418-f73a-4df3-9942-f2543572b886</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerfileContext>..\..\..</DockerfileContext>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
+		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+		<PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\BuildingBlocks\FlashSales.Infrastructure\FlashSales.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Modules\Catalog\Modules.Catalog.Infrastructure\Modules.Catalog.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Modules\Launches\Modules.Launches.Infrastructure\Modules.Launches.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Modules\Notifications\Modules.Notifications.Infrastructure\Modules.Notifications.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Modules\Orders\Modules.Orders.Infrastructure\Modules.Orders.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Modules\Payments\Modules.Payments.Infrastructure\Modules.Payments.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Modules\Users\Modules.Users.Infrastructure\Modules.Users.Infrastructure.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\BuildingBlocks\FlashSales.Infrastructure\FlashSales.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\Modules\Catalog\Modules.Catalog.Infrastructure\Modules.Catalog.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\Modules\Launches\Modules.Launches.Infrastructure\Modules.Launches.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\Modules\Notifications\Modules.Notifications.Infrastructure\Modules.Notifications.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\Modules\Orders\Modules.Orders.Infrastructure\Modules.Orders.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\Modules\Payments\Modules.Payments.Infrastructure\Modules.Payments.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\Modules\Users\Modules.Users.Infrastructure\Modules.Users.Infrastructure.csproj" />
+	</ItemGroup>
 
 </Project>

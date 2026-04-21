@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.Permissions;
 using Modules.Users.Application.AccessManagement.UseCases.AssignRole;
 
 namespace Modules.Users.Endpoints.AccessManagement
@@ -24,8 +23,7 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(() => Results.Created(), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Assign a role to an user")
-              .RequireAuthorization(UsersPermissions.Roles.Assign);
+              .WithDescription("Assign a role to an user");
         }
     }
 }

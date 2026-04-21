@@ -1,6 +1,6 @@
 using Dapper;
+using FlashSales.Application.Abstractions;
 using FlashSales.Domain.Results;
-using FlashSales.Infrastructure.Factories;
 using Modules.Users.Application.AccessManagement.Repositories;
 using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
 using Modules.Users.Application.AccessManagement.UseCases.GetRole;
@@ -9,45 +9,39 @@ using Modules.Users.Domain.Users.Enum;
 
 namespace Modules.Users.Infrastructure.Database.Repositories
 {
-    internal sealed class RoleRepository(SqlConnectionFactory sqlConnectionFactory) : IRoleRepository
+    internal sealed class RoleRepository(IUnitOfWork unitOfWork) : IRoleRepository
     {
         public Task AddAsync(Role role, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 INSERT INTO users."Roles" ("Name")
                 VALUES (@Name)
                 ON CONFLICT DO NOTHING
                 """;
 
-            return connection.ExecuteAsync(new(sql, new { role.Name }, cancellationToken: cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(new(sql, new { role.Name }, cancellationToken: cancellationToken));
         }
 
         public Task AddPermissionAsync(string code, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 INSERT INTO users."Permissions" ("Code")
                 VALUES (@Code)
                 ON CONFLICT DO NOTHING
                 """;
 
-            return connection.ExecuteAsync(new(sql, new { Code = code }, cancellationToken: cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(new(sql, new { Code = code }, cancellationToken: cancellationToken));
         }
 
         public Task AddDefaultRoleForRegistrationTypeAsync(string roleName, RegistrationType registrationType, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 INSERT INTO users."RegistrationTypeRoles" ("Type", "RoleName")
                 VALUES (@Type, @RoleName)
                 ON CONFLICT DO NOTHING
                 """;
 
-            return connection.ExecuteAsync(new(sql, new
+            return unitOfWork.Connection.ExecuteAsync(new(sql, new
             {
                 Type = registrationType.ToString(),
                 RoleName = roleName
@@ -56,46 +50,38 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public Task AssignToUserAsync(string roleName, Guid userId, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 INSERT INTO users."UserRoles" ("RoleName", "UserId")
                 VALUES (@RoleName, @UserId)
                 ON CONFLICT DO NOTHING
                 """;
 
-            return connection.ExecuteAsync(new(sql, new { RoleName = roleName, UserId = userId }, cancellationToken: cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(new(sql, new { RoleName = roleName, UserId = userId }, cancellationToken: cancellationToken));
         }
 
         public Task UnassignFromUserAsync(string roleName, Guid userId, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 DELETE FROM users."UserRoles"
                 WHERE "RoleName" = @RoleName
                   AND "UserId" = @UserId
                 """;
 
-            return connection.ExecuteAsync(new(sql, new { RoleName = roleName, UserId = userId }, cancellationToken: cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(new(sql, new { RoleName = roleName, UserId = userId }, cancellationToken: cancellationToken));
         }
 
         public Task DeleteAsync(string name, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 DELETE FROM users."Roles"
                 WHERE "Name" = @Name
                 """;
 
-            return connection.ExecuteAsync(new(sql, new { Name = name }, cancellationToken: cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(new(sql, new { Name = name }, cancellationToken: cancellationToken));
         }
 
         public Task<bool> RoleExistsAsync(string name, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 SELECT EXISTS (
                     SELECT 1 FROM users."Roles"
@@ -103,13 +89,11 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 )
                 """;
 
-            return connection.ExecuteScalarAsync<bool>(new(sql, new { Name = name }, cancellationToken: cancellationToken));
+            return unitOfWork.Connection.ExecuteScalarAsync<bool>(new(sql, new { Name = name }, cancellationToken: cancellationToken));
         }
 
         public Task<bool> PermissionExistsAsync(string code, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 SELECT EXISTS (
                     SELECT 1 FROM users."Permissions"
@@ -117,13 +101,11 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 )
                 """;
 
-            return connection.ExecuteScalarAsync<bool>(new(sql, new { Code = code }, cancellationToken: cancellationToken));
+            return unitOfWork.Connection.ExecuteScalarAsync<bool>(new(sql, new { Code = code }, cancellationToken: cancellationToken));
         }
 
         public Task<bool> RolePermissionExistsAsync(string roleName, string permissionCode, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 SELECT EXISTS (
                     SELECT 1 FROM users."RolePermissions"
@@ -132,7 +114,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 )
                 """;
 
-            return connection.ExecuteScalarAsync<bool>(new(sql, new
+            return unitOfWork.Connection.ExecuteScalarAsync<bool>(new(sql, new
             {
                 RoleName = roleName,
                 PermissionCode = permissionCode
@@ -141,15 +123,13 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public Task GrantPermissionAsync(string roleName, string permissionCode, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 INSERT INTO users."RolePermissions" ("RoleName", "PermissionCode")
                 VALUES (@RoleName, @PermissionCode)
                 ON CONFLICT DO NOTHING
                 """;
 
-            return connection.ExecuteAsync(new(sql, new
+            return unitOfWork.Connection.ExecuteAsync(new(sql, new
             {
                 RoleName = roleName,
                 PermissionCode = permissionCode
@@ -158,15 +138,13 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public Task RevokePermissionAsync(string roleName, string permissionCode, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 DELETE FROM users."RolePermissions"
                 WHERE "RoleName" = @RoleName
                   AND "PermissionCode" = @PermissionCode
                 """;
 
-            return connection.ExecuteAsync(new(sql, new
+            return unitOfWork.Connection.ExecuteAsync(new(sql, new
             {
                 RoleName = roleName,
                 PermissionCode = permissionCode
@@ -175,8 +153,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public async Task<GetRoleResponse?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 SELECT r."Name", rp."PermissionCode"
                 FROM users."Roles" r
@@ -184,7 +160,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 WHERE r."Name" = @Name
                 """;
 
-            var rows = await connection.QueryAsync<(string Name, string? PermissionCode)>(
+            var rows = await unitOfWork.Connection.QueryAsync<(string Name, string? PermissionCode)>(
                 new(sql, new { Name = name }, cancellationToken: cancellationToken));
 
             var list = rows.ToList();
@@ -199,8 +175,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public async Task<PagedResult<Role>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 SELECT r."Name", COUNT(*) OVER() AS "TotalCount"
                 FROM users."Roles" r
@@ -208,7 +182,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 LIMIT @PageSize OFFSET @Offset
                 """;
 
-            var rows = await connection.QueryAsync<(string Name, int TotalCount)>(
+            var rows = await unitOfWork.Connection.QueryAsync<(string Name, int TotalCount)>(
                 new(sql, new { PageSize = pageSize, Offset = (page - 1) * pageSize }, cancellationToken: cancellationToken));
 
             var list = rows.ToList();
@@ -224,8 +198,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public async Task<IReadOnlyCollection<Role>> GetDefaultRolesByRegistrationTypeAsync(RegistrationType registrationType, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 SELECT r."Name"
                 FROM users."Roles" r
@@ -233,7 +205,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 WHERE rtr."Type" = @Type
                 """;
 
-            var roles = await connection.QueryAsync<string>(
+            var roles = await unitOfWork.Connection.QueryAsync<string>(
                 new(sql, new { Type = registrationType.ToString() }, cancellationToken: cancellationToken));
 
             return roles.Select(name => new Role(name)).ToList();
@@ -241,8 +213,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public async Task<GetUserPermissionsResponse?> GetUserPermissionsAsync(string identiyProviderId, CancellationToken cancellationToken = default)
         {
-            using var connection = sqlConnectionFactory.Create();
-
             const string sql = """
                 SELECT u."Id" AS "UserId", ur."RoleName", rp."PermissionCode"
                 FROM users."Users" u
@@ -251,7 +221,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 WHERE u."IdentiyProviderId" = @IdentiyProviderId
                 """;
 
-            var rows = await connection.QueryAsync<(Guid UserId, string RoleName, string? PermissionCode)>(
+            var rows = await unitOfWork.Connection.QueryAsync<(Guid UserId, string RoleName, string? PermissionCode)>(
                 new(sql, new { IdentiyProviderId = identiyProviderId }, cancellationToken: cancellationToken));
 
             var list = rows.ToList();

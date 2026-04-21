@@ -2,19 +2,23 @@ using FlashSales.Application.Abstractions;
 using FlashSales.Application.Authorization;
 using FlashSales.Application.Behaviors;
 using FlashSales.Endpoints.Endpoints;
+using FlashSales.Infrastructure.Http;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MidR.DependencyInjection;
 using Modules.Users.Application;
 using Modules.Users.Application.AccessManagement.Options;
 using Modules.Users.Application.AccessManagement.Repositories;
 using Modules.Users.Application.Users.Repositories;
+using Modules.Users.Application.Users.Services;
 using Modules.Users.Endpoints;
 using Modules.Users.Infrastructure.Authorization;
 using Modules.Users.Infrastructure.Database;
 using Modules.Users.Infrastructure.Database.Repositories;
+using Modules.Users.Infrastructure.Identity;
 
 namespace Modules.Users.Infrastructure
 {
@@ -24,6 +28,7 @@ namespace Modules.Users.Infrastructure
         {
             services
                 .AddUseCases()
+                .AddHttpClientServices(configuration)
                 .AddEndpoints()
                 .AddPermissionService()
                 .AddData(configuration);
@@ -68,6 +73,27 @@ namespace Modules.Users.Infrastructure
         private static IServiceCollection AddPermissionService(this IServiceCollection services)
         {
             services.AddTransient<IPermissionService, PermissionService>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddHttpClientServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<KeyCloakOptions>(configuration.GetSection(KeyCloakOptions.SectionName));
+
+            services.AddTransient<KeyCloakAuthDelegatingHandler>();
+
+            services.AddHttpClient<KeyCloakClient>((serviceProvider, httpClient) =>
+            {
+                var keyCloakOptions = serviceProvider.GetRequiredService<IOptions<KeyCloakOptions>>().Value;
+
+                httpClient.BaseAddress = new Uri(keyCloakOptions.AdminUrl);
+            }).AddHttpMessageHandler<KeyCloakAuthDelegatingHandler>()
+            .ConfigurePrimaryHttpMessageHandler(HttpMessageHandlerFactory.CreateSocketsHttpHandler)
+            .SetHandlerLifetime(Timeout.InfiniteTimeSpan)
+            .AddResilienceHandler(nameof(ResiliencePipelineExtensions), pipeline => pipeline.ConfigureResilience());
+
+            services.AddTransient<IIdentityProviderService, IdentityProviderService>();
 
             return services;
         }

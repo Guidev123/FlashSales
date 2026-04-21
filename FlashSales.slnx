@@ -44,5 +44,6 @@
     <Project Path="src/Modules/Users/Modules.Users.Domain/Modules.Users.Domain.csproj" />
     <Project Path="src/Modules/Users/Modules.Users.Endpoints/Modules.Users.Endpoints.csproj" />
     <Project Path="src/Modules/Users/Modules.Users.Infrastructure/Modules.Users.Infrastructure.csproj" />
+    <Project Path="src/Modules/Users/Modules.Users.IntegrationEvents/Modules.Users.IntegrationEvents.csproj" />
   </Folder>
 </Solution>

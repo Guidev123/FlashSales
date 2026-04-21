@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Modules.Users.Domain\Modules.Users.Domain.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Application\FlashSales.Application.csproj" />
-    <ProjectReference Include="..\Modules.Users.IntegrationEvents\Modules.Users.IntegrationEvents.csproj" />
   </ItemGroup>
 
 </Project>

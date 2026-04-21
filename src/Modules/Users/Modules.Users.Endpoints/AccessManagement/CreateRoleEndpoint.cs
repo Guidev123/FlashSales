@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.Permissions;
 using Modules.Users.Application.AccessManagement.UseCases.CreateRole;
 
 namespace Modules.Users.Endpoints.AccessManagement
@@ -25,8 +24,7 @@ namespace Modules.Users.Endpoints.AccessManagement
                     () => Results.Created($"api/v1/roles/{request.Name}", request.Name),
                     ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Create a role")
-              .RequireAuthorization(UsersPermissions.Roles.Create);
+              .WithDescription("Create a role");
         }
     }
 }
