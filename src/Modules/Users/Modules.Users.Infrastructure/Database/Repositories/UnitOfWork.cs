@@ -6,31 +6,39 @@ using System.Data;
 namespace Modules.Users.Infrastructure.Database.Repositories
 {
     internal sealed class UnitOfWork(
-                 UsersDbContext context
-             ) : IUnitOfWork, IAsyncDisposable
+        UsersDbContext context
+    ) : IUnitOfWork, IDisposable, IAsyncDisposable
     {
-        private IDbTransaction? _transaction;
-
         public IDbConnection Connection => context.Database.GetDbConnection();
-        public IDbTransaction? Transaction => _transaction;
+        public IDbTransaction? Transaction => _contextTransaction?.GetDbTransaction();
+
+        private IDbContextTransaction? _contextTransaction;
+        private int _nestingLevel;
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
-            if (_transaction is not null)
+            if (_contextTransaction is not null)
+            {
+                _nestingLevel++;
                 return;
+            }
 
-            await context.Database.OpenConnectionAsync(cancellationToken);
-
-            var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
-            _transaction = transaction.GetDbTransaction();
+            _contextTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
+            _nestingLevel = 1;
         }
 
         public async Task<bool> CommitAsync(CancellationToken cancellationToken = default)
         {
+            if (_nestingLevel > 1)
+            {
+                _nestingLevel--;
+                return true;
+            }
+
             try
             {
-                await context.SaveChangesAsync(cancellationToken);
-                await context.Database.CurrentTransaction!.CommitAsync(cancellationToken);
+                await _contextTransaction!.CommitAsync(cancellationToken);
+                _nestingLevel = 0;
                 return true;
             }
             catch
@@ -42,18 +50,27 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
-            if (context.Database.CurrentTransaction is not null)
-            {
-                await context.Database.CurrentTransaction.RollbackAsync(cancellationToken);
-            }
+            _nestingLevel = 0;
+
+            if (_contextTransaction is not null)
+                await _contextTransaction.RollbackAsync(cancellationToken);
         }
+
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+            => context.SaveChangesAsync(cancellationToken);
 
         public async ValueTask DisposeAsync()
         {
-            if (context.Database.CurrentTransaction is not null)
-                await context.Database.CurrentTransaction.DisposeAsync();
+            if (_contextTransaction is not null)
+                await _contextTransaction.DisposeAsync();
 
-            await context.Database.CloseConnectionAsync();
+            await context.DisposeAsync();
+        }
+
+        public void Dispose()
+        {
+            _contextTransaction?.Dispose();
+            context?.Dispose();
         }
     }
 }

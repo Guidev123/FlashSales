@@ -24,7 +24,8 @@ namespace Modules.Users.Endpoints.AccessManagement
                     role => Results.Ok(role),
                     ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Obtain a specific role and its permissions");
+              .WithDescription("Obtain a specific role and its permissions")
+              .RequireAuthorization(UsersPermissions.Roles.Read);
         }
     }
 }

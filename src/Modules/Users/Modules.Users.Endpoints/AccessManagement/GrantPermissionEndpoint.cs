@@ -24,7 +24,8 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(Results.Created, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Adds a permission for a role");
+              .WithDescription("Adds a permission for a role")
+              .RequireAuthorization(UsersPermissions.Permissions.Grant);
         }
     }
 }

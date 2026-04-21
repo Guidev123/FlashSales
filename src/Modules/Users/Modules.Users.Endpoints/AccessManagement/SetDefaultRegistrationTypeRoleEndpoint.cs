@@ -24,7 +24,8 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(Results.NoContent, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Assigns default roles to a specific account type");
+              .WithDescription("Assigns default roles to a specific account type")
+              .RequireAuthorization(UsersPermissions.Roles.Configure);
         }
     }
 }

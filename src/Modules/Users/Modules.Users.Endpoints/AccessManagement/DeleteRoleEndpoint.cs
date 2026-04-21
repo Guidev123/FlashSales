@@ -22,7 +22,8 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(Results.NoContent, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Delete a role");
+              .WithDescription("Delete a role")
+              .RequireAuthorization(UsersPermissions.Roles.Delete);
         }
     }
 }

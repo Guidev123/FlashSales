@@ -22,7 +22,8 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(() => Results.Created(), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Create a permission");
+              .WithDescription("Create a permission")
+              .RequireAuthorization(UsersPermissions.Permissions.Create);
         }
     }
 }

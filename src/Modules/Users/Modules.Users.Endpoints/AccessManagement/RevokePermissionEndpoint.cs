@@ -23,7 +23,8 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(Results.NoContent, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Remove a permission from a role");
+              .WithDescription("Remove a permission from a role")
+              .RequireAuthorization(UsersPermissions.Permissions.Revoke);
         }
     }
 }

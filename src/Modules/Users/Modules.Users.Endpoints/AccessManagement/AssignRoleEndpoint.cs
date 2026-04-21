@@ -23,7 +23,8 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(() => Results.Created(), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Assign a role to an user");
+              .WithDescription("Assign a role to an user")
+              .RequireAuthorization(UsersPermissions.Roles.Assign);
         }
     }
 }
