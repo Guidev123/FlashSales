@@ -59,6 +59,8 @@ namespace Modules.Users.Infrastructure.Database.Configurations
                 .IsRequired(false);
 
             builder.HasIndex(c => new { c.CreatedOn, c.Id });
+
+            builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
 }

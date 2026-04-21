@@ -1,0 +1,274 @@
+using Dapper;
+using FlashSales.Domain.Results;
+using FlashSales.Infrastructure.Factories;
+using Modules.Users.Application.AccessManagement.Repositories;
+using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
+using Modules.Users.Application.AccessManagement.UseCases.GetRole;
+using Modules.Users.Domain.AccessManagement.Models;
+using Modules.Users.Domain.Users.Enum;
+
+namespace Modules.Users.Infrastructure.Database.Repositories
+{
+    internal sealed class RoleRepository(SqlConnectionFactory sqlConnectionFactory) : IRoleRepository
+    {
+        public Task AddAsync(Role role, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                INSERT INTO users."Roles" ("Name")
+                VALUES (@Name)
+                ON CONFLICT DO NOTHING
+                """;
+
+            return connection.ExecuteAsync(new(sql, new { role.Name }, cancellationToken: cancellationToken));
+        }
+
+        public Task AddPermissionAsync(string code, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                INSERT INTO users."Permissions" ("Code")
+                VALUES (@Code)
+                ON CONFLICT DO NOTHING
+                """;
+
+            return connection.ExecuteAsync(new(sql, new { Code = code }, cancellationToken: cancellationToken));
+        }
+
+        public Task AddDefaultRoleForRegistrationTypeAsync(string roleName, RegistrationType registrationType, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                INSERT INTO users."RegistrationTypeRoles" ("Type", "RoleName")
+                VALUES (@Type, @RoleName)
+                ON CONFLICT DO NOTHING
+                """;
+
+            return connection.ExecuteAsync(new(sql, new
+            {
+                Type = registrationType.ToString(),
+                RoleName = roleName
+            }, cancellationToken: cancellationToken));
+        }
+
+        public Task AssignToUserAsync(string roleName, Guid userId, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                INSERT INTO users."UserRoles" ("RoleName", "UserId")
+                VALUES (@RoleName, @UserId)
+                ON CONFLICT DO NOTHING
+                """;
+
+            return connection.ExecuteAsync(new(sql, new { RoleName = roleName, UserId = userId }, cancellationToken: cancellationToken));
+        }
+
+        public Task UnassignFromUserAsync(string roleName, Guid userId, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                DELETE FROM users."UserRoles"
+                WHERE "RoleName" = @RoleName
+                  AND "UserId" = @UserId
+                """;
+
+            return connection.ExecuteAsync(new(sql, new { RoleName = roleName, UserId = userId }, cancellationToken: cancellationToken));
+        }
+
+        public Task DeleteAsync(string name, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                DELETE FROM users."Roles"
+                WHERE "Name" = @Name
+                """;
+
+            return connection.ExecuteAsync(new(sql, new { Name = name }, cancellationToken: cancellationToken));
+        }
+
+        public Task<bool> RoleExistsAsync(string name, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                SELECT EXISTS (
+                    SELECT 1 FROM users."Roles"
+                    WHERE "Name" = @Name
+                )
+                """;
+
+            return connection.ExecuteScalarAsync<bool>(new(sql, new { Name = name }, cancellationToken: cancellationToken));
+        }
+
+        public Task<bool> PermissionExistsAsync(string code, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                SELECT EXISTS (
+                    SELECT 1 FROM users."Permissions"
+                    WHERE "Code" = @Code
+                )
+                """;
+
+            return connection.ExecuteScalarAsync<bool>(new(sql, new { Code = code }, cancellationToken: cancellationToken));
+        }
+
+        public Task<bool> RolePermissionExistsAsync(string roleName, string permissionCode, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                SELECT EXISTS (
+                    SELECT 1 FROM users."RolePermissions"
+                    WHERE "RoleName" = @RoleName
+                      AND "PermissionCode" = @PermissionCode
+                )
+                """;
+
+            return connection.ExecuteScalarAsync<bool>(new(sql, new
+            {
+                RoleName = roleName,
+                PermissionCode = permissionCode
+            }, cancellationToken: cancellationToken));
+        }
+
+        public Task GrantPermissionAsync(string roleName, string permissionCode, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                INSERT INTO users."RolePermissions" ("RoleName", "PermissionCode")
+                VALUES (@RoleName, @PermissionCode)
+                ON CONFLICT DO NOTHING
+                """;
+
+            return connection.ExecuteAsync(new(sql, new
+            {
+                RoleName = roleName,
+                PermissionCode = permissionCode
+            }, cancellationToken: cancellationToken));
+        }
+
+        public Task RevokePermissionAsync(string roleName, string permissionCode, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                DELETE FROM users."RolePermissions"
+                WHERE "RoleName" = @RoleName
+                  AND "PermissionCode" = @PermissionCode
+                """;
+
+            return connection.ExecuteAsync(new(sql, new
+            {
+                RoleName = roleName,
+                PermissionCode = permissionCode
+            }, cancellationToken: cancellationToken));
+        }
+
+        public async Task<GetRoleResponse?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                SELECT r."Name", rp."PermissionCode"
+                FROM users."Roles" r
+                LEFT JOIN users."RolePermissions" rp ON rp."RoleName" = r."Name"
+                WHERE r."Name" = @Name
+                """;
+
+            var rows = await connection.QueryAsync<(string Name, string? PermissionCode)>(
+                new(sql, new { Name = name }, cancellationToken: cancellationToken));
+
+            var list = rows.ToList();
+            if (list.Count == 0)
+                return null;
+
+            return new GetRoleResponse(
+                list[0].Name,
+                list.Where(r => r.PermissionCode is not null).Select(r => r.PermissionCode!)
+            );
+        }
+
+        public async Task<PagedResult<Role>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                SELECT r."Name", COUNT(*) OVER() AS "TotalCount"
+                FROM users."Roles" r
+                ORDER BY r."Name"
+                LIMIT @PageSize OFFSET @Offset
+                """;
+
+            var rows = await connection.QueryAsync<(string Name, int TotalCount)>(
+                new(sql, new { PageSize = pageSize, Offset = (page - 1) * pageSize }, cancellationToken: cancellationToken));
+
+            var list = rows.ToList();
+            var totalCount = list.Count > 0 ? list[0].TotalCount : 0;
+
+            return new PagedResult<Role>(
+                list.Select(r => new Role(r.Name)).ToList(),
+                totalCount,
+                page,
+                pageSize
+            );
+        }
+
+        public async Task<IReadOnlyCollection<Role>> GetDefaultRolesByRegistrationTypeAsync(RegistrationType registrationType, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                SELECT r."Name"
+                FROM users."Roles" r
+                INNER JOIN users."RegistrationTypeRoles" rtr ON rtr."RoleName" = r."Name"
+                WHERE rtr."Type" = @Type
+                """;
+
+            var roles = await connection.QueryAsync<string>(
+                new(sql, new { Type = registrationType.ToString() }, cancellationToken: cancellationToken));
+
+            return roles.Select(name => new Role(name)).ToList();
+        }
+
+        public async Task<GetUserPermissionsResponse?> GetUserPermissionsAsync(string identiyProviderId, CancellationToken cancellationToken = default)
+        {
+            using var connection = sqlConnectionFactory.Create();
+
+            const string sql = """
+                SELECT u."Id" AS "UserId", ur."RoleName", rp."PermissionCode"
+                FROM users."Users" u
+                INNER JOIN users."UserRoles" ur ON ur."UserId" = u."Id"
+                LEFT JOIN users."RolePermissions" rp ON rp."RoleName" = ur."RoleName"
+                WHERE u."IdentiyProviderId" = @IdentiyProviderId
+                """;
+
+            var rows = await connection.QueryAsync<(Guid UserId, string RoleName, string? PermissionCode)>(
+                new(sql, new { IdentiyProviderId = identiyProviderId }, cancellationToken: cancellationToken));
+
+            var list = rows.ToList();
+            if (list.Count == 0)
+                return null;
+
+            var roles = list
+                .GroupBy(r => r.RoleName)
+                .Select(g => new RolePermissions(
+                    g.Key,
+                    g.Where(r => r.PermissionCode is not null)
+                     .Select(r => r.PermissionCode!)
+                     .ToHashSet()
+                ))
+                .ToList();
+
+            return new GetUserPermissionsResponse(list[0].UserId, roles);
+        }
+    }
+}

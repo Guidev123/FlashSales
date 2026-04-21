@@ -1,4 +1,4 @@
-﻿namespace Modules.Users.Domain.Users.Models
+﻿namespace Modules.Users.Domain.AccessManagement.Models
 {
     public sealed class Permission
     {

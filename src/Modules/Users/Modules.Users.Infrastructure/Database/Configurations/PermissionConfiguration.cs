@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Modules.Users.Domain.Users.Models;
+using Modules.Users.Domain.AccessManagement.Models;
 
 namespace Modules.Users.Infrastructure.Database.Configurations
 {

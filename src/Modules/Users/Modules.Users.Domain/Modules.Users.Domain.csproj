@@ -10,4 +10,8 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Domain\FlashSales.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AccessManagement\Errors\" />
+  </ItemGroup>
+
 </Project>

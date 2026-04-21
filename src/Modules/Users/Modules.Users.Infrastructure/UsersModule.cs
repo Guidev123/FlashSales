@@ -1,7 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Deliveryix.Commons.Application.Behaviors;
+using FlashSales.Application.Abstractions;
+using FlashSales.Application.Authorization;
+using FlashSales.Application.Behaviors;
+using FlashSales.Endpoints.Endpoints;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MidR.DependencyInjection;
+using Modules.Users.Application;
+using Modules.Users.Application.AccessManagement.Options;
+using Modules.Users.Application.AccessManagement.Repositories;
+using Modules.Users.Application.Users.Repositories;
+using Modules.Users.Endpoints;
+using Modules.Users.Infrastructure.Authorization;
 using Modules.Users.Infrastructure.Database;
+using Modules.Users.Infrastructure.Database.Repositories;
 
 namespace Modules.Users.Infrastructure
 {
@@ -10,6 +24,9 @@ namespace Modules.Users.Infrastructure
         public static IServiceCollection AddUsersModule(this IServiceCollection services, IConfiguration configuration)
         {
             services
+                .AddUseCases()
+                .AddEndpoints()
+                .AddPermissionService()
                 .AddData(configuration);
 
             return services;
@@ -21,6 +38,44 @@ namespace Modules.Users.Infrastructure
             {
                 cfg.UseNpgsql(configuration.GetConnectionString("Postgres"));
             });
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+
+            services.Configure<PermissionsCacheOptions>(configuration.GetSection(PermissionsCacheOptions.SectionName));
+
+            return services;
+        }
+
+        private static IServiceCollection AddUseCases(this IServiceCollection services)
+        {
+            services.AddValidatorsFromAssembly(AssemblyReference.Assembly, includeInternalTypes: true);
+
+            services
+                .AddMidR(args: AssemblyReference.Assembly)
+                .WithBehaviors(cfg =>
+                {
+                    cfg.AddBehavior(typeof(RequestLoggingBehavior<,>)).WithPriority(1);
+                    cfg.AddBehavior(typeof(RequestValidationBehavior<,>)).WithPriority(2);
+                    cfg.AddBehavior(typeof(RequestTransactionBehavior<,>)).WithPriority(3);
+
+                    cfg.AddBehavior(typeof(NotificationLoggingBehavior<>)).WithPriority(1);
+                });
+
+            return services;
+        }
+
+        private static IServiceCollection AddPermissionService(this IServiceCollection services)
+        {
+            services.AddTransient<IPermissionService, PermissionService>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddEndpoints(this IServiceCollection services)
+        {
+            services.AddEndpoints(typeof(EndpointsModule).Assembly);
 
             return services;
         }

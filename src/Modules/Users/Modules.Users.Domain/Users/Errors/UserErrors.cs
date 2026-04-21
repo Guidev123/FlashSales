@@ -7,6 +7,10 @@ namespace Modules.Users.Domain.Users.Errors
 {
     public static class UserErrors
     {
+        public static Error NotFound(Guid userId) => Error.NotFound(
+            "Users.NotFound",
+            $"User with id {userId} was not found");
+
         public static readonly Error EmailMustBeNotEmpty = Error.Invalid(
             "Users.EmailMustBeNotEmpty",
             "Email must not be empty");

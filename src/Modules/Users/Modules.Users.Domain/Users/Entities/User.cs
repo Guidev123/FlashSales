@@ -1,7 +1,7 @@
 ﻿using FlashSales.Domain.DomainObjects;
+using Modules.Users.Domain.AccessManagement.Models;
 using Modules.Users.Domain.Users.DomainEvents;
 using Modules.Users.Domain.Users.Errors;
-using Modules.Users.Domain.Users.Models;
 using Modules.Users.Domain.Users.ValueObjects;
 
 namespace Modules.Users.Domain.Users.Entities
