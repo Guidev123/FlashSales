@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Modules.Users.Application.Users.Dtos;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 
 namespace Modules.Users.Infrastructure.Identity
 {
@@ -17,6 +18,36 @@ namespace Modules.Users.Infrastructure.Identity
             return ExtractIdentityIdFromLocationHeader(httpResponseMessage);
         }
 
+        internal async Task SetUserAttributesAsync(string userId, Dictionary<string, List<string>> attributes, CancellationToken cancellationToken = default)
+        {
+            var payload = new { attributes };
+
+            var httpResponseMessage = await httpClient.PutAsJsonAsync(
+                $"{_options.CurrentRealm}/users/{userId}",
+                payload,
+                cancellationToken);
+
+            httpResponseMessage.EnsureSuccessStatusCode();
+        }
+
+        internal async Task AssignRoleAsync(string userId, string roleName, CancellationToken cancellationToken = default)
+        {
+            var roleResponse = await httpClient.GetAsync(
+                $"{_options.CurrentRealm}/roles/{roleName}",
+                cancellationToken);
+
+            roleResponse.EnsureSuccessStatusCode();
+
+            var role = await roleResponse.Content.ReadFromJsonAsync<RoleRepresentationDto>(cancellationToken: cancellationToken);
+
+            var httpResponseMessage = await httpClient.PostAsJsonAsync(
+                $"{_options.CurrentRealm}/users/{userId}/role-mappings/realm",
+                new[] { role },
+                cancellationToken);
+
+            httpResponseMessage.EnsureSuccessStatusCode();
+        }
+
         private static string ExtractIdentityIdFromLocationHeader(HttpResponseMessage httpResponseMessage)
         {
             const string USER_SEGMENT_NAME = "users/";
@@ -30,4 +61,8 @@ namespace Modules.Users.Infrastructure.Identity
             return locationHeader[(userSegmentValueIndex + USER_SEGMENT_NAME.Length)..];
         }
     }
+
+    internal sealed record RoleRepresentationDto(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string Name);
 }

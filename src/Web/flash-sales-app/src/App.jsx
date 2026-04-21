@@ -1,0 +1,54 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from 'react-oidc-context'
+import { isActivated, needsActivation } from './lib/auth.js'
+
+import LoadingScreen from './components/LoadingScreen.jsx'
+import HomePage from './pages/HomePage.jsx'
+import CallbackPage from './pages/CallbackPage.jsx'
+import RegisterPage from './pages/RegisterPage.jsx'
+import ActivateSocialPage from './pages/ActivateSocialPage.jsx'
+import LaunchesPage from './pages/LaunchesPage.jsx'
+import BecomeSellerPage from './pages/BecomeSellerPage.jsx'
+
+function RequireActivated({ children }) {
+  const auth = useAuth()
+  if (auth.isLoading) return <LoadingScreen />
+  if (!auth.isAuthenticated) return <Navigate to="/" replace />
+  if (needsActivation(auth.user)) return <Navigate to="/activate/social" replace />
+  if (!isActivated(auth.user)) return <Navigate to="/" replace />
+  return children
+}
+
+export default function App() {
+  const auth = useAuth()
+
+  if (auth.isLoading) return <LoadingScreen />
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/callback" element={<CallbackPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/activate/social" element={<ActivateSocialPage />} />
+        <Route
+          path="/launches"
+          element={
+            <RequireActivated>
+              <LaunchesPage />
+            </RequireActivated>
+          }
+        />
+        <Route
+          path="/become-seller"
+          element={
+            <RequireActivated>
+              <BecomeSellerPage />
+            </RequireActivated>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}

@@ -1,0 +1,154 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: var(--bg);
+  background-image: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(249,115,22,0.05) 0%, transparent 60%);
+}
+
+.card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeUp 0.4s ease both;
+}
+
+.brandRow { display: flex; align-items: center; gap: 9px; }
+
+.brandIcon {
+  width: 28px; height: 28px;
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0;
+}
+
+.brandName {
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.header { display: flex; flex-direction: column; gap: 6px; }
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.sub { font-size: 14px; color: var(--text-secondary); line-height: 1.6; font-weight: 300; }
+
+.divider { display: flex; align-items: center; gap: 10px; }
+.divLine { flex: 1; height: 1px; background: var(--border); }
+.divLabel { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+
+.form { display: flex; flex-direction: column; gap: 14px; }
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.apiError {
+  padding: 10px 14px;
+  background: var(--error-dim);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--error);
+  line-height: 1.5;
+}
+
+.strengthBar { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+.strengthSegs { display: flex; gap: 4px; flex: 1; }
+.seg { flex: 1; height: 3px; border-radius: 2px; }
+.strengthLabel { font-size: 12px; font-weight: 500; min-width: 38px; text-align: right; }
+
+.terms { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+.terms a { color: var(--text-secondary); text-decoration: underline; text-underline-offset: 2px; }
+
+.switchText { font-size: 13px; color: var(--text-muted); text-align: center; }
+.switchLink {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 13px;
+  color: var(--accent); font-weight: 500;
+  padding: 0; transition: color var(--transition);
+}
+.switchLink:hover { color: var(--accent-hover); }
+
+.readonlyBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.readonlyField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.readonlyField:last-child { border-bottom: none; }
+
+.roIcon { color: var(--text-muted); flex-shrink: 0; }
+
+.roLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  min-width: 46px;
+}
+
+.roValue { font-size: 14px; color: var(--text-primary); }
+
+.logoutLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: none; border: none;
+  font-family: var(--font-body);
+  font-size: 13px; color: var(--text-muted);
+  cursor: pointer; padding: 4px;
+  transition: color var(--transition);
+  margin-top: -8px;
+}
+.logoutLink:hover { color: var(--text-secondary); }
+
+.success {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  gap: 14px; padding: 16px 0;
+}
+
+.successIcon {
+  width: 58px; height: 58px;
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--success);
+}
+
+.success .sub { max-width: 280px; }
+
+@media (max-width: 500px) {
+  .card { padding: 28px 20px; }
+  .row { grid-template-columns: 1fr; }
+}

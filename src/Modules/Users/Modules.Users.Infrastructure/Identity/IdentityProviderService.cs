@@ -11,6 +11,7 @@ namespace Modules.Users.Infrastructure.Identity
     internal sealed class IdentityProviderService(KeyCloakClient keyCloakClient, ILogger<IdentityProviderService> logger) : IIdentityProviderService
     {
         private const string PASSWORD_CREDENTIAL_TYPE = "password";
+        private const string ACTIVATED_ROLE = "activated";
 
         public async Task<Result<string>> RegisterAsync(UserDto userDto, CancellationToken cancellationToken = default)
         {
@@ -31,6 +32,8 @@ namespace Modules.Users.Infrastructure.Identity
             try
             {
                 var identityId = await keyCloakClient.RegisterAsync(request, cancellationToken);
+
+                await keyCloakClient.AssignRoleAsync(identityId, ACTIVATED_ROLE, cancellationToken);
 
                 return string.IsNullOrWhiteSpace(identityId)
                     ? Result.Failure<string>(Error.NullValue)
