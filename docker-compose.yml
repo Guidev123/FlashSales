@@ -13,6 +13,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin_pass
     ports:
       - "8080:8080"
+    volumes:
+      - ./keycloak/themes:/opt/keycloak/themes
     depends_on:
       keycloak-postgres:
         condition: service_healthy

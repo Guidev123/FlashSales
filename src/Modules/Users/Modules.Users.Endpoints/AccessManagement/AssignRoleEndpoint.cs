@@ -16,10 +16,11 @@ namespace Modules.Users.Endpoints.AccessManagement
             app.MapPost("/api/v1/roles/{name}/users/{userId:guid}", async (
                 string name,
                 Guid userId,
+                string identityProviderId,
                 ISender sender,
                 CancellationToken cancellationToken) =>
             {
-                var result = await sender.SendAsync(new AssignRoleCommand(userId, name), cancellationToken);
+                var result = await sender.SendAsync(new AssignRoleCommand(userId, name, identityProviderId), cancellationToken);
 
                 return result.Match(() => Results.Created(), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)

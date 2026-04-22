@@ -1,7 +1,7 @@
 import { useAuth } from 'react-oidc-context'
 import { Link, useNavigate } from 'react-router-dom'
 import { Zap, LogOut, Rocket } from 'lucide-react'
-import { isActivated } from '../lib/auth.js'
+import { isActivated, isSeller } from '../lib/auth.js'
 import Button from './Button.jsx'
 import styles from './Navbar.module.css'
 
@@ -9,6 +9,7 @@ export default function Navbar() {
   const auth = useAuth()
   const navigate = useNavigate()
   const activated = isActivated(auth.user)
+  const seller    = isSeller(auth.user)
 
   const handleLogout = () =>
     auth.signoutRedirect({ post_logout_redirect_uri: import.meta.env.VITE_POST_LOGOUT_URI })
@@ -23,17 +24,24 @@ export default function Navbar() {
 
         <div className={styles.actions}>
           {!auth.isAuthenticated && (
-            <Button variant="primary" size="sm" onClick={() => auth.signinRedirect()}>
-              Sign in / Register
-            </Button>
+            <>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/register')}>
+                Register
+              </Button>
+              <Button variant="primary" size="sm" onClick={() => auth.signinRedirect()}>
+                Sign in
+              </Button>
+            </>
           )}
 
           {auth.isAuthenticated && activated && (
             <>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/become-seller')}>
-                <Rocket size={13} />
-                Become a seller
-              </Button>
+              {!seller && (
+                <Button variant="ghost" size="sm" onClick={() => navigate('/become-seller')}>
+                  <Rocket size={13} />
+                  Become a seller
+                </Button>
+              )}
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut size={13} />
                 Sign out

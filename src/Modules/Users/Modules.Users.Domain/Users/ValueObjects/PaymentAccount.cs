@@ -1,5 +1,7 @@
-﻿using FlashSales.Domain.ValueObjects;
+﻿using FlashSales.Domain.DomainObjects;
+using FlashSales.Domain.ValueObjects;
 using Modules.Users.Domain.Users.Enum;
+using Modules.Users.Domain.Users.Errors;
 
 namespace Modules.Users.Domain.Users.ValueObjects
 {
@@ -34,6 +36,12 @@ namespace Modules.Users.Domain.Users.ValueObjects
 
         protected override void Validate()
         {
+            AssertionConcern.EnsureNotEmpty(BankCode, SellerErrors.BankCodeMustBeNotEmpty.Description);
+            AssertionConcern.EnsureNotEmpty(Agency, SellerErrors.AgencyMustBeNotEmpty.Description);
+            AssertionConcern.EnsureNotEmpty(AccountNumber, SellerErrors.AccountNumberMustBeNotEmpty.Description);
+            AssertionConcern.EnsureMaxLength(BankCode, 3, SellerErrors.BankCodeTooLong.Description);
+            AssertionConcern.EnsureMaxLength(Agency, 10, SellerErrors.AgencyTooLong.Description);
+            AssertionConcern.EnsureMaxLength(AccountNumber, 20, SellerErrors.AccountNumberTooLong.Description);
         }
     }
 }

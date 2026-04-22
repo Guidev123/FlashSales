@@ -9,7 +9,7 @@ namespace Modules.Users.Application.Users.DomainEvents
     {
         public async Task ExecuteAsync(UserCreatedDomainEvent notification, CancellationToken cancellationToken)
         {
-            var result = await sender.SendAsync(new AssignDefaultRolesCommand(notification.UserId), cancellationToken);
+            var result = await sender.SendAsync(new AssignDefaultRolesCommand(notification.UserId, notification.IdentityProviderId), cancellationToken);
             if (result.IsFailure)
             {
                 throw new FlashSalesException(nameof(AssignDefaultRolesCommand), result.Error);

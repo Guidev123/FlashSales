@@ -10,20 +10,34 @@ export const oidcConfig = {
   loadUserInfo: true,
 }
 
+// Decodes the payload of a JWT without verifying the signature.
+// realm_access is present in Keycloak access tokens but NOT in the
+// userinfo endpoint response, so we must read it from here.
+function parseJwt(token) {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    return JSON.parse(atob(base64))
+  } catch {
+    return {}
+  }
+}
+
 export function getRoles(user) {
-  return user?.profile?.realm_access?.roles ?? []
+  const payload = parseJwt(user?.access_token ?? '')
+  return payload?.realm_access?.roles ?? []
 }
 
 export function isActivated(user) {
   return getRoles(user).includes('activated')
 }
 
-export function isSocialLogin(user) {
-  const sub = user?.profile?.sub ?? ''
-  return sub.includes(':')
+export function isSeller(user) {
+  return getRoles(user).includes('seller')
 }
 
+// Any authenticated user without the 'activated' role must go through
+// the activation flow — regardless of whether they used social login or email.
 export function needsActivation(user) {
   if (!user) return false
-  return isSocialLogin(user) && !isActivated(user)
+  return !isActivated(user)
 }

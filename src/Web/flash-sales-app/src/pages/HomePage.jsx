@@ -23,7 +23,7 @@ export default function HomePage() {
     if (auth.isAuthenticated && activated) {
       navigate('/launches')
     } else {
-      auth.signinRedirect()
+      navigate('/register')
     }
   }
 

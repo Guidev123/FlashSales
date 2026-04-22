@@ -31,7 +31,7 @@ namespace Modules.Users.Application.Users.UseCases.ActivateCustomer
 
             await roleRepository.AssignToUserAsync("customer", user.Id, cancellationToken);
 
-            var assignRoleResultTask = identityProviderService.ActivateAsync(request.IdentityProviderId, cancellationToken);
+            var assignRoleResultTask = identityProviderService.ActivateCustomerAsync(request.IdentityProviderId, cancellationToken);
             var updateAttributesResultTask = identityProviderService.SetAttributesAsync(request.IdentityProviderId, new Dictionary<string, List<string>>()
             {
                 {"birth_date", [request.BirthDate.Date.ToString("yyyy-MM-dd")]},

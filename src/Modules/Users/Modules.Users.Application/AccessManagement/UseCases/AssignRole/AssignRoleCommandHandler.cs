@@ -1,4 +1,6 @@
-﻿using FlashSales.Application.Messaging;
+﻿using FlashSales.Application.Authorization;
+using FlashSales.Application.Cache;
+using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
 using Modules.Users.Application.AccessManagement.Repositories;
 using Modules.Users.Application.Users.Repositories;
@@ -13,7 +15,8 @@ namespace Modules.Users.Application.AccessManagement.UseCases.AssignRole
     internal sealed class AssignRoleCommandHandler(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IDomainEventCollector domainEventCollector
+        IDomainEventCollector domainEventCollector,
+        ICacheService cacheService
         ) : ICommandHandler<AssignRoleCommand>
     {
         public async Task<Result> ExecuteAsync(AssignRoleCommand request, CancellationToken cancellationToken = default)
@@ -40,6 +43,8 @@ namespace Modules.Users.Application.AccessManagement.UseCases.AssignRole
             await roleRepository.AssignToUserAsync(request.RoleName, request.UserId, cancellationToken);
 
             domainEventCollector.Collect(RoleAssignedToUserDomainEvent.Create(request.UserId, request.RoleName));
+
+            await cacheService.RemoveAsync(PermissionResponse.GetCacheKey(request.IdentityProviderId), cancellationToken);
 
             return Result.Success();
         }

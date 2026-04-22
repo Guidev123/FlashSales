@@ -23,6 +23,7 @@ namespace Modules.Users.Endpoints.Users
             {
                 var result = await sender.SendAsync(new ActivateSellerCommand(
                     claimsPrincipal.GetUserId(),
+                    claimsPrincipal.GetIdentityId(),
                     request.Document,
                     request.BankCode,
                     request.Agency,

@@ -1,4 +1,6 @@
-﻿using FlashSales.Application.Messaging;
+﻿using FlashSales.Application.Authorization;
+using FlashSales.Application.Cache;
+using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
 using Modules.Users.Application.AccessManagement.Repositories;
 using Modules.Users.Application.Users.Repositories;
@@ -13,7 +15,8 @@ namespace Modules.Users.Application.AccessManagement.UseCases.AssignDefaultRoles
     internal sealed class AssignDefaultRolesCommandHandler(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IDomainEventCollector domainEventCollector
+        IDomainEventCollector domainEventCollector,
+        ICacheService cacheService
         ) : ICommandHandler<AssignDefaultRolesCommand>
     {
         public async Task<Result> ExecuteAsync(AssignDefaultRolesCommand request, CancellationToken cancellationToken = default)
@@ -37,6 +40,8 @@ namespace Modules.Users.Application.AccessManagement.UseCases.AssignDefaultRoles
             });
 
             await Task.WhenAll(tasks).WaitAsync(cancellationToken);
+
+            await cacheService.RemoveAsync(PermissionResponse.GetCacheKey(request.IdentityProviderId), cancellationToken);
 
             return Result.Success();
         }

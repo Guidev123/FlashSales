@@ -35,7 +35,7 @@ namespace Modules.Users.Domain.Users.Entities
         {
             var user = new User(email, name, age, identiyProviderId);
 
-            user.AddDomainEvent(UserCreatedDomainEvent.Create(user.Id, user.Email.Address));
+            user.AddDomainEvent(UserCreatedDomainEvent.Create(user.Id, user.Email.Address, user.IdentiyProviderId));
 
             return user;
         }

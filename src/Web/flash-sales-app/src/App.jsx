@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from 'react-oidc-context'
 import { isActivated, needsActivation } from './lib/auth.js'
 
@@ -9,6 +9,21 @@ import RegisterPage from './pages/RegisterPage.jsx'
 import ActivateSocialPage from './pages/ActivateSocialPage.jsx'
 import LaunchesPage from './pages/LaunchesPage.jsx'
 import BecomeSellerPage from './pages/BecomeSellerPage.jsx'
+
+// Redirects any authenticated social user that hasn't completed activation,
+// regardless of which route they try to access.
+function ActivationGuard({ children }) {
+  const auth = useAuth()
+  const location = useLocation()
+
+  const exempt = location.pathname === '/activate/social' || location.pathname === '/callback'
+
+  if (!auth.isLoading && auth.isAuthenticated && needsActivation(auth.user) && !exempt) {
+    return <Navigate to="/activate/social" replace />
+  }
+
+  return children
+}
 
 function RequireActivated({ children }) {
   const auth = useAuth()
@@ -26,29 +41,31 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/callback" element={<CallbackPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/activate/social" element={<ActivateSocialPage />} />
-        <Route
-          path="/launches"
-          element={
-            <RequireActivated>
-              <LaunchesPage />
-            </RequireActivated>
-          }
-        />
-        <Route
-          path="/become-seller"
-          element={
-            <RequireActivated>
-              <BecomeSellerPage />
-            </RequireActivated>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <ActivationGuard>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/callback" element={<CallbackPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/activate/social" element={<ActivateSocialPage />} />
+          <Route
+            path="/launches"
+            element={
+              <RequireActivated>
+                <LaunchesPage />
+              </RequireActivated>
+            }
+          />
+          <Route
+            path="/become-seller"
+            element={
+              <RequireActivated>
+                <BecomeSellerPage />
+              </RequireActivated>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ActivationGuard>
     </BrowserRouter>
   )
 }

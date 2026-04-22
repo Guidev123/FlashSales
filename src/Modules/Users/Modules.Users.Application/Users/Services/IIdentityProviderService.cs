@@ -13,6 +13,8 @@ namespace Modules.Users.Application.Users.Services
             CancellationToken cancellationToken = default
             );
 
-        Task<Result> ActivateAsync(string identityProviderId, CancellationToken cancellationToken = default);
+        Task<Result> ActivateCustomerAsync(string identityProviderId, CancellationToken cancellationToken = default);
+
+        Task<Result> ActivateSellerAsync(string identityProviderId, CancellationToken cancellationToken = default);
     }
 }

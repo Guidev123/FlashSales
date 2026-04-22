@@ -12,12 +12,28 @@ namespace Modules.Users.Infrastructure.Identity
     {
         private const string PASSWORD_CREDENTIAL_TYPE = "password";
         private const string ACTIVATED_ROLE = "activated";
+        private const string CUSTOMER_ROLE = "customer";
+        private const string SELLER_ROLE = "seller";
 
-        public async Task<Result> ActivateAsync(string identityProviderId, CancellationToken cancellationToken = default)
+        public async Task<Result> ActivateCustomerAsync(string identityProviderId, CancellationToken cancellationToken = default)
         {
             try
             {
                 await keyCloakClient.AssignRoleAsync(identityProviderId, ACTIVATED_ROLE, cancellationToken);
+                await keyCloakClient.AssignRoleAsync(identityProviderId, CUSTOMER_ROLE, cancellationToken);
+                return Result.Success();
+            }
+            catch
+            {
+                return Result.Failure(UserErrors.FailedToActivateCustomer);
+            }
+        }
+
+        public async Task<Result> ActivateSellerAsync(string identityProviderId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await keyCloakClient.AssignRoleAsync(identityProviderId, SELLER_ROLE, cancellationToken);
                 return Result.Success();
             }
             catch

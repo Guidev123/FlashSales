@@ -1,6 +1,7 @@
 ﻿using FlashSales.Domain.DomainObjects;
 using Modules.Users.Domain.Users.DomainEvents;
 using Modules.Users.Domain.Users.Enum;
+using Modules.Users.Domain.Users.Errors;
 using Modules.Users.Domain.Users.ValueObjects;
 
 namespace Modules.Users.Domain.Users.Entities
@@ -37,6 +38,9 @@ namespace Modules.Users.Domain.Users.Entities
 
         protected override void Validate()
         {
+            AssertionConcern.EnsureTrue(UserId != Guid.Empty, SellerErrors.UserIdMustBeNotEmpty.Description);
+            AssertionConcern.EnsureNotNull(Document, SellerErrors.DocumentMustBeNotEmpty.Description);
+            AssertionConcern.EnsureNotNull(PaymentAccount, SellerErrors.AccountNumberMustBeNotEmpty.Description);
         }
     }
 }

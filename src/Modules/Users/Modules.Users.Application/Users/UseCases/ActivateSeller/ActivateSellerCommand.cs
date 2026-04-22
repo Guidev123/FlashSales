@@ -4,6 +4,7 @@ namespace Modules.Users.Application.Users.UseCases.ActivateSeller
 {
     public sealed record ActivateSellerCommand(
         Guid UserId,
+        string IdentityProviderId,
         string Document,
         string BankCode,
         string Agency,

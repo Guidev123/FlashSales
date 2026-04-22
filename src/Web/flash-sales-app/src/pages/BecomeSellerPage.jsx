@@ -84,7 +84,7 @@ export default function BecomeSellerPage() {
           document:      values.document.replace(/\D/g, ''),
           bankCode:      values.bankCode,
           agency:        values.agency,
-          agencyNumber:  values.accountNumber,
+          accountNumber: values.accountNumber,
           accountType:   values.accountType,
         }),
       })
@@ -111,7 +111,7 @@ export default function BecomeSellerPage() {
             <p className={styles.sub}>
               Your seller account is activated. You can now create launches and sell your digital products.
             </p>
-            <Button variant="primary" size="md" onClick={() => navigate('/launches')}>
+            <Button variant="primary" size="md" onClick={() => auth.signinRedirect()}>
               Go to launches <ArrowRight size={14} />
             </Button>
           </div>

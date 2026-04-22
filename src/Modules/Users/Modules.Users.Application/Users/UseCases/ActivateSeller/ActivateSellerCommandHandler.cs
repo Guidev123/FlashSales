@@ -2,6 +2,7 @@
 using FlashSales.Domain.Results;
 using Modules.Users.Application.AccessManagement.Repositories;
 using Modules.Users.Application.Users.Repositories;
+using Modules.Users.Application.Users.Services;
 using Modules.Users.Domain.Users.Entities;
 using Modules.Users.Domain.Users.Enum;
 using Modules.Users.Domain.Users.Errors;
@@ -12,7 +13,8 @@ namespace Modules.Users.Application.Users.UseCases.ActivateSeller
     internal sealed class ActivateSellerCommandHandler(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IDomainEventCollector domainEventCollector
+        IDomainEventCollector domainEventCollector,
+        IIdentityProviderService identityProviderService
         ) : ICommandHandler<ActivateSellerCommand>
     {
         public async Task<Result> ExecuteAsync(ActivateSellerCommand request, CancellationToken cancellationToken = default)
@@ -41,6 +43,7 @@ namespace Modules.Users.Application.Users.UseCases.ActivateSeller
             userRepository.AddSeller(seller);
 
             await roleRepository.AssignToUserAsync("seller", request.UserId, cancellationToken);
+            await identityProviderService.ActivateSellerAsync(request.IdentityProviderId, cancellationToken);
 
             domainEventCollector.Collect(seller);
 

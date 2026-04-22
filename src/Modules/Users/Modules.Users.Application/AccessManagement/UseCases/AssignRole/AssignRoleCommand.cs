@@ -4,6 +4,7 @@ namespace Modules.Users.Application.AccessManagement.UseCases.AssignRole
 {
     public sealed record AssignRoleCommand(
         Guid UserId,
-        string RoleName
+        string RoleName,
+        string IdentityProviderId
         ) : ICommand;
 }

@@ -19,14 +19,14 @@ function validate(v) {
 }
 
 export default function ActivateSocialPage() {
-  const auth     = useAuth()
+  const auth = useAuth()
   const navigate = useNavigate()
 
-  const [birthDate, setBirthDate]   = useState('')
-  const [error,     setError]       = useState('')
-  const [apiError,  setApiError]    = useState('')
-  const [loading,   setLoading]     = useState(false)
-  const [done,      setDone]        = useState(false)
+  const [birthDate, setBirthDate] = useState('')
+  const [error, setError] = useState('')
+  const [apiError, setApiError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
 
   useEffect(() => {
     if (auth.isLoading) return
@@ -51,19 +51,16 @@ export default function ActivateSocialPage() {
     setLoading(true)
     setApiError('')
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/customer/activate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.user.access_token}`,
+      const params = new URLSearchParams({ birthDate: new Date(birthDate).toISOString() })
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/users/customer/activate?${params}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${auth.user.access_token}`,
+          },
         },
-        body: JSON.stringify({
-          email:     profile.email,
-          firstName: profile.given_name,
-          lastName:  profile.family_name,
-          birthDate,
-        }),
-      })
+      )
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         setApiError(body.message || 'Activation failed. Please try again.')
@@ -88,10 +85,10 @@ export default function ActivateSocialPage() {
             <div className={styles.successIcon}><CheckCircle2 size={28} /></div>
             <h2 className={styles.title}>You're in!</h2>
             <p className={styles.sub}>
-              Your customer account is activated. Sign back in to refresh your session.
+              Your customer account is activated. Now you can participate in future launches.
             </p>
             <Button variant="primary" size="md" onClick={() => auth.signinRedirect()}>
-              Sign in again <ArrowRight size={14} />
+              Go to launches <ArrowRight size={14} />
             </Button>
           </div>
         </div>
