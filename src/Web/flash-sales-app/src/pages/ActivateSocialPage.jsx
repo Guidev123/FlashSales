@@ -3,6 +3,7 @@ import { useAuth } from 'react-oidc-context'
 import { useNavigate } from 'react-router-dom'
 import { Zap, Calendar, User, Mail, ArrowRight, CheckCircle2, LogOut } from 'lucide-react'
 import { isActivated, needsActivation } from '../lib/auth.js'
+import { useApiFetch } from '../hooks/useApiFetch.js'
 import Input from '../components/Input.jsx'
 import Button from '../components/Button.jsx'
 import styles from './AuthFormPage.module.css'
@@ -19,8 +20,9 @@ function validate(v) {
 }
 
 export default function ActivateSocialPage() {
-  const auth = useAuth()
-  const navigate = useNavigate()
+  const auth      = useAuth()
+  const navigate  = useNavigate()
+  const apiFetch  = useApiFetch()
 
   const [birthDate, setBirthDate] = useState('')
   const [error, setError] = useState('')
@@ -51,8 +53,8 @@ export default function ActivateSocialPage() {
     setLoading(true)
     setApiError('')
     try {
-      const params = new URLSearchParams({ birthDate: new Date(birthDate).toISOString() })
-      const res = await fetch(
+      const params = new URLSearchParams({ birthDate: `${birthDate}T00:00:00.000Z` })
+      const res = await apiFetch(
         `${import.meta.env.VITE_API_URL}/api/v1/users/customer/activate?${params}`,
         {
           method: 'POST',
@@ -61,6 +63,7 @@ export default function ActivateSocialPage() {
           },
         },
       )
+      if (!res) return  // redirected by useApiFetch (account_not_activated)
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         setApiError(body.message || 'Activation failed. Please try again.')

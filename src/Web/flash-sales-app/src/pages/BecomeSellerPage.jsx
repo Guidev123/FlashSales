@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from 'react-oidc-context'
 import { useNavigate } from 'react-router-dom'
 import { Landmark, Hash, CreditCard, ArrowRight, CheckCircle2, Zap, ChevronLeft } from 'lucide-react'
+import { useApiFetch } from '../hooks/useApiFetch.js'
 import Input from '../components/Input.jsx'
 import Button from '../components/Button.jsx'
 import styles from './AuthFormPage.module.css'
@@ -35,8 +36,9 @@ function formatCPF(raw) {
 }
 
 export default function BecomeSellerPage() {
-  const auth     = useAuth()
-  const navigate = useNavigate()
+  const auth      = useAuth()
+  const navigate  = useNavigate()
+  const apiFetch  = useApiFetch()
 
   const [values, setValues] = useState({
     document: '', bankCode: '', agency: '', accountNumber: '', accountType: '',
@@ -74,7 +76,7 @@ export default function BecomeSellerPage() {
     setLoading(true)
     setApiError('')
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/seller/activate`, {
+      const res = await apiFetch(`${import.meta.env.VITE_API_URL}/api/v1/users/seller/activate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,6 +90,7 @@ export default function BecomeSellerPage() {
           accountType:   values.accountType,
         }),
       })
+      if (!res) return  // redirected by useApiFetch (account_not_activated)
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         setApiError(body.message || 'Activation failed. Please try again.')

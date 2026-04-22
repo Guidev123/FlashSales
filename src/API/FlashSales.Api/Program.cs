@@ -12,6 +12,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerConfig();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddTransient<AccountActivationMiddleware>();
 builder.Configuration.AddModuleConfiguration([
     "users"
     ]);
@@ -62,6 +63,8 @@ app.UseCors("AllowWebApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<AccountActivationMiddleware>();
 
 app.MapEndpoints();
 
