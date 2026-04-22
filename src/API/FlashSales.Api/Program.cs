@@ -22,6 +22,21 @@ if (!builder.Environment.IsEnvironment("Testing"))
         => loggerConfig.ReadFrom.Configuration(context.Configuration));
 }
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWebApp", policy =>
+    {
+        if (builder.Configuration["WebAppEndpoints"] is null) return;
+
+        var origins = builder.Configuration["WebAppEndpoints"]!.Split(',');
+
+        policy
+            .WithOrigins([.. origins])
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services
     .AddInfrastructureModule(builder.Configuration)
     .AddUsersModule(builder.Configuration);
@@ -42,6 +57,8 @@ if (!app.Environment.IsEnvironment("Testing"))
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowWebApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

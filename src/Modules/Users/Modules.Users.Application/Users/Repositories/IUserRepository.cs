@@ -14,5 +14,7 @@ namespace Modules.Users.Application.Users.Repositories
         Task<bool> ExistsAsync(string email, CancellationToken cancellationToken = default);
 
         void Add(User user);
+
+        void AddSeller(SellerProfile sellerProfile);
     }
 }

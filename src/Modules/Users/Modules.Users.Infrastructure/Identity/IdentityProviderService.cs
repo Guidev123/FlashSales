@@ -13,6 +13,19 @@ namespace Modules.Users.Infrastructure.Identity
         private const string PASSWORD_CREDENTIAL_TYPE = "password";
         private const string ACTIVATED_ROLE = "activated";
 
+        public async Task<Result> ActivateAsync(string identityProviderId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await keyCloakClient.AssignRoleAsync(identityProviderId, ACTIVATED_ROLE, cancellationToken);
+                return Result.Success();
+            }
+            catch
+            {
+                return Result.Failure(UserErrors.FailedToActivateCustomer);
+            }
+        }
+
         public async Task<Result<string>> RegisterAsync(UserDto userDto, CancellationToken cancellationToken = default)
         {
             var request = new UserRepresentationDto(
@@ -43,6 +56,19 @@ namespace Modules.Users.Infrastructure.Identity
             {
                 logger.LogError(ex, "User registration failed");
                 return Result.Failure<string>(UserErrors.EmailIsNotUnique);
+            }
+        }
+
+        public async Task<Result> SetAttributesAsync(string identityProviderId, Dictionary<string, List<string>> attributes, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await keyCloakClient.SetUserAttributesAsync(identityProviderId, attributes, cancellationToken);
+                return Result.Success();
+            }
+            catch
+            {
+                return Result.Failure(UserErrors.FailedToSetAttributesInIdentityProvider);
             }
         }
     }

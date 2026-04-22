@@ -12,7 +12,8 @@ namespace Modules.Users.Domain.Users.Entities
             UserId = userId;
             Document = document;
             PaymentAccount = paymentAccount;
-            Status = SellerStatus.Inactive;
+            Status = SellerStatus.Active;
+            ActivatedOn = DateTimeOffset.UtcNow;
             Validate();
         }
 
@@ -29,15 +30,9 @@ namespace Modules.Users.Domain.Users.Entities
         {
             var sellerProfile = new SellerProfile(userId, document, paymentAccount);
 
-            return sellerProfile;
-        }
+            sellerProfile.AddDomainEvent(SellerActivatedDomainEvent.Create(sellerProfile.UserId, sellerProfile.Id));
 
-        public void Activate()
-        {
-            if (Status == SellerStatus.Active) return;
-            Status = SellerStatus.Active;
-            ActivatedOn = DateTimeOffset.UtcNow;
-            AddDomainEvent(SellerActivatedDomainEvent.Create(UserId, Id));
+            return sellerProfile;
         }
 
         protected override void Validate()

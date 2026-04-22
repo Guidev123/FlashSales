@@ -91,13 +91,13 @@ namespace Modules.Users.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Modules.Users.Domain.Users.Models.RegistrationTypeRoles", b =>
                 {
-                    b.Property<string>("Type")
+                    b.Property<string>("AccountType")
                         .HasColumnType("VARCHAR(30)");
 
                     b.Property<string>("RoleName")
                         .HasColumnType("VARCHAR(50)");
 
-                    b.HasKey("Type", "RoleName");
+                    b.HasKey("AccountType", "RoleName");
 
                     b.HasIndex("RoleName");
 
@@ -158,12 +158,12 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                             b1.Property<Guid>("SellerProfileId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<string>("Number")
+                            b1.Property<string>("AccountNumber")
                                 .IsRequired()
                                 .HasColumnType("VARCHAR(50)")
                                 .HasColumnName("Document");
 
-                            b1.Property<string>("Type")
+                            b1.Property<string>("AccountType")
                                 .IsRequired()
                                 .HasColumnType("VARCHAR(50)")
                                 .HasColumnName("DocumentType");
@@ -191,12 +191,12 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                                 .HasColumnType("VARCHAR(50)")
                                 .HasColumnName("BankCode");
 
-                            b1.Property<string>("Number")
+                            b1.Property<string>("AccountNumber")
                                 .IsRequired()
                                 .HasColumnType("VARCHAR(50)")
                                 .HasColumnName("AccountNumber");
 
-                            b1.Property<string>("Type")
+                            b1.Property<string>("AccountType")
                                 .IsRequired()
                                 .HasColumnType("VARCHAR(50)")
                                 .HasColumnName("AccountType");

@@ -19,6 +19,19 @@ namespace FlashSales.Infrastructure.Authentication
                 ?? throw new FlashSalesException("User identity is unavaible");
         }
 
+        public static string GetName(this ClaimsPrincipal claimsPrincipal)
+        {
+            return claimsPrincipal?.FindFirst(ClaimTypes.Name)?.Value
+                ?? claimsPrincipal?.FindFirst("name")?.Value
+                ?? throw new FlashSalesException("User name is unavailable");
+        }
+
+        public static string GetEmail(this ClaimsPrincipal claimsPrincipal)
+        {
+            return claimsPrincipal?.FindFirst(ClaimTypes.Email)?.Value
+                ?? throw new FlashSalesException("User email is unavailable");
+        }
+
         public static HashSet<string> GetPermissions(this ClaimsPrincipal claimsPrincipal)
         {
             var permissionClaims = claimsPrincipal?.FindAll("permissions")

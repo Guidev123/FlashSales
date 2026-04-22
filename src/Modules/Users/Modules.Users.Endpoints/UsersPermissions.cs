@@ -18,5 +18,10 @@ namespace Modules.Users.Endpoints
             public const string Grant = "permissions:grant";
             public const string Revoke = "permissions:revoke";
         }
+
+        public static class Accounts
+        {
+            public const string UpdateOwn = "accounts:update-own";
+        }
     }
 }

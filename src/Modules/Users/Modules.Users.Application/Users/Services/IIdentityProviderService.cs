@@ -6,5 +6,13 @@ namespace Modules.Users.Application.Users.Services
     public interface IIdentityProviderService
     {
         Task<Result<string>> RegisterAsync(UserDto userRequest, CancellationToken cancellationToken = default);
+
+        Task<Result> SetAttributesAsync(
+            string identityProviderId,
+            Dictionary<string, List<string>> attributes,
+            CancellationToken cancellationToken = default
+            );
+
+        Task<Result> ActivateAsync(string identityProviderId, CancellationToken cancellationToken = default);
     }
 }

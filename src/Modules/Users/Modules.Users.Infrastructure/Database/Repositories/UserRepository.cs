@@ -63,5 +63,10 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
             context.Users.Add(user);
         }
+
+        public void AddSeller(SellerProfile sellerProfile)
+        {
+            context.SellerProfiles.Add(sellerProfile);
+        }
     }
 }

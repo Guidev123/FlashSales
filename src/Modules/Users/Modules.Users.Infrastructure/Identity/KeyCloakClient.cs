@@ -20,7 +20,11 @@ namespace Modules.Users.Infrastructure.Identity
 
         internal async Task SetUserAttributesAsync(string userId, Dictionary<string, List<string>> attributes, CancellationToken cancellationToken = default)
         {
-            var payload = new { attributes };
+            var payload = new
+            {
+                email = attributes.GetValueOrDefault("email")?[0],
+                attributes
+            };
 
             var httpResponseMessage = await httpClient.PutAsJsonAsync(
                 $"{_options.CurrentRealm}/users/{userId}",

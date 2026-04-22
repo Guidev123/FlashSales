@@ -75,5 +75,17 @@ namespace Modules.Users.Domain.Users.Errors
         public static readonly Error SomethingHasFailedDuringRegistration = Error.Problem(
             "Users.SomethingHasFailedDuringRegistration",
             "Something has failed during registration");
+
+        public static readonly Error FailedToActivateCustomer = Error.Problem(
+            "Users.FailedToActivateCustomer",
+            "Something has failed to activate customer");
+
+        public static readonly Error FailedToSetAttributesInIdentityProvider = Error.Problem(
+            "Users.FailedToSetAttributesInIdentityProvider",
+            "Something has failed to set attributes in Identity Provider");
+
+        public static readonly Error FailedToParseAccountType = Error.Invalid(
+            "Users.FailedToParseAccountType",
+            "Something has failed to parse account type");
     }
 }

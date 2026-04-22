@@ -23,6 +23,8 @@ namespace FlashSales.Infrastructure
 
             services.AddScoped<IDomainEventCollector, DomainEventCollector>();
 
+            services.AddSingleton(TimeProvider.System);
+
             return services;
         }
 

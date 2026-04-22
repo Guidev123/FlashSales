@@ -52,12 +52,12 @@ namespace Modules.Users.Infrastructure.Database.Configurations
                     .HasColumnName("Agency")
                     .IsRequired();
 
-                paymentAccount.Property(p => p.Number)
+                paymentAccount.Property(p => p.AccountNumber)
                     .HasColumnType("VARCHAR(50)")
                     .HasColumnName("AccountNumber")
                     .IsRequired();
 
-                paymentAccount.Property(p => p.Type)
+                paymentAccount.Property(p => p.AccountType)
                     .HasColumnType("VARCHAR(50)")
                     .HasColumnName("AccountType")
                     .HasConversion<string>()

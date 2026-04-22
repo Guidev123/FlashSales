@@ -9,8 +9,8 @@ namespace Modules.Users.Domain.Users.ValueObjects
         {
             BankCode = bankCode;
             Agency = agency;
-            Number = number;
-            Type = type;
+            AccountNumber = number;
+            AccountType = type;
             Validate();
         }
 
@@ -19,8 +19,8 @@ namespace Modules.Users.Domain.Users.ValueObjects
 
         public string BankCode { get; } = string.Empty;
         public string Agency { get; } = string.Empty;
-        public string Number { get; } = string.Empty;
-        public BankAccountType Type { get; }
+        public string AccountNumber { get; } = string.Empty;
+        public BankAccountType AccountType { get; }
 
         public static PaymentAccount Create(
             string bankCode,
@@ -34,7 +34,6 @@ namespace Modules.Users.Domain.Users.ValueObjects
 
         protected override void Validate()
         {
-            throw new NotImplementedException();
         }
     }
 }
