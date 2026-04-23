@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Users.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
-    [Migration("20260420020740_Initial")]
+    [Migration("20260423014000_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -26,6 +26,41 @@ namespace Modules.Users.Infrastructure.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Modules.Users.Domain.AccessManagement.Models.Permission", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("VARCHAR(100)");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("Permissions", "users");
+                });
+
+            modelBuilder.Entity("Modules.Users.Domain.AccessManagement.Models.RegistrationTypeRoles", b =>
+                {
+                    b.Property<string>("Type")
+                        .HasColumnType("VARCHAR(30)");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("VARCHAR(50)");
+
+                    b.HasKey("Type", "RoleName");
+
+                    b.HasIndex("RoleName");
+
+                    b.ToTable("RegistrationTypeRoles", "users");
+                });
+
+            modelBuilder.Entity("Modules.Users.Domain.AccessManagement.Models.Role", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("VARCHAR(50)");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Roles", "users");
+                });
+
             modelBuilder.Entity("Modules.Users.Domain.Users.Entities.SellerProfile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -37,6 +72,9 @@ namespace Modules.Users.Infrastructure.Database.Migrations
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("VARCHAR(160)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -79,41 +117,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                     b.ToTable("Users", "users");
                 });
 
-            modelBuilder.Entity("Modules.Users.Domain.Users.Models.Permission", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("VARCHAR(100)");
-
-                    b.HasKey("Code");
-
-                    b.ToTable("Permissions", "users");
-                });
-
-            modelBuilder.Entity("Modules.Users.Domain.Users.Models.RegistrationTypeRoles", b =>
-                {
-                    b.Property<string>("AccountType")
-                        .HasColumnType("VARCHAR(30)");
-
-                    b.Property<string>("RoleName")
-                        .HasColumnType("VARCHAR(50)");
-
-                    b.HasKey("AccountType", "RoleName");
-
-                    b.HasIndex("RoleName");
-
-                    b.ToTable("RegistrationTypeRoles", "users");
-                });
-
-            modelBuilder.Entity("Modules.Users.Domain.Users.Models.Role", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("VARCHAR(50)");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("Roles", "users");
-                });
-
             modelBuilder.Entity("PermissionRole", b =>
                 {
                     b.Property<string>("PermissionCode")
@@ -145,6 +148,15 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                     b.ToTable("UserRoles", "users");
                 });
 
+            modelBuilder.Entity("Modules.Users.Domain.AccessManagement.Models.RegistrationTypeRoles", b =>
+                {
+                    b.HasOne("Modules.Users.Domain.AccessManagement.Models.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleName")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Modules.Users.Domain.Users.Entities.SellerProfile", b =>
                 {
                     b.HasOne("Modules.Users.Domain.Users.Entities.User", null)
@@ -158,12 +170,12 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                             b1.Property<Guid>("SellerProfileId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<string>("AccountNumber")
+                            b1.Property<string>("Number")
                                 .IsRequired()
                                 .HasColumnType("VARCHAR(50)")
                                 .HasColumnName("Document");
 
-                            b1.Property<string>("AccountType")
+                            b1.Property<string>("Type")
                                 .IsRequired()
                                 .HasColumnType("VARCHAR(50)")
                                 .HasColumnName("DocumentType");
@@ -181,16 +193,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                             b1.Property<Guid>("SellerProfileId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<string>("Agency")
-                                .IsRequired()
-                                .HasColumnType("VARCHAR(50)")
-                                .HasColumnName("Agency");
-
-                            b1.Property<string>("BankCode")
-                                .IsRequired()
-                                .HasColumnType("VARCHAR(50)")
-                                .HasColumnName("BankCode");
-
                             b1.Property<string>("AccountNumber")
                                 .IsRequired()
                                 .HasColumnType("VARCHAR(50)")
@@ -200,6 +202,16 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                                 .IsRequired()
                                 .HasColumnType("VARCHAR(50)")
                                 .HasColumnName("AccountType");
+
+                            b1.Property<string>("Agency")
+                                .IsRequired()
+                                .HasColumnType("VARCHAR(50)")
+                                .HasColumnName("Agency");
+
+                            b1.Property<string>("BankCode")
+                                .IsRequired()
+                                .HasColumnType("VARCHAR(50)")
+                                .HasColumnName("BankCode");
 
                             b1.HasKey("SellerProfileId");
 
@@ -290,24 +302,15 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Modules.Users.Domain.Users.Models.RegistrationTypeRoles", b =>
-                {
-                    b.HasOne("Modules.Users.Domain.Users.Models.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RoleName")
-                        .OnDelete(DeleteBehavior.ClientNoAction)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("PermissionRole", b =>
                 {
-                    b.HasOne("Modules.Users.Domain.Users.Models.Permission", null)
+                    b.HasOne("Modules.Users.Domain.AccessManagement.Models.Permission", null)
                         .WithMany()
                         .HasForeignKey("PermissionCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Modules.Users.Domain.Users.Models.Role", null)
+                    b.HasOne("Modules.Users.Domain.AccessManagement.Models.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleName")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -316,7 +319,7 @@ namespace Modules.Users.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.HasOne("Modules.Users.Domain.Users.Models.Role", null)
+                    b.HasOne("Modules.Users.Domain.AccessManagement.Models.Role", null)
                         .WithMany()
                         .HasForeignKey("RolesName")
                         .OnDelete(DeleteBehavior.Cascade)

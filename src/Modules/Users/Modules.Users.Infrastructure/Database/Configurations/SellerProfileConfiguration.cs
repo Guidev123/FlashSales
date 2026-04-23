@@ -26,6 +26,10 @@ namespace Modules.Users.Infrastructure.Database.Configurations
             builder.Property(c => c.CreatedOn)
                 .IsRequired();
 
+            builder.Property(c => c.ProfilePictureUrl)
+                .IsRequired(false)
+                .HasColumnType("VARCHAR(160)");
+
             builder.OwnsOne(c => c.Document, document =>
             {
                 document.Property(d => d.Number)

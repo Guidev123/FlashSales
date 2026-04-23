@@ -119,6 +119,7 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                     AccountType = table.Column<string>(type: "VARCHAR(50)", nullable: false),
                     Status = table.Column<string>(type: "VARCHAR(50)", nullable: false),
                     ActivatedOn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    ProfilePictureUrl = table.Column<string>(type: "VARCHAR(160)", nullable: true),
                     CreatedOn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

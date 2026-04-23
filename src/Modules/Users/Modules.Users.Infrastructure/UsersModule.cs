@@ -40,7 +40,10 @@ namespace Modules.Users.Infrastructure
         {
             services.AddDbContext<UsersDbContext>(cfg =>
             {
-                cfg.UseNpgsql(configuration.GetConnectionString("Postgres"));
+                cfg.UseNpgsql(configuration.GetConnectionString("Postgres"), npgSqlCfg =>
+                {
+                    npgSqlCfg.MigrationsHistoryTable("__EFMigrationsHistory", Schemas.Users);
+                });
             });
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();

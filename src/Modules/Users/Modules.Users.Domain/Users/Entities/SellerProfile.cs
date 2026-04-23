@@ -26,6 +26,7 @@ namespace Modules.Users.Domain.Users.Entities
         public PaymentAccount PaymentAccount { get; private set; } = null!;
         public SellerStatus Status { get; private set; }
         public DateTimeOffset? ActivatedOn { get; private set; }
+        public string? ProfilePictureUrl { get; private set; }
 
         public static SellerProfile Create(Guid userId, string document, PaymentAccount paymentAccount)
         {
@@ -34,6 +35,11 @@ namespace Modules.Users.Domain.Users.Entities
             sellerProfile.AddDomainEvent(SellerActivatedDomainEvent.Create(sellerProfile.UserId, sellerProfile.Id));
 
             return sellerProfile;
+        }
+
+        public void SetProfilePictureUrl(string profilePictureUrl)
+        {
+            ProfilePictureUrl = profilePictureUrl;
         }
 
         protected override void Validate()
