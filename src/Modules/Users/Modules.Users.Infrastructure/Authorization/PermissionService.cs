@@ -32,14 +32,16 @@ namespace Modules.Users.Infrastructure.Authorization
                 .SelectMany(c => c.Permissions)
                 .ToHashSet();
 
+            var response = new PermissionResponse(result.Value.UserId, permissions);
+
             await cacheService.SetAsync(
                 PermissionResponse.GetCacheKey(identityId),
-                permissions,
+                response,
                 TimeSpan.FromSeconds(options.Value.CacheExpirationInSeconds),
                 cancellationToken
-                );
+            );
 
-            return new PermissionResponse(result.Value.UserId, permissions);
+            return response;
         }
     }
 }

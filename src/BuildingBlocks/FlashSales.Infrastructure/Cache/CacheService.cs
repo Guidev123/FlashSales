@@ -1,4 +1,5 @@
 ﻿using FlashSales.Application.Cache;
+using FlashSales.Application.Extensions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using System.Buffers;
@@ -48,13 +49,14 @@ namespace FlashSales.Infrastructure.Cache
             return cache.SetAsync(key, bytes, cacheExpiration, cancellationToken);
         }
 
-        private static T Deserialize<T>(byte[] bytes) => JsonSerializer.Deserialize<T>(bytes)!;
+        private static T Deserialize<T>(byte[] bytes)
+            => JsonSerializer.Deserialize<T>(bytes, JsonSerializerOptionsExtensions.GetDefault())!;
 
         private static byte[] Serialize<T>(T value)
         {
             var buffer = new ArrayBufferWriter<byte>();
             using var writer = new Utf8JsonWriter(buffer);
-            JsonSerializer.Serialize(writer, value);
+            JsonSerializer.Serialize(writer, value, JsonSerializerOptionsExtensions.GetDefault());
             return buffer.WrittenSpan.ToArray();
         }
 
