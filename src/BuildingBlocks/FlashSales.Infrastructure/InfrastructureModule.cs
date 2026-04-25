@@ -1,12 +1,18 @@
+using Azure.Storage.Blobs;
+using FlashSales.Application.Bus;
 using FlashSales.Application.Cache;
 using FlashSales.Application.Messaging;
+using FlashSales.Application.Storage;
 using FlashSales.Infrastructure.Authentication;
 using FlashSales.Infrastructure.Authorization;
+using FlashSales.Infrastructure.Bus;
 using FlashSales.Infrastructure.Cache;
 using FlashSales.Infrastructure.Factories;
+using FlashSales.Infrastructure.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace FlashSales.Infrastructure
@@ -17,11 +23,13 @@ namespace FlashSales.Infrastructure
         {
             services
                 .AddCache(configuration)
+                .AddBlobStorage(configuration)
                 .AddConnectionFactory(configuration)
                 .AddAuthenticationExtensions()
                 .AddAuthorizationExtensions();
 
             services.AddScoped<IDomainEventCollector, DomainEventCollector>();
+            services.AddTransient<IEventBus, MemoryEventBus>();
 
             services.AddSingleton(TimeProvider.System);
 
@@ -47,6 +55,21 @@ namespace FlashSales.Infrastructure
                 services.TryAddSingleton<ICacheService, CacheService>();
                 services.AddDistributedMemoryCache();
             }
+
+            return services;
+        }
+
+        private static IServiceCollection AddBlobStorage(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
+
+            services.AddSingleton<IBlobStorageService, BlobStorageService>();
+            services.AddSingleton((sp) =>
+            {
+                var blobOptions = sp.GetRequiredService<IOptions<BlobStorageOptions>>();
+
+                return new BlobServiceClient(blobOptions.Value.ConnectionString);
+            });
 
             return services;
         }

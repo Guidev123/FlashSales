@@ -83,12 +83,29 @@ services:
     environment:
       ACCEPT_EULA: Y
     ports:
-      - "5341:5341" # ingest (Serilog aponta aqui)
-      - "8081:80" # UI  →  http://localhost:8081
+      - "5341:5341"
+      - "8081:80"
     volumes:
       - seq_data:/data
     networks:
       - backend
+    restart: unless-stopped
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    container_name: azurite
+    command: azurite-blob --blobHost 0.0.0.0 --blobPort 10000
+    ports:
+      - "10000:10000"
+    volumes:
+      - azurite_data:/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "10000" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
 
 volumes:
@@ -96,6 +113,7 @@ volumes:
   app_pgdata:
   redis_data:
   seq_data:
+  azurite_data:
 
 networks:
   backend:
