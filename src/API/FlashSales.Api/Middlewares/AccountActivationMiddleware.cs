@@ -28,9 +28,9 @@
 
                     return;
                 }
-
-                await next(context);
             }
+
+            await next(context);
         }
     }
 }

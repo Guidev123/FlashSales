@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from 'react-oidc-context'
-import { isActivated, needsActivation } from './lib/auth.js'
+import { isActivated, isSeller, needsActivation } from './lib/auth.js'
 
 import LoadingScreen from './components/LoadingScreen.jsx'
 import HomePage from './pages/HomePage.jsx'
@@ -9,9 +9,9 @@ import RegisterPage from './pages/RegisterPage.jsx'
 import ActivateSocialPage from './pages/ActivateSocialPage.jsx'
 import LaunchesPage from './pages/LaunchesPage.jsx'
 import BecomeSellerPage from './pages/BecomeSellerPage.jsx'
+import SellerProfilePage from './pages/SellerProfilePage.jsx'
+import CustomerProfilePage from './pages/CustomerProfilePage.jsx'
 
-// Redirects any authenticated social user that hasn't completed activation,
-// regardless of which route they try to access.
 function ActivationGuard({ children }) {
   const auth = useAuth()
   const location = useLocation()
@@ -31,6 +31,24 @@ function RequireActivated({ children }) {
   if (!auth.isAuthenticated) return <Navigate to="/" replace />
   if (needsActivation(auth.user)) return <Navigate to="/activate/social" replace />
   if (!isActivated(auth.user)) return <Navigate to="/" replace />
+  return children
+}
+
+function RequireSeller({ children }) {
+  const auth = useAuth()
+  if (auth.isLoading) return <LoadingScreen />
+  if (!auth.isAuthenticated) return <Navigate to="/" replace />
+  if (needsActivation(auth.user)) return <Navigate to="/activate/social" replace />
+  if (!isSeller(auth.user)) return <Navigate to="/launches" replace />
+  return children
+}
+
+function RequireCustomer({ children }) {
+  const auth = useAuth()
+  if (auth.isLoading) return <LoadingScreen />
+  if (!auth.isAuthenticated) return <Navigate to="/" replace />
+  if (needsActivation(auth.user)) return <Navigate to="/activate/social" replace />
+  if (isSeller(auth.user)) return <Navigate to="/seller/profile" replace />
   return children
 }
 
@@ -61,6 +79,22 @@ export default function App() {
               <RequireActivated>
                 <BecomeSellerPage />
               </RequireActivated>
+            }
+          />
+          <Route
+            path="/seller/profile"
+            element={
+              <RequireSeller>
+                <SellerProfilePage />
+              </RequireSeller>
+            }
+          />
+          <Route
+            path="/customer/profile"
+            element={
+              <RequireCustomer>
+                <CustomerProfilePage />
+              </RequireCustomer>
             }
           />
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -63,7 +63,7 @@ export default function ActivateSocialPage() {
           },
         },
       )
-      if (!res) return  // redirected by useApiFetch (account_not_activated)
+      if (!res) return
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         setApiError(body.message || 'Activation failed. Please try again.')

@@ -1,4 +1,6 @@
-﻿using FlashSales.Application.Messaging;
+﻿using FlashSales.Application.Authorization;
+using FlashSales.Application.Cache;
+using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
 using Modules.Users.Application.AccessManagement.Repositories;
 using Modules.Users.Application.Users.Repositories;
@@ -14,7 +16,8 @@ namespace Modules.Users.Application.Users.UseCases.ActivateSeller
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IDomainEventCollector domainEventCollector,
-        IIdentityProviderService identityProviderService
+        IIdentityProviderService identityProviderService,
+        ICacheService cacheService
         ) : ICommandHandler<ActivateSellerCommand>
     {
         public async Task<Result> ExecuteAsync(ActivateSellerCommand request, CancellationToken cancellationToken = default)
@@ -44,6 +47,7 @@ namespace Modules.Users.Application.Users.UseCases.ActivateSeller
 
             await roleRepository.AssignToUserAsync("seller", request.UserId, cancellationToken);
             await identityProviderService.ActivateSellerAsync(request.IdentityProviderId, cancellationToken);
+            await cacheService.RemoveAsync(PermissionResponse.GetCacheKey(request.IdentityProviderId), cancellationToken);
 
             domainEventCollector.Collect(seller);
 

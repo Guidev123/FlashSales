@@ -8,9 +8,29 @@ namespace Modules.Users.Domain.Users.Errors
             "Users.NotFound",
             $"User with id {userId} was not found");
 
+        public static Error SellerNotFound(Guid userId) => Error.NotFound(
+            "Users.NotFound",
+            $"Seller with user id {userId} was not found");
+
+        public static Error IsNotSeller(Guid userId) => Error.NotFound(
+            "Users.IsNotSeller",
+            $"User with id {userId} is not a seller");
+
         public static readonly Error NameMustBeNotEmpty = Error.Invalid(
             "Users.NameMustBeNotEmpty",
             "Name must not be empty");
+
+        public static readonly Error ProfilePictureIsEmpty = Error.Invalid(
+             "Users.ProfilePictureIsEmpty",
+             "Profile picture file must not be empty");
+
+        public static readonly Error ProfilePictureTooLarge = Error.Invalid(
+            "Users.ProfilePictureTooLarge",
+            "Profile picture must not exceed 5MB");
+
+        public static readonly Error ProfilePictureInvalidContentType = Error.Invalid(
+            "Users.ProfilePictureInvalidContentType",
+            "Profile picture must be a valid image (jpeg, png or webp)");
 
         public static Error NameLengthMustNotExceedTheLimitCharacters(int maxLength) => Error.Invalid(
             "Users.NameLengthMustNotExceedTheLimitCharacters",

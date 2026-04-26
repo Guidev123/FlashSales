@@ -90,7 +90,7 @@ export default function BecomeSellerPage() {
           accountType:   values.accountType,
         }),
       })
-      if (!res) return  // redirected by useApiFetch (account_not_activated)
+      if (!res) return
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         setApiError(body.message || 'Activation failed. Please try again.')
