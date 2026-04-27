@@ -1,6 +1,8 @@
+using FlashSales.Endpoints.Endpoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Modules.Catalog.Endpoints;
 using Modules.Catalog.Infrastructure.Database;
 
 namespace Modules.Catalog.Infrastructure
@@ -10,7 +12,8 @@ namespace Modules.Catalog.Infrastructure
         public static IServiceCollection AddCatalogModule(this IServiceCollection services, IConfiguration configuration)
         {
             services
-                .AddData(configuration);
+                .AddData(configuration)
+                .AddEndpoints();
 
             return services;
         }
@@ -24,6 +27,13 @@ namespace Modules.Catalog.Infrastructure
                     npgSqlCfg.MigrationsHistoryTable("__EFMigrationsHistory", Schemas.Catalog);
                 });
             });
+
+            return services;
+        }
+
+        private static IServiceCollection AddEndpoints(this IServiceCollection services)
+        {
+            services.AddEndpoints(typeof(EndpointsModule).Assembly);
 
             return services;
         }
