@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /src/API/FlashSales.Api/appsettings.Development.json
 /src/Web/flash-sales-app/.env
+/src/API/FlashSales.Api/modules.catalog.Development.json
+/src/API/FlashSales.Api/modules.users.Development.json

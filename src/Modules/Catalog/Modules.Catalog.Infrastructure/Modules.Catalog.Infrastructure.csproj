@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Infrastructure\FlashSales.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules.Catalog.Application\Modules.Catalog.Application.csproj" />
+    <ProjectReference Include="..\Modules.Catalog.Endpoints\Modules.Catalog.Endpoints.csproj" />
+  </ItemGroup>
+
 </Project>

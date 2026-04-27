@@ -3,6 +3,7 @@ using FlashSales.Api.Middlewares;
 using FlashSales.Endpoints.Configurations;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Infrastructure;
+using Modules.Catalog.Infrastructure;
 using Modules.Users.Infrastructure;
 using Serilog;
 
@@ -14,7 +15,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddTransient<AccountActivationMiddleware>();
 builder.Configuration.AddModuleConfiguration([
-    "users"
+    "users",
+    "catalog"
     ]);
 
 if (!builder.Environment.IsEnvironment("Testing"))
@@ -40,7 +42,8 @@ builder.Services.AddCors(options =>
 
 builder.Services
     .AddInfrastructureModule(builder.Configuration)
-    .AddUsersModule(builder.Configuration);
+    .AddUsersModule(builder.Configuration)
+    .AddCatalogModule(builder.Configuration);
 
 var app = builder.Build();
 
