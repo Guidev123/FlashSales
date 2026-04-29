@@ -5,8 +5,6 @@ using Modules.Users.Application.Users.Dtos;
 using Modules.Users.Application.Users.Repositories;
 using Modules.Users.Application.Users.UseCases.GetSeller;
 using Modules.Users.Domain.Users.Entities;
-using Modules.Users.Domain.Users.Enum;
-using Modules.Users.Domain.Users.ValueObjects;
 
 namespace Modules.Users.Infrastructure.Database.Repositories
 {
@@ -40,6 +38,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         {
             const string sql = """
                 SELECT
+                    sp.Id
                     u."Email",
                     sp."Document",
                     u."FirstName",
@@ -64,6 +63,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             if (result is null) return null!;
 
             return new GetSellerResponse(
+                result.Id,
                 result.Email,
                 result.Document,
                 result.FirstName,

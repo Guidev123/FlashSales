@@ -8,6 +8,10 @@ namespace Modules.Catalog.Domain.Sellers.Errors
             "CatalogSellers.NotFound",
             $"Seller with id {sellerId} was not found");
 
+        public static Error AlreadyExists(Guid userId, Guid sellerId) => Error.Conflict(
+            "CatalogSellers.AlreadyExists",
+            $"Seller with user id {userId} and seller id {sellerId}");
+
         public static readonly Error UserIdRequired = Error.Invalid(
             "CatalogSellers.UserIdRequired",
             "User id must not be empty");

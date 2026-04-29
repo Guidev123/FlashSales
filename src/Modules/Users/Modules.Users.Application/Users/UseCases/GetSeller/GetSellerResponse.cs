@@ -1,6 +1,7 @@
 ﻿namespace Modules.Users.Application.Users.UseCases.GetSeller
 {
     public sealed record GetSellerResponse(
+        Guid Id,
         string Email,
         string Document,
         string FirstName,

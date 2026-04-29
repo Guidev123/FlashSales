@@ -19,6 +19,7 @@ using Modules.Users.Infrastructure.Authorization;
 using Modules.Users.Infrastructure.Database;
 using Modules.Users.Infrastructure.Database.Repositories;
 using Modules.Users.Infrastructure.Identity;
+using System.Reflection;
 
 namespace Modules.Users.Infrastructure
 {
@@ -60,15 +61,17 @@ namespace Modules.Users.Infrastructure
             services.AddValidatorsFromAssembly(AssemblyReference.Assembly, includeInternalTypes: true);
 
             services
-                .AddMidR(args: AssemblyReference.Assembly)
-                .WithBehaviors(cfg =>
-                {
-                    cfg.AddBehavior(typeof(RequestLoggingBehavior<,>)).WithPriority(1);
-                    cfg.AddBehavior(typeof(RequestValidationBehavior<,>)).WithPriority(2);
-                    cfg.AddBehavior(typeof(RequestTransactionBehavior<,>)).WithPriority(3);
+                .AddMidR(args: [
+                    AssemblyReference.Assembly,
+                    Assembly.GetExecutingAssembly()
+                    ]).WithBehaviors(cfg =>
+                    {
+                        cfg.AddBehavior(typeof(RequestLoggingBehavior<,>)).WithPriority(1);
+                        cfg.AddBehavior(typeof(RequestValidationBehavior<,>)).WithPriority(2);
+                        cfg.AddBehavior(typeof(RequestTransactionBehavior<,>)).WithPriority(3);
 
-                    cfg.AddBehavior(typeof(NotificationLoggingBehavior<>)).WithPriority(1);
-                });
+                        cfg.AddBehavior(typeof(NotificationLoggingBehavior<>)).WithPriority(1);
+                    });
 
             return services;
         }

@@ -4,6 +4,6 @@ namespace FlashSales.Application.Bus
 {
     public interface IEventBus
     {
-        Task ProduceAsync<T>(T message, CancellationToken cancellationToken = default) where T : IntegrationEvent;
+        Task PublishAsync<T>(T message, CancellationToken cancellationToken = default) where T : IntegrationEvent;
     }
 }
