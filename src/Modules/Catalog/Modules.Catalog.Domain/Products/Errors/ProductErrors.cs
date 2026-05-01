@@ -47,5 +47,17 @@ namespace Modules.Catalog.Domain.Products.Errors
         public static readonly Error InvalidImageOrder = Error.Invalid(
             "Products.InvalidImageOrder",
             "Image order must be between 0 and 100");
+
+        public static readonly Error ImageIsEmpty = Error.Invalid(
+            "Products.ImageIsEmpty",
+            "Image file must not be empty");
+
+        public static readonly Error ImageInvalidContentType = Error.Invalid(
+            "Products.ImageInvalidContentType",
+            "Image file must be of type jpeg, png, or webp");
+
+        public static readonly Error ImageTooLarge = Error.Invalid(
+            "Products.ImageTooLarge",
+            "Image file must not exceed 5 MB"); 
     }
 }

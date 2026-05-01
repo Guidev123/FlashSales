@@ -4,9 +4,9 @@ namespace Modules.Catalog.Domain.Sellers.Errors
 {
     public static class SellerErrors
     {
-        public static Error NotFound(Guid sellerId) => Error.NotFound(
+        public static Error NotFound(Guid userId) => Error.NotFound(
             "CatalogSellers.NotFound",
-            $"Seller with id {sellerId} was not found");
+            $"Seller with user id {userId} was not found");
 
         public static Error AlreadyExists(Guid userId, Guid sellerId) => Error.Conflict(
             "CatalogSellers.AlreadyExists",
