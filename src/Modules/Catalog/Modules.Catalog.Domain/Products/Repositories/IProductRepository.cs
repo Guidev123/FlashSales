@@ -1,13 +1,14 @@
-﻿using Modules.Catalog.Application.Products.Dtos;
-using Modules.Catalog.Domain.Products.Entities;
+﻿using Modules.Catalog.Domain.Products.Entities;
 
-namespace Modules.Catalog.Application.Products.Repositories
+namespace Modules.Catalog.Domain.Products.Repositories
 {
     public interface IProductRepository
     {
         Task<IEnumerable<Product>> GetAllAsync(CancellationToken cancellationToken = default);
 
         Task<Product?> GetAsync(Guid id, CancellationToken cancellationToken = default);
+
+        Task<Product?> GetWithImagesAsync(Guid id, CancellationToken cancellationToken = default);
 
         Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default);
 

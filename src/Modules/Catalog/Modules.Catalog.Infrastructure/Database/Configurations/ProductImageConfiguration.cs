@@ -28,11 +28,6 @@ namespace Modules.Catalog.Infrastructure.Database.Configurations
             builder.Property(pi => pi.CreatedOn)
                 .IsRequired();
 
-            builder.HasOne<Product>()
-                .WithMany()
-                .HasForeignKey(pi => pi.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasIndex(pi => new { pi.ProductId, pi.Order })
                 .HasDatabaseName("IX_ProductImages_ProductId_Order");
         }

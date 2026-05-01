@@ -2,12 +2,12 @@
 using FlashSales.Application.Cache;
 using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
-using Modules.Users.Application.AccessManagement.Repositories;
-using Modules.Users.Application.Users.Repositories;
 using Modules.Users.Application.Users.Services;
+using Modules.Users.Domain.AccessManagement.Repositories;
 using Modules.Users.Domain.Users.Entities;
 using Modules.Users.Domain.Users.Enum;
 using Modules.Users.Domain.Users.Errors;
+using Modules.Users.Domain.Users.Repositories;
 using Modules.Users.Domain.Users.ValueObjects;
 
 namespace Modules.Users.Application.Users.UseCases.ActivateSeller

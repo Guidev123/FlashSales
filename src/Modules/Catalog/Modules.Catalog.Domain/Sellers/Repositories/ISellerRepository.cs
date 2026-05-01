@@ -1,6 +1,6 @@
 ﻿using Modules.Catalog.Domain.Sellers.Entities;
 
-namespace Modules.Catalog.Application.Sellers.Repositories
+namespace Modules.Catalog.Domain.Sellers.Repositories
 {
     public interface ISellerRepository
     {

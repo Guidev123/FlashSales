@@ -1,7 +1,8 @@
 using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
-using Modules.Users.Application.AccessManagement.Repositories;
+using Modules.Users.Application.AccessManagement.Services;
 using Modules.Users.Domain.AccessManagement.Models;
+using Modules.Users.Domain.AccessManagement.Repositories;
 
 namespace Modules.Users.Application.AccessManagement.UseCases.GetAllRoles
 {

@@ -2,13 +2,13 @@
 using FlashSales.Application.Cache;
 using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
-using Modules.Users.Application.AccessManagement.Repositories;
-using Modules.Users.Application.Users.Repositories;
 using Modules.Users.Domain.AccessManagement.Errors;
 using Modules.Users.Domain.AccessManagement.Models;
+using Modules.Users.Domain.AccessManagement.Repositories;
 using Modules.Users.Domain.Users.DomainEvents;
 using Modules.Users.Domain.Users.Enum;
 using Modules.Users.Domain.Users.Errors;
+using Modules.Users.Domain.Users.Repositories;
 
 namespace Modules.Users.Application.AccessManagement.UseCases.AssignRole
 {

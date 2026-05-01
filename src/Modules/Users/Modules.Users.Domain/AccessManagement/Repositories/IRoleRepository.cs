@@ -1,16 +1,12 @@
 ﻿using FlashSales.Domain.Results;
-using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
-using Modules.Users.Application.AccessManagement.UseCases.GetRole;
 using Modules.Users.Domain.AccessManagement.Models;
 using Modules.Users.Domain.Users.Enum;
 
-namespace Modules.Users.Application.AccessManagement.Repositories
+namespace Modules.Users.Domain.AccessManagement.Repositories
 {
     public interface IRoleRepository
     {
         Task AddAsync(Role role, CancellationToken cancellationToken = default);
-
-        Task<GetRoleResponse?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
 
         Task<PagedResult<Role>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default);
 
@@ -35,7 +31,5 @@ namespace Modules.Users.Application.AccessManagement.Repositories
         Task AddDefaultRoleForRegistrationTypeAsync(string roleName, RegistrationType registrationType, CancellationToken cancellationToken = default);
 
         Task<IReadOnlyCollection<Role>> GetDefaultRolesByRegistrationTypeAsync(RegistrationType registrationType, CancellationToken cancellationToken = default);
-
-        Task<GetUserPermissionsResponse?> GetUserPermissionsAsync(string identiyProviderId, CancellationToken cancellationToken = default);
     }
 }

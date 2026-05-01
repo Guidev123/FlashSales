@@ -51,6 +51,11 @@ namespace Modules.Catalog.Infrastructure.Database.Configurations
                 .HasForeignKey(p => p.SellerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasMany(p => p.Images)
+                .WithOne()
+                .HasForeignKey(pi => pi.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasIndex(p => new { p.SellerId, p.CreatedOn });
             builder.HasIndex(p => new { p.CategoryId, p.CreatedOn });
         }

@@ -1,4 +1,5 @@
 using FlashSales.Domain.DomainObjects;
+using FlashSales.Domain.Results;
 using Modules.Catalog.Domain.Products.Enums;
 using Modules.Catalog.Domain.Products.Errors;
 using Modules.Catalog.Domain.Products.ValueObjects;
@@ -7,6 +8,9 @@ namespace Modules.Catalog.Domain.Products.Entities
 {
     public sealed class Product : Entity, IAggregateRoot
     {
+        internal const int MAX_IMAGES = 5;
+        private readonly List<ProductImage> _images = [];
+
         private Product(Guid sellerId, Guid categoryId, string name, string description)
         {
             SellerId = sellerId;
@@ -23,12 +27,43 @@ namespace Modules.Catalog.Domain.Products.Entities
         public Guid CategoryId { get; private set; }
         public ProductMetadata Metadata { get; private set; } = null!;
         public ProductStatus Status { get; private set; }
+        public IReadOnlyCollection<ProductImage> Images => _images.AsReadOnly();
 
         public static Product Create(Guid sellerId, Guid categoryId, string name, string description)
         {
             var product = new Product(sellerId, categoryId, name, description);
 
             return product;
+        }
+
+        public Result<ProductImage> AddImage(string url, int order, bool isCover)
+        {
+            if (isCover && AlreadyHasCoverImage())
+            {
+                return Result.Failure<ProductImage>(ProductErrors.ProductAlreadyHasCoverImage);
+            }
+
+            if (_images.Any(c => c.Order == order))
+            {
+                return Result.Failure<ProductImage>(ProductErrors.InvalidImageOrder);
+            }
+
+            AssertionConcern
+                .EnsureGreaterThanOrEqual(
+                MAX_IMAGES,
+                _images.Count,
+                ProductErrors.MaxImagesExceeded.Description
+                );
+
+            var image = ProductImage.Create(Id, url, order, isCover);
+            _images.Add(image);
+
+            return image;
+        }
+
+        private bool AlreadyHasCoverImage()
+        {
+            return _images.Any(i => i.IsCover);
         }
 
         protected override void Validate()

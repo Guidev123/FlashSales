@@ -1,8 +1,8 @@
 ﻿using FlashSales.Application.Messaging;
 using FlashSales.Application.Storage;
 using FlashSales.Domain.Results;
-using Modules.Users.Application.Users.Repositories;
 using Modules.Users.Domain.Users.Errors;
+using Modules.Users.Domain.Users.Repositories;
 
 namespace Modules.Users.Application.Users.UseCases.UpdateProfilePicture
 {

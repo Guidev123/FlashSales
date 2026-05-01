@@ -1,10 +1,10 @@
 ﻿using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
-using Modules.Catalog.Application.Products.Repositories;
-using Modules.Catalog.Application.Sellers.Repositories;
 using Modules.Catalog.Domain.Products.Entities;
 using Modules.Catalog.Domain.Products.Errors;
+using Modules.Catalog.Domain.Products.Repositories;
 using Modules.Catalog.Domain.Sellers.Errors;
+using Modules.Catalog.Domain.Sellers.Repositories;
 
 namespace Modules.Catalog.Application.Products.UseCases.Create
 {

@@ -1,20 +1,17 @@
-using FlashSales.Application.Cache;
 using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
-using Microsoft.Extensions.Options;
-using Modules.Users.Application.AccessManagement.Options;
-using Modules.Users.Application.AccessManagement.Repositories;
+using Modules.Users.Application.AccessManagement.Services;
 using Modules.Users.Domain.AccessManagement.Errors;
 
 namespace Modules.Users.Application.AccessManagement.UseCases.GetPermissions
 {
     internal sealed class GetUserPermissionsQueryHandler(
-        IRoleRepository roleRepository
+        IRoleQueryService roleQueryService
         ) : IQueryHandler<GetUserPermissionsQuery, GetUserPermissionsResponse>
     {
         public async Task<Result<GetUserPermissionsResponse>> ExecuteAsync(GetUserPermissionsQuery request, CancellationToken cancellationToken = default)
         {
-            var permissions = await roleRepository.GetUserPermissionsAsync(request.IdentityId, cancellationToken);
+            var permissions = await roleQueryService.GetUserPermissionsAsync(request.IdentityId, cancellationToken);
 
             if (permissions is null)
             {

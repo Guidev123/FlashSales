@@ -11,9 +11,10 @@ using Microsoft.Extensions.Options;
 using MidR.DependencyInjection;
 using Modules.Users.Application;
 using Modules.Users.Application.AccessManagement.Options;
-using Modules.Users.Application.AccessManagement.Repositories;
-using Modules.Users.Application.Users.Repositories;
+using Modules.Users.Application.AccessManagement.Services;
 using Modules.Users.Application.Users.Services;
+using Modules.Users.Domain.AccessManagement.Repositories;
+using Modules.Users.Domain.Users.Repositories;
 using Modules.Users.Endpoints;
 using Modules.Users.Infrastructure.Authorization;
 using Modules.Users.Infrastructure.Database;
@@ -50,6 +51,8 @@ namespace Modules.Users.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IRoleQueryService, RoleQueryService>();
+            services.AddScoped<IUserQueryService, UserQueryService>();
 
             services.Configure<PermissionsCacheOptions>(configuration.GetSection(PermissionsCacheOptions.SectionName));
 

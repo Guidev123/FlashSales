@@ -1,8 +1,8 @@
 ﻿using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
-using Modules.Catalog.Application.Sellers.Repositories;
 using Modules.Catalog.Domain.Sellers.Entities;
 using Modules.Catalog.Domain.Sellers.Errors;
+using Modules.Catalog.Domain.Sellers.Repositories;
 
 namespace Modules.Catalog.Application.Sellers.UseCases.Create
 {

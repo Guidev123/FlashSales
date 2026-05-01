@@ -1,4 +1,5 @@
 using FlashSales.Domain.Results;
+using Modules.Catalog.Domain.Products.Entities;
 
 namespace Modules.Catalog.Domain.Products.Errors
 {
@@ -58,6 +59,14 @@ namespace Modules.Catalog.Domain.Products.Errors
 
         public static readonly Error ImageTooLarge = Error.Invalid(
             "Products.ImageTooLarge",
-            "Image file must not exceed 5 MB"); 
+            "Image file must not exceed 5 MB");
+
+        public static readonly Error ProductAlreadyHasCoverImage = Error.Invalid(
+            "Products.ProductAlreadyHasCoverImage",
+            "Product already has a cover image");
+
+        public static readonly Error MaxImagesExceeded = Error.Invalid(
+            "Products.MaxImagesExceeded",
+            $"A product cannot have more than {Product.MAX_IMAGES} images");
     }
 }
