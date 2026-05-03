@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using FlashSales.Application.Behaviors;
 using FlashSales.Application.Bus;
 using FlashSales.Application.Cache;
 using FlashSales.Application.Messaging;
@@ -9,29 +10,50 @@ using FlashSales.Infrastructure.Bus;
 using FlashSales.Infrastructure.Cache;
 using FlashSales.Infrastructure.Factories;
 using FlashSales.Infrastructure.Storage;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using MidR.DependencyInjection;
 using StackExchange.Redis;
+using System.Reflection;
+using System.Reflection.Metadata;
 
 namespace FlashSales.Infrastructure
 {
     public static class InfrastructureModule
     {
-        public static IServiceCollection AddInfrastructureModule(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureModule(this IServiceCollection services, IConfiguration configuration, IEnumerable<Assembly> assemblies)
         {
             services
+                .AddApplication([.. assemblies])
                 .AddCache(configuration)
                 .AddBlobStorage(configuration)
                 .AddConnectionFactory(configuration)
                 .AddAuthenticationExtensions()
                 .AddAuthorizationExtensions();
 
+            return services;
+        }
+
+        private static IServiceCollection AddApplication(this IServiceCollection services, params Assembly[] assemblies)
+        {
+            services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true);
+
+            var assembliesArray = assemblies.ToArray();
+
+            services
+                .AddMidR(args: assembliesArray).WithBehaviors(cfg =>
+                    {
+                        cfg.AddBehavior(typeof(RequestLoggingBehavior<,>)).WithPriority(1);
+                        cfg.AddBehavior(typeof(RequestValidationBehavior<,>)).WithPriority(2);
+                        cfg.AddBehavior(typeof(RequestTransactionBehavior<,>)).WithPriority(3);
+                        cfg.AddBehavior(typeof(NotificationLoggingBehavior<>)).WithPriority(1);
+                    });
+            services.AddSingleton(TimeProvider.System);
             services.AddScoped<IDomainEventCollector, DomainEventCollector>();
             services.AddTransient<IEventBus, MemoryEventBus>();
-
-            services.AddSingleton(TimeProvider.System);
 
             return services;
         }

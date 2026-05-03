@@ -1,8 +1,6 @@
 ﻿using Dapper;
 using FlashSales.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Modules.Users.Application.Users.Dtos;
-using Modules.Users.Application.Users.UseCases.GetSeller;
 using Modules.Users.Domain.Users.Entities;
 using Modules.Users.Domain.Users.Repositories;
 
@@ -31,7 +29,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public Task<bool> ExistsAsync(string email, CancellationToken cancellationToken = default)
         {
-            return context.Users.AsNoTracking().AnyAsync(u => u.Email.Address == email.ToLower(), cancellationToken: cancellationToken);
+            return context.Users.AsNoTracking().AnyAsync(u => u.Email.Address == email, cancellationToken: cancellationToken);
         }
 
         public Task<bool> IsSellerAsync(Guid userId, CancellationToken cancellationToken = default)

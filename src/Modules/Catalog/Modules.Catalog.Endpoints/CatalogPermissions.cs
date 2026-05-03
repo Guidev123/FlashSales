@@ -4,6 +4,8 @@ namespace Modules.Catalog.Endpoints
     {
         public static class Products
         {
+            public const string ProductsRead = "products:read";
+            public const string ProductsCreate = "products:create";
         }
     }
 }

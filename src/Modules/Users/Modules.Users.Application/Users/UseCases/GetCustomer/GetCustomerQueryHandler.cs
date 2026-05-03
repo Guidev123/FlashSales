@@ -2,7 +2,6 @@
 using FlashSales.Domain.Results;
 using Modules.Users.Application.Users.Dtos;
 using Modules.Users.Application.Users.Services;
-using Modules.Users.Application.Users.UseCases.Get;
 using Modules.Users.Domain.Users.Errors;
 
 namespace Modules.Users.Application.Users.UseCases.GetCustomer

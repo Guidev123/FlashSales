@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 
@@ -6,48 +7,55 @@ namespace FlashSales.Endpoints.Configurations
 {
     public static class DocumentationConfiguration
     {
-        public static void AddSwaggerConfig(this IServiceCollection services)
+        public static void AddOpenApiConfig(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSwaggerGen(c =>
+            services.AddOpenApi(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo()
+                options.AddDocumentTransformer((document, context, cancellationToken) =>
                 {
-                    Version = "v1"
-                });
+                    document.Components ??= new OpenApiComponents();
+                    document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
 
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                });
+                    document.Components.SecuritySchemes["oauth2"] = new OpenApiSecurityScheme
+                    {
+                        Type = SecuritySchemeType.OAuth2,
+                        Flows = new OpenApiOAuthFlows
+                        {
+                            AuthorizationCode = new OpenApiOAuthFlow
+                            {
+                                AuthorizationUrl = new Uri(configuration["Keycloak:AuthorizationUrl"]!),
+                                TokenUrl = new Uri(configuration["Keycloak:TokenUrl"]!),
+                                Scopes = new Dictionary<string, string>
+                                {
+                                    { "openid", "OpenID Connect" },
+                                    { "profile", "Profile information" }
+                                }
+                            }
+                        }
+                    };
 
-                var securityScheme = new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header
-                };
+                    document.Security ??= [];
+                    document.Security.Add(new OpenApiSecurityRequirement
+                    {
+                        [new OpenApiSecuritySchemeReference("oauth2", document)] = ["openid", "profile"]
+                    });
 
-                c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-                {
-                    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+                    return Task.CompletedTask;
                 });
             });
         }
 
-        public static void UseSwaggerConfig(this IApplicationBuilder app)
+        public static void UseOpenApiConfig(this IApplicationBuilder app, IConfiguration configuration)
         {
-            app.UseSwagger();
-
+            app.UseStaticFiles();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                c.SwaggerEndpoint("/openapi/v1.json", "FlashSales API v1");
                 c.DisplayRequestDuration();
+                c.OAuthClientId(configuration["Keycloak:SwaggerClientId"]);
+                c.OAuthAppName("FlashSales Swagger");
+                c.OAuthScopeSeparator(" ");
+                c.OAuthUsePkce();
             });
         }
     }

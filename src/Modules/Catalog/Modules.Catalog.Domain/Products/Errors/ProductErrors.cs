@@ -17,6 +17,10 @@ namespace Modules.Catalog.Domain.Products.Errors
             "Products.CategoryIdRequired",
             "Category id must not be empty");
 
+        public static readonly Error CategoryNameMustBeNotEmpty = Error.Invalid(
+            "Products.CategoryNameMustBeNotEmpty",
+            "Category name must be not empty");
+
         public static readonly Error NameMustNotBeEmpty = Error.Invalid(
             "Products.NameMustNotBeEmpty",
             "Product name must not be empty");

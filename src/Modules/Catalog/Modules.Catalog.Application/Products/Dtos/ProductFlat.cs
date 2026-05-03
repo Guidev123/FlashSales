@@ -1,10 +1,9 @@
 ﻿namespace Modules.Catalog.Application.Products.Dtos
 {
-    public sealed record ProductResponse(
+    public sealed record ProductFlat(
         Guid Id,
         string Name,
         string Description,
-        List<ProductImageResponse> Images,
-        CategoryResponse Category
+        string Status
         );
 }

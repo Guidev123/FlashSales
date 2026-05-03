@@ -1,3 +1,4 @@
+using FlashSales.Application.Abstractions;
 using FlashSales.Application.Behaviors;
 using FlashSales.Endpoints.Endpoints;
 using FluentValidation;
@@ -6,19 +7,27 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MidR.DependencyInjection;
 using Modules.Catalog.Application;
+using Modules.Catalog.Application.Products.Services;
+using Modules.Catalog.Domain.Products.Repositories;
+using Modules.Catalog.Domain.Sellers.Repositories;
 using Modules.Catalog.Endpoints;
 using Modules.Catalog.Infrastructure.Database;
+using Modules.Catalog.Infrastructure.Database.Repositories;
 using System.Reflection;
 
 namespace Modules.Catalog.Infrastructure
 {
     public static class CatalogModule
     {
+        public static readonly Assembly[] Assemblies = [
+                    AssemblyReference.Assembly,
+                    Assembly.GetExecutingAssembly()
+                    ];
+
         public static IServiceCollection AddCatalogModule(this IServiceCollection services, IConfiguration configuration)
         {
             services
                 .AddData(configuration)
-                .AddUseCases()
                 .AddEndpoints();
 
             return services;
@@ -34,25 +43,10 @@ namespace Modules.Catalog.Infrastructure
                 });
             });
 
-            return services;
-        }
-
-        private static IServiceCollection AddUseCases(this IServiceCollection services)
-        {
-            services.AddValidatorsFromAssembly(AssemblyReference.Assembly, includeInternalTypes: true);
-
-            services
-                .AddMidR(args: [
-                    AssemblyReference.Assembly,
-                    Assembly.GetExecutingAssembly()
-                    ]).WithBehaviors(cfg =>
-                    {
-                        cfg.AddBehavior(typeof(RequestLoggingBehavior<,>)).WithPriority(1);
-                        cfg.AddBehavior(typeof(RequestValidationBehavior<,>)).WithPriority(2);
-                        cfg.AddBehavior(typeof(RequestTransactionBehavior<,>)).WithPriority(3);
-
-                        cfg.AddBehavior(typeof(NotificationLoggingBehavior<>)).WithPriority(1);
-                    });
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ISellerRepository, SellerRepository>();
+            services.AddScoped<IProductQueryService, ProductQueryService>();
 
             return services;
         }

@@ -25,7 +25,7 @@ namespace Modules.Catalog.Domain.Products.Entities
         public int Order { get; private set; }
         public bool IsCover { get; private set; }
 
-        public static ProductImage Create(Guid productId, string url, int order, bool isCover)
+        internal static ProductImage Create(Guid productId, string url, int order, bool isCover)
         {
             var productImage = new ProductImage(productId, url, order, isCover);
 

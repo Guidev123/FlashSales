@@ -9,8 +9,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
-builder.Services.AddSwaggerConfig();
+builder.Services.AddOpenApiConfig(builder.Configuration);
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddTransient<AccountActivationMiddleware>();
@@ -41,7 +40,11 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services
-    .AddInfrastructureModule(builder.Configuration)
+    .AddInfrastructureModule(builder.Configuration,
+    [
+        ..UsersModule.Assemblies,
+        ..CatalogModule.Assemblies
+    ])
     .AddUsersModule(builder.Configuration)
     .AddCatalogModule(builder.Configuration);
 
@@ -50,7 +53,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwaggerConfig();
+    app.UseOpenApiConfig(builder.Configuration);
 }
 
 if (!app.Environment.IsEnvironment("Testing"))

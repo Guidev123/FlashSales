@@ -38,12 +38,12 @@ namespace Modules.Catalog.Application.Products.UseCases.CreateProductImage
                 return Result.Failure<CreateProductImageResponse>(addImageResult.Error!);
             }
 
+            productRepository.AddProductImage(addImageResult.Value);
+
             return new CreateProductImageResponse(addImageResult.Value.Id, imageUrl);
         }
 
         private Task<Result<string>> UploadImageAsync(CreateProductImageCommand request, CancellationToken cancellationToken = default)
-        {
-            return blobStorageService.UploadAsync(request.File, request.ContentType, cancellationToken);
-        }
+            => blobStorageService.UploadAsync(request.File, request.ContentType, cancellationToken);
     }
 }
