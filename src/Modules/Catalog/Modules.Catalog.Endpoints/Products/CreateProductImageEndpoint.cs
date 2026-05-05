@@ -6,28 +6,27 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Catalog.Application.Products.UseCases.GetAll;
+using Modules.Catalog.Application.Products.UseCases.CreateProductImage;
 using System.Security.Claims;
 
 namespace Modules.Catalog.Endpoints.Products
 {
-    internal sealed class GetProductsEndpoint : IEndpoint
+    internal sealed class CreateProductImageEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapGet("api/v1/products", async (
+            app.MapPost("api/v1/products/images", async (
+                [FromBody] CreateProductImageCommand command,
                 [FromServices] ISender sender,
                 [FromServices] ClaimsPrincipal claimsPrincipal,
-                CancellationToken cancellationToken,
-                [FromQuery] int page = 1,
-                [FromQuery] int size = 10
+                CancellationToken cancellationToken
                 ) =>
             {
-                var result = await sender.SendAsync(new GetAllProductsQuery(page, size), cancellationToken);
+                var result = await sender.SendAsync(command, cancellationToken);
 
                 return result.Match(success => Results.Ok(success), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .RequireAuthorization(CatalogPermissions.Products.ProductsRead);
+              .RequireAuthorization(CatalogPermissions.Products.ProductsUpdate);
         }
     }
 }

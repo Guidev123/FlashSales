@@ -5,7 +5,9 @@ using Modules.Catalog.Application.Products.Services;
 
 namespace Modules.Catalog.Infrastructure.Database.Repositories
 {
-    internal sealed class ProductQueryService(IUnitOfWork unitOfWork) : IProductQueryService
+    internal sealed class ProductQueryService(
+        IUnitOfWork unitOfWork
+        ) : IProductQueryService
     {
         public async Task<IReadOnlyCollection<ProductResponse>> GetAllAsync(int page, int size, CancellationToken cancellationToken = default)
         {
@@ -58,9 +60,51 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
                 },
                 param: new { Offset = (page - 1) * size, Size = size },
                 splitOn: "CategoryId,ImageId"
-            );
+            ).WaitAsync(cancellationToken);
 
             return productMap.Values.ToList().AsReadOnly();
+        }
+
+        public async Task<ProductResponse?> GetAsync(Guid productId, CancellationToken cancellationToken = default)
+        {
+            const string sql = """
+                SELECT 
+                    p."Id",
+                    p."Name",
+                    p."Description",
+                    p."CategoryId",
+                    c."Name" AS "CategoryName",
+                    pi."Id" AS "ImageId",
+                    pi."ProductId",
+                    pi."Url",
+                    pi."Order",
+                    pi."IsCover"
+                FROM catalog."Products" p
+                INNER JOIN catalog."Categories" c ON c."Id" = p."CategoryId"
+                LEFT JOIN catalog."ProductImages" pi ON pi."ProductId" = p."Id"
+                WHERE p."Id" = @productId
+                ORDER BY pi."Order";
+                """;
+
+            var rows = await unitOfWork.Connection.QueryAsync(sql, new { productId });
+
+            var first = rows.FirstOrDefault();
+            if (first is null) return null;
+
+            return new(
+                first.Id,
+                first.Name,
+                first.Description,
+                rows.Where(r => r.ImageId is not null)
+                    .Select(r => new ProductImageResponse(
+                        r.ImageId,
+                        r.ProductId,
+                        r.Url,
+                        r.Order,
+                        r.IsCover
+                    )).ToList(),
+                new CategoryResponse(first.CategoryId, first.CategoryName)
+            );
         }
 
         public Task<IReadOnlyCollection<CategoryResponse>> GetCategoriesAsync(int page, int size, CancellationToken cancellationToken = default)
