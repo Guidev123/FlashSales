@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MidR.DependencyInjection;
 using Modules.Catalog.Application;
+using Modules.Catalog.Application.Abstractions;
 using Modules.Catalog.Application.Products.Services;
 using Modules.Catalog.Domain.Products.Repositories;
 using Modules.Catalog.Domain.Sellers.Repositories;
@@ -43,7 +44,8 @@ namespace Modules.Catalog.Infrastructure
                 });
             });
 
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ICatalogUnitOfWork, UnitOfWork>();
+            services.AddSingleton<IUnitOfWorkRegistration, CatalogUnitOfWorkRegistration>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ISellerRepository, SellerRepository>();
             services.AddScoped<IProductQueryService, ProductQueryService>();

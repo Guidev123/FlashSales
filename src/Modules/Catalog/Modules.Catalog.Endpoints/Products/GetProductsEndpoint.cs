@@ -3,7 +3,6 @@ using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
 using Modules.Catalog.Application.Products.UseCases.GetAll;
@@ -16,11 +15,11 @@ namespace Modules.Catalog.Endpoints.Products
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapGet("api/v1/products", async (
-                [FromServices] ISender sender,
-                [FromServices] ClaimsPrincipal claimsPrincipal,
+                ISender sender,
+                ClaimsPrincipal claimsPrincipal,
                 CancellationToken cancellationToken,
-                [FromQuery] int page = 1,
-                [FromQuery] int size = 10
+                int page = 1,
+                int size = 10
                 ) =>
             {
                 var result = await sender.SendAsync(new GetAllProductsQuery(page, size), cancellationToken);

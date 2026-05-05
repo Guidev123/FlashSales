@@ -16,17 +16,32 @@ namespace Modules.Catalog.Endpoints.Products
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapPost("api/v1/products/images", async (
-                [FromBody] CreateProductImageCommand command,
-                [FromServices] ISender sender,
-                [FromServices] ClaimsPrincipal claimsPrincipal,
+                CreateProductImageRequest request,
+                ISender sender,
+                ClaimsPrincipal claimsPrincipal,
                 CancellationToken cancellationToken
                 ) =>
             {
-                var result = await sender.SendAsync(command, cancellationToken);
+                await using var stream = request.File.OpenReadStream();
+
+                var result = await sender.SendAsync(new CreateProductImageCommand(
+                    request.ProductId,
+                    request.Order,
+                    request.IsCover,
+                    stream,
+                    request.File.ContentType
+                    ), cancellationToken);
 
                 return result.Match(success => Results.Ok(success), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
               .RequireAuthorization(CatalogPermissions.Products.ProductsUpdate);
         }
+
+        private sealed record CreateProductImageRequest(
+            Guid ProductId,
+            int Order,
+            bool IsCover,
+            IFormFile File
+            );
     }
 }

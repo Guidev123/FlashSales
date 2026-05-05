@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using FlashSales.Application.Abstractions;
 using FlashSales.Application.Behaviors;
 using FlashSales.Application.Bus;
 using FlashSales.Application.Cache;
@@ -54,6 +55,7 @@ namespace FlashSales.Infrastructure
             services.AddSingleton(TimeProvider.System);
             services.AddScoped<IDomainEventCollector, DomainEventCollector>();
             services.AddTransient<IEventBus, MemoryEventBus>();
+            services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
 
             return services;
         }

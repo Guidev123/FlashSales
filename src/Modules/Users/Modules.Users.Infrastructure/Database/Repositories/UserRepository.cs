@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using FlashSales.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Modules.Users.Application.Abstractions;
 using Modules.Users.Domain.Users.Entities;
 using Modules.Users.Domain.Users.Repositories;
 
@@ -8,7 +9,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 {
     internal sealed class UserRepository(
         UsersDbContext context,
-        IUnitOfWork unitOfWork
+        IUsersUnitOfWork unitOfWork
         ) : IUserRepository
     {
         public Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken = default)

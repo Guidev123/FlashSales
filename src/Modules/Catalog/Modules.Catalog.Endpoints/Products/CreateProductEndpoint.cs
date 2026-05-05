@@ -4,7 +4,6 @@ using FlashSales.Endpoints.Results;
 using FlashSales.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
 using Modules.Catalog.Application.Products.UseCases.Create;
@@ -17,9 +16,9 @@ namespace Modules.Catalog.Endpoints.Products
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapPost("api/v1/products", async (
-                [FromBody] CreateProductRequest request,
-                [FromServices] ISender sender,
-                [FromServices] ClaimsPrincipal claimsPrincipal,
+                CreateProductRequest request,
+                ISender sender,
+                ClaimsPrincipal claimsPrincipal,
                 CancellationToken cancellationToken
                 ) =>
             {

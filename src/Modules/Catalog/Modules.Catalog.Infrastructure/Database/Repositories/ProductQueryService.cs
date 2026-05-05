@@ -1,12 +1,12 @@
 ﻿using Dapper;
-using FlashSales.Application.Abstractions;
+using Modules.Catalog.Application.Abstractions;
 using Modules.Catalog.Application.Products.Dtos;
 using Modules.Catalog.Application.Products.Services;
 
 namespace Modules.Catalog.Infrastructure.Database.Repositories
 {
     internal sealed class ProductQueryService(
-        IUnitOfWork unitOfWork
+        ICatalogUnitOfWork unitOfWork
         ) : IProductQueryService
     {
         public async Task<IReadOnlyCollection<ProductResponse>> GetAllAsync(int page, int size, CancellationToken cancellationToken = default)
@@ -68,7 +68,7 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
         public async Task<ProductResponse?> GetAsync(Guid productId, CancellationToken cancellationToken = default)
         {
             const string sql = """
-                SELECT 
+                SELECT
                     p."Id",
                     p."Name",
                     p."Description",

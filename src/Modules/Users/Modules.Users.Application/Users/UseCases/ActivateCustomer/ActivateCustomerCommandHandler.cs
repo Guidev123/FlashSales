@@ -1,6 +1,6 @@
-﻿using FlashSales.Application.Abstractions;
-using FlashSales.Application.Messaging;
+﻿using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
+using Modules.Users.Application.Abstractions;
 using Modules.Users.Application.Users.Services;
 using Modules.Users.Domain.AccessManagement.Repositories;
 using Modules.Users.Domain.Users.Entities;
@@ -13,7 +13,7 @@ namespace Modules.Users.Application.Users.UseCases.ActivateCustomer
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IIdentityProviderService identityProviderService,
-        IUnitOfWork unitOfWork
+        IUsersUnitOfWork unitOfWork
         ) : ICommandHandler<ActivateCustomerCommand>
     {
         public async Task<Result> ExecuteAsync(ActivateCustomerCommand request, CancellationToken cancellationToken = default)

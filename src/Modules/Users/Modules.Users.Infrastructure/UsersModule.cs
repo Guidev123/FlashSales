@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Modules.Users.Application;
+using Modules.Users.Application.Abstractions;
 using Modules.Users.Application.AccessManagement.Options;
 using Modules.Users.Application.AccessManagement.Services;
 using Modules.Users.Application.Users.Services;
@@ -49,7 +50,8 @@ namespace Modules.Users.Infrastructure
                 });
             });
 
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUsersUnitOfWork, UnitOfWork>();
+            services.AddSingleton<IUnitOfWorkRegistration, UsersUnitOfWorkRegistration>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IRoleQueryService, RoleQueryService>();

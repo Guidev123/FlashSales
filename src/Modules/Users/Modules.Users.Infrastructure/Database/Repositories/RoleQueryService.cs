@@ -1,12 +1,12 @@
 ﻿using Dapper;
-using FlashSales.Application.Abstractions;
+using Modules.Users.Application.Abstractions;
 using Modules.Users.Application.AccessManagement.Services;
 using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
 using Modules.Users.Application.AccessManagement.UseCases.GetRole;
 
 namespace Modules.Users.Infrastructure.Database.Repositories
 {
-    internal sealed class RoleQueryService(IUnitOfWork unitOfWork) : IRoleQueryService
+    internal sealed class RoleQueryService(IUsersUnitOfWork unitOfWork) : IRoleQueryService
     {
         private CommandDefinition Cmd(string sql, object? param = null, CancellationToken cancellationToken = default) =>
             new(sql, param, transaction: unitOfWork.Transaction, cancellationToken: cancellationToken);
