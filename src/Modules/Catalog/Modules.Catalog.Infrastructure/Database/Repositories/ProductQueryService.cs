@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Modules.Catalog.Application.Abstractions;
 using Modules.Catalog.Application.Products.Dtos;
 using Modules.Catalog.Application.Products.Services;
@@ -6,7 +7,8 @@ using Modules.Catalog.Application.Products.Services;
 namespace Modules.Catalog.Infrastructure.Database.Repositories
 {
     internal sealed class ProductQueryService(
-        ICatalogUnitOfWork unitOfWork
+        ICatalogUnitOfWork unitOfWork,
+        CatalogDbContext context
         ) : IProductQueryService
     {
         public async Task<IReadOnlyCollection<ProductResponse>> GetAllAsync(int page, int size, CancellationToken cancellationToken = default)
@@ -107,19 +109,24 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
             );
         }
 
-        public Task<IReadOnlyCollection<CategoryResponse>> GetCategoriesAsync(int page, int size, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyCollection<CategoryResponse>> GetCategoriesAsync(int page, int size, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await context.Categories
+                .AsNoTracking()
+                .Select(c => new CategoryResponse(c.Id, c.Name))
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync(cancellationToken);
         }
 
         public Task<int> GetCategoryTotalCountAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return context.Categories.AsNoTracking().CountAsync(cancellationToken);
         }
 
         public Task<int> GetTotalCountAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return context.Products.AsNoTracking().CountAsync(cancellationToken);
         }
     }
 }

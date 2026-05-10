@@ -32,6 +32,10 @@ namespace Modules.Catalog.Domain.Products.Entities
             return productImage;
         }
 
+        internal void SetAsCover() => IsCover = true;
+
+        internal void UpdateOrder(int order) => Order = order;
+
         protected override void Validate()
         {
             AssertionConcern.EnsureTrue(ProductId != Guid.Empty, ProductErrors.ProductIdRequired.Description);

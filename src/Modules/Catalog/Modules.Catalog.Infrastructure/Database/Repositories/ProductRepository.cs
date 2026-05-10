@@ -58,5 +58,10 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
                 .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }
+
+        public void UpdateProductImage(ProductImage productImage)
+        {
+            context.ProductImages.Update(productImage);
+        }
     }
 }

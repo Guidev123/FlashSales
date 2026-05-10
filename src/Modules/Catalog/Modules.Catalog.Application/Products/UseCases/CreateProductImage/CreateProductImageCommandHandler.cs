@@ -3,11 +3,14 @@ using FlashSales.Application.Storage;
 using FlashSales.Domain.Results;
 using Modules.Catalog.Domain.Products.Errors;
 using Modules.Catalog.Domain.Products.Repositories;
+using Modules.Catalog.Domain.Sellers.Errors;
+using Modules.Catalog.Domain.Sellers.Repositories;
 
 namespace Modules.Catalog.Application.Products.UseCases.CreateProductImage
 {
     internal sealed class CreateProductImageCommandHandler(
         IProductRepository productRepository,
+        ISellerRepository sellerRepository,
         IBlobStorageService blobStorageService
         ) : ICommandHandler<CreateProductImageCommand, CreateProductImageResponse>
     {
@@ -19,6 +22,18 @@ namespace Modules.Catalog.Application.Products.UseCases.CreateProductImage
                 return Result.Failure<CreateProductImageResponse>(ProductErrors.NotFound(request.ProductId));
             }
 
+            var seller = await sellerRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+
+            if (seller is null)
+            {
+                return Result.Failure<CreateProductImageResponse>(SellerErrors.NotFound(request.UserId));
+            }
+
+            if (product.SellerId != seller.Id)
+            {
+                return Result.Failure<CreateProductImageResponse>(ProductErrors.SellerWithIdNotFoundOrIsNotProductOwner(seller.Id));
+            }
+
             var imageUrlResult = await UploadImageAsync(request, cancellationToken);
             if (imageUrlResult.IsFailure)
             {
@@ -27,11 +42,7 @@ namespace Modules.Catalog.Application.Products.UseCases.CreateProductImage
 
             var imageUrl = imageUrlResult.Value;
 
-            var addImageResult = product.AddImage(
-                imageUrl,
-                request.Order,
-                request.IsCover
-                );
+            var addImageResult = product.AddImage(imageUrl, request.Order, request.IsCover);
 
             if (addImageResult.IsFailure)
             {

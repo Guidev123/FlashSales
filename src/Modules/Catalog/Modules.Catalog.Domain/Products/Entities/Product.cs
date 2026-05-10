@@ -61,7 +61,59 @@ namespace Modules.Catalog.Domain.Products.Entities
             return image;
         }
 
-        private bool AlreadyHasCoverImage()
+        public Result<ProductImage> GetProductImage(Guid productImageId)
+        {
+            var productImage = _images.FirstOrDefault(i => i.Id == productImageId);
+            if (productImage is null)
+            {
+                return Result.Failure<ProductImage>(ProductErrors.ProductImageNotFound(Id, productImageId));
+            }
+
+            return Result.Success(productImage);
+        }
+
+        public Result SetCoverImage(Guid productImageId)
+        {
+            var productImage = _images.FirstOrDefault(c => c.Id == productImageId);
+            if (productImage is null)
+            {
+                return Result.Failure(ProductErrors.ProductImageNotFound(Id, productImageId));
+            }
+
+            if (_images.Where(i => i.Id == productImageId).SingleOrDefault(i => i.IsCover) is not null)
+            {
+                productImage.SetAsCover();
+                return Result.Success();
+            }
+
+            if (AlreadyHasCoverImage())
+            {
+                return Result.Failure(ProductErrors.ProductAlreadyHasCoverImage);
+            }
+
+            productImage.SetAsCover();
+            return Result.Success();
+        }
+
+        public Result UpdateImageOrder(Guid productImageId, int newOrder)
+        {
+            if (_images.Any(c => c.Order == newOrder))
+            {
+                return Result.Failure(ProductErrors.InvalidImageOrder);
+            }
+
+            var productImage = _images.FirstOrDefault(c => c.Id == productImageId);
+            if (productImage is null)
+            {
+                return Result.Failure(ProductErrors.ProductImageNotFound(Id, productImageId));
+            }
+
+            productImage.UpdateOrder(newOrder);
+
+            return Result.Success();
+        }
+
+        public bool AlreadyHasCoverImage()
         {
             return _images.Any(i => i.IsCover);
         }

@@ -1,6 +1,7 @@
 ﻿using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
+using FlashSales.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,33 +16,31 @@ namespace Modules.Catalog.Endpoints.Products
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapPost("api/v1/products/images", async (
-                CreateProductImageRequest request,
+            app.MapPost("api/v1/products/images/{productId:guid}", async (
+                Guid productId,
+                IFormFile file,
                 ISender sender,
                 ClaimsPrincipal claimsPrincipal,
-                CancellationToken cancellationToken
+                CancellationToken cancellationToken,
+                [FromHeader] int order = 1,
+                [FromHeader] bool isCover = false
                 ) =>
             {
-                await using var stream = request.File.OpenReadStream();
+                await using var stream = file.OpenReadStream();
 
                 var result = await sender.SendAsync(new CreateProductImageCommand(
-                    request.ProductId,
-                    request.Order,
-                    request.IsCover,
+                    claimsPrincipal.GetUserId(),
+                    productId,
+                    order,
+                    isCover,
                     stream,
-                    request.File.ContentType
+                    file.ContentType
                     ), cancellationToken);
 
                 return result.Match(success => Results.Ok(success), ApiResults.Problem);
-            }).WithTags(EndpointsModule.Module)
+            }).DisableAntiforgery()
+              .WithTags(EndpointsModule.Module)
               .RequireAuthorization(CatalogPermissions.Products.ProductsUpdate);
         }
-
-        private sealed record CreateProductImageRequest(
-            Guid ProductId,
-            int Order,
-            bool IsCover,
-            IFormFile File
-            );
     }
 }

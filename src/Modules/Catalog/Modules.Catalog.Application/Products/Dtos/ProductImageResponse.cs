@@ -1,10 +1,9 @@
 ﻿namespace Modules.Catalog.Application.Products.Dtos
 {
     public sealed record ProductImageResponse(
-        Guid Id,
-        Guid ProductId,
+        Guid ImageId,
+        Guid ImageProductId,
         string Url,
         int Order,
-        bool IsCover
-        );
+        bool IsCover);
 }

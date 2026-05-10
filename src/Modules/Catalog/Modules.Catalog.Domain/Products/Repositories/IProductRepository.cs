@@ -22,6 +22,8 @@ namespace Modules.Catalog.Domain.Products.Repositories
 
         void AddProductImage(ProductImage productImage);
 
+        void UpdateProductImage(ProductImage productImage);
+
         void AddCategory(Category category);
     }
 }

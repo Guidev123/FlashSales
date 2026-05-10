@@ -21,8 +21,7 @@ namespace Modules.Catalog.Endpoints.Products
                 var result = await sender.SendAsync(new GetProductByIdQuery(productId), cancellationToken);
 
                 return result.Match(() => Results.Ok(result.Value), ApiResults.Problem);
-            }).WithTags(EndpointsModule.Module)
-              .RequireAuthorization(CatalogPermissions.Products.ProductsRead);
+            }).WithTags(EndpointsModule.Module);
         }
     }
 }

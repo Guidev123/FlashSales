@@ -30,7 +30,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         {
             const string sql = """
                 SELECT
-                    sp.Id
+                    sp."Id",
                     u."Email",
                     sp."Document",
                     u."FirstName",

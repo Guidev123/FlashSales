@@ -9,9 +9,17 @@ namespace Modules.Catalog.Domain.Products.Errors
             "Products.NotFound",
             $"Product with id {productId} was not found");
 
+        public static Error ProductImageNotFound(Guid productId, Guid productImageId) => Error.NotFound(
+            "Products.ProductImageNotFound",
+            $"Product image with id {productImageId} for product with id {productId} was not found");
+
         public static readonly Error SellerIdRequired = Error.Invalid(
             "Products.SellerIdRequired",
             "Seller id must not be empty");
+
+        public static Error SellerWithIdNotFoundOrIsNotProductOwner(Guid sellerId) => Error.Invalid(
+            "Products.SellerWithIdNotFoundOrIsNotProductOwner",
+            $"Seller with id {sellerId} was not found or is not the owner of the product");
 
         public static readonly Error CategoryIdRequired = Error.Invalid(
             "Products.CategoryIdRequired",
@@ -72,5 +80,9 @@ namespace Modules.Catalog.Domain.Products.Errors
         public static readonly Error MaxImagesExceeded = Error.Invalid(
             "Products.MaxImagesExceeded",
             $"A product cannot have more than {Product.MAX_IMAGES} images");
+
+        public static readonly Error OrderMustBeGreaterThanZero = Error.Invalid(
+            "Products.OrderMustBeGreaterThanZero",
+            "Image order must be greater than or equal to 0");
     }
 }
