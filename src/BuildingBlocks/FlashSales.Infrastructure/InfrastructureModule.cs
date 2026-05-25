@@ -4,6 +4,7 @@ using FlashSales.Application.Behaviors;
 using FlashSales.Application.Bus;
 using FlashSales.Application.Cache;
 using FlashSales.Application.Messaging;
+using FlashSales.Application.Outbox;
 using FlashSales.Application.Storage;
 using FlashSales.Infrastructure.Authentication;
 using FlashSales.Infrastructure.Authorization;
@@ -19,7 +20,6 @@ using Microsoft.Extensions.Options;
 using MidR.DependencyInjection;
 using StackExchange.Redis;
 using System.Reflection;
-using System.Reflection.Metadata;
 
 namespace FlashSales.Infrastructure
 {
@@ -56,6 +56,7 @@ namespace FlashSales.Infrastructure
             services.AddScoped<IDomainEventCollector, DomainEventCollector>();
             services.AddTransient<IEventBus, MemoryEventBus>();
             services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
+            services.AddScoped<IOutboxRepositoryFactory, OutboxRepositoryFactory>();
 
             return services;
         }
