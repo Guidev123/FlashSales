@@ -83,7 +83,7 @@ namespace Modules.Users.Infrastructure
             }).AddHttpMessageHandler<KeyCloakAuthDelegatingHandler>()
             .ConfigurePrimaryHttpMessageHandler(HttpMessageHandlerFactory.CreateSocketsHttpHandler)
             .SetHandlerLifetime(Timeout.InfiniteTimeSpan)
-            .AddResilienceHandler(nameof(ResiliencePipelineExtensions), pipeline => pipeline.ConfigureResilience());
+            .AddResilienceHandler(nameof(ResiliencePipelineExtensions), pipeline => pipeline.ConfigureResilience(new HttpResilienceOptions()));
 
             services.AddTransient<IIdentityProviderService, IdentityProviderService>();
 
