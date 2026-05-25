@@ -6,7 +6,9 @@ using System.Diagnostics;
 
 namespace FlashSales.Application.Behaviors
 {
-    public sealed class NotificationLoggingBehavior<TNotification>(ILogger<NotificationLoggingBehavior<TNotification>> logger) : INotificationBehavior<TNotification>
+    public sealed class NotificationLoggingBehavior<TNotification>(
+        ILogger<NotificationLoggingBehavior<TNotification>> logger
+        ) : INotificationBehavior<TNotification>
             where TNotification : DomainEvent
 
     {
@@ -53,6 +55,19 @@ namespace FlashSales.Application.Behaviors
             }
         }
 
-        private static string GetRequestModule(string requestName) => requestName.Split('.')[1];
+        private static string GetRequestModule(string requestName)
+        {
+            const string prefix = "Modules.";
+
+            if (!requestName.StartsWith(prefix))
+                return string.Empty;
+
+            var start = prefix.Length;
+            var end = requestName.IndexOf('.', start);
+
+            return end == -1
+                ? string.Empty
+                : requestName[start..end];
+        }
     }
 }

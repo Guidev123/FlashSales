@@ -66,6 +66,19 @@ namespace FlashSales.Application.Behaviors
             }
         }
 
-        private static string GetRequestModule(string requestName) => requestName.Split('.')[1];
+        private static string GetRequestModule(string requestName)
+        {
+            const string prefix = "Modules.";
+
+            if (!requestName.StartsWith(prefix))
+                return string.Empty;
+
+            var start = prefix.Length;
+            var end = requestName.IndexOf('.', start);
+
+            return end == -1
+                ? string.Empty
+                : requestName[start..end];
+        }
     }
 }
