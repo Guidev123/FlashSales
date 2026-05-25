@@ -1,6 +1,6 @@
 ﻿using FlashSales.Application.Outbox;
 
-namespace FlashSales.Infrastructure.Factories
+namespace FlashSales.Infrastructure.Outbox
 {
     internal sealed class OutboxRepositoryFactory(
         IEnumerable<IOutboxRepositoryRegistration> registrations,
