@@ -51,7 +51,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         public void Dispose()
         {
             _contextTransaction?.Dispose();
-            context?.Dispose();
         }
     }
 }

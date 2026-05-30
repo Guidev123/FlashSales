@@ -1,10 +1,9 @@
-﻿using FlashSales.Application.Bus;
+using FlashSales.Application.Bus;
 using FlashSales.Domain.DomainObjects;
 using MidR.Interfaces;
 using Modules.Users.Application.Users.Services;
 using Modules.Users.Domain.Users.DomainEvents;
 using Modules.Users.Domain.Users.Errors;
-using Modules.Users.Domain.Users.Repositories;
 using Modules.Users.IntegrationEvents;
 
 namespace Modules.Users.Application.Users.DomainEvents
@@ -22,13 +21,17 @@ namespace Modules.Users.Application.Users.DomainEvents
                 throw new FlashSalesException(nameof(SellerActivatedDomainEvent), UserErrors.SellerNotFound(notification.UserId));
             }
 
-            await eventBus.PublishAsync(SellerActivatedIntegrationEvent.Create(
+            var integrationEvent = SellerActivatedIntegrationEvent.Create(
                 notification.UserId,
                 seller.Id,
                 $"{seller.FirstName} {seller.LastName}",
                 seller.ProfilePictureUrl,
-                true
-                ), cancellationToken);
+                true);
+
+            await eventBus.PublishAsync(
+                Topics.SellerActivated,
+                IntegrationEnvelope.FromEvent(integrationEvent),
+                cancellationToken);
         }
     }
 }

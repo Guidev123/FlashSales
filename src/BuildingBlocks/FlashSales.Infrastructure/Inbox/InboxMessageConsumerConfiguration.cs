@@ -1,29 +1,29 @@
-﻿using FlashSales.Application.Outbox;
+using FlashSales.Application.Inbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FlashSales.Infrastructure.Inbox
 {
-    public sealed class InboxMessageConsumerConfiguration : IEntityTypeConfiguration<OutboxMessageConsumer>
+    public sealed class InboxMessageConsumerConfiguration : IEntityTypeConfiguration<InboxMessageConsumer>
     {
-        public void Configure(EntityTypeBuilder<OutboxMessageConsumer> builder)
+        public void Configure(EntityTypeBuilder<InboxMessageConsumer> builder)
         {
             builder.ToTable("InboxMessageConsumers");
             builder.HasKey(c => c.Id);
 
-            builder.HasIndex(c => new { c.OutboxMessageId, c.Name }).IsUnique();
+            builder.HasIndex(c => new { c.InboxMessageId, c.Name }).IsUnique();
 
             builder.Property(c => c.Name)
                 .HasColumnType("VARCHAR(256)")
                 .IsRequired();
 
-            builder.Property(c => c.OutboxMessageId)
+            builder.Property(c => c.InboxMessageId)
                 .HasColumnType("UNIQUEIDENTIFIER")
                 .IsRequired();
 
-            builder.HasOne<OutboxMessage>()
+            builder.HasOne<InboxMessage>()
                 .WithOne()
-                .HasForeignKey<OutboxMessageConsumer>(x => x.OutboxMessageId)
+                .HasForeignKey<InboxMessageConsumer>(x => x.InboxMessageId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

@@ -1,5 +1,6 @@
 using FlashSales.Application.Abstractions;
 using FlashSales.Application.Behaviors;
+using FlashSales.Application.Inbox;
 using FlashSales.Application.Outbox;
 using FlashSales.Endpoints.Endpoints;
 using FluentValidation;
@@ -15,6 +16,7 @@ using Modules.Catalog.Domain.Sellers.Repositories;
 using Modules.Catalog.Endpoints;
 using Modules.Catalog.Infrastructure.Database;
 using Modules.Catalog.Infrastructure.Database.Repositories;
+using Modules.Catalog.Infrastructure.Inbox;
 using Modules.Catalog.Infrastructure.Outbox;
 using System.Reflection;
 
@@ -32,6 +34,7 @@ namespace Modules.Catalog.Infrastructure
             services
                 .AddData(configuration)
                 .AddOutbox(configuration)
+                .AddInbox(configuration)
                 .AddEndpoints();
 
             return services;
@@ -63,6 +66,18 @@ namespace Modules.Catalog.Infrastructure
             services.AddSingleton<IOutboxRepositoryRegistration, CatalogOutboxRepositoryRegistration>();
             services.Configure<OutboxOptions>(configuration.GetSection($"Catalog:{OutboxOptions.SectionName}"));
             services.AddHostedService<OutboxProcessor>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddInbox(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHostedService<InboxConsumer>();
+            services.AddScoped<InboxRepository>();
+            services.AddScoped<IInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
+            services.AddSingleton<IInboxRepositoryRegistration, CatalogInboxRepositoryRegistration>();
+            services.Configure<InboxOptions>(configuration.GetSection($"Catalog:{InboxOptions.SectionName}"));
+            services.AddHostedService<InboxProcessor>();
 
             return services;
         }

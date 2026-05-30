@@ -1,3 +1,5 @@
+using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using FlashSales.Application.Abstractions;
 using FlashSales.Application.Behaviors;
@@ -36,7 +38,8 @@ namespace FlashSales.Infrastructure
                 .AddBlobStorage(configuration)
                 .AddConnectionFactory(configuration)
                 .AddAuthenticationExtensions()
-                .AddAuthorizationExtensions();
+                .AddAuthorizationExtensions()
+                .AddServiceBus(configuration);
 
             return services;
         }
@@ -54,13 +57,54 @@ namespace FlashSales.Infrastructure
                         cfg.AddBehavior(typeof(RequestValidationBehavior<,>)).WithPriority(2);
                         cfg.AddBehavior(typeof(RequestTransactionBehavior<,>)).WithPriority(3);
                         cfg.AddBehavior(typeof(NotificationLoggingBehavior<>)).WithPriority(1);
+                        cfg.AddBehavior(typeof(OutboxIdempotencyBehavior<>)).WithPriority(2);
+                        cfg.AddBehavior(typeof(InboxIdempotencyBehavior<>)).WithPriority(3);
                     });
             services.AddSingleton(TimeProvider.System);
             services.AddScoped<IDomainEventCollector, DomainEventCollector>();
-            services.AddTransient<IEventBus, MemoryEventBus>();
             services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
             services.AddScoped<IOutboxRepositoryFactory, OutboxRepositoryFactory>();
             services.AddScoped<IInboxRepositoryFactory, InboxRepositoryFactory>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddServiceBus(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.Configure<ServiceBusOptions>(configuration.GetSection(ServiceBusOptions.SectionName));
+
+            var section = configuration.GetSection("ServiceBus");
+            var fullyQualifiedNamespace = section["FullyQualifiedNamespace"];
+            var connectionString = section["ConnectionString"];
+
+            var clientOptions = new ServiceBusClientOptions
+            {
+                TransportType = ServiceBusTransportType.AmqpTcp,
+                RetryOptions = new ServiceBusRetryOptions
+                {
+                    Mode = ServiceBusRetryMode.Exponential,
+                    MaxRetries = 3,
+                    Delay = TimeSpan.FromMilliseconds(800),
+                    MaxDelay = TimeSpan.FromSeconds(60)
+                }
+            };
+
+            services.AddSingleton(_ =>
+            {
+                if (!string.IsNullOrWhiteSpace(fullyQualifiedNamespace))
+                    return new ServiceBusClient(fullyQualifiedNamespace, new DefaultAzureCredential(), clientOptions);
+
+                if (!string.IsNullOrWhiteSpace(connectionString))
+                    return new ServiceBusClient(connectionString, clientOptions);
+
+                throw new InvalidOperationException(
+                    "Configure 'ServiceBus:FullyQualifiedNamespace' (Managed Identity) " +
+                    "or 'ServiceBus:ConnectionString' (dev local) on appsettings.json.");
+            });
+
+            services.AddSingleton<IEventBus, AzureServiceBus>();
 
             return services;
         }

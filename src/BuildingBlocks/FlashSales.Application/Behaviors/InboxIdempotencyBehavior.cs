@@ -1,5 +1,5 @@
-﻿using FlashSales.Application.Inbox;
-using FlashSales.Domain.DomainObjects;
+using FlashSales.Application.Inbox;
+using FlashSales.Application.Messaging;
 using MidR.Behaviors;
 
 namespace FlashSales.Application.Behaviors
@@ -8,7 +8,7 @@ namespace FlashSales.Application.Behaviors
            IInboxRepositoryFactory inboxRepositoryFactory
            )
            : INotificationBehavior<TNotification>
-           where TNotification : DomainEvent
+           where TNotification : IntegrationEvent
     {
         public async Task ExecuteAsync(TNotification notification, NotificationDelegate next, CancellationToken cancellationToken)
         {

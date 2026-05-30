@@ -1,12 +1,12 @@
-﻿using FlashSales.Application.Outbox;
+using FlashSales.Application.Inbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FlashSales.Infrastructure.Inbox
 {
-    public sealed class InboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessage>
+    public sealed class InboxMessageConfiguration : IEntityTypeConfiguration<InboxMessage>
     {
-        public void Configure(EntityTypeBuilder<OutboxMessage> builder)
+        public void Configure(EntityTypeBuilder<InboxMessage> builder)
         {
             builder.ToTable("InboxMessages");
             builder.HasKey(x => x.Id);
