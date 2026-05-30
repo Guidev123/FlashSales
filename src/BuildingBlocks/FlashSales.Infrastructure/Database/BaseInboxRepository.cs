@@ -70,34 +70,38 @@ namespace FlashSales.Infrastructure.Database
             }, cancellationToken)).WaitAsync(cancellationToken);
         }
 
-        public Task<bool> IsProcessedAsync(InboxMessageConsumer inboxMessageConsumer, CancellationToken cancellationToken)
+        public Task<bool> IsProcessedAsync(Guid correlationId, string name, CancellationToken cancellationToken)
         {
             var sql = $"""
                 SELECT EXISTS (
-                    SELECT 1 FROM {schema}."InboxMessageConsumers"
-                    WHERE "InboxMessageId" = @InboxMessageId
-                      AND "Name" = @Name
+                    SELECT 1 FROM {schema}."InboxMessageConsumers" imc
+                    WHERE imc."InboxMessageId" = (
+                        SELECT "Id" FROM {schema}."InboxMessages" WHERE "CorrelationId" = @CorrelationId
+                    )
+                    AND imc."Name" = @Name
                 )
                 """;
 
             return unitOfWork.Connection.ExecuteScalarAsync<bool>(
-                unitOfWork.CreateCommand(sql, new { inboxMessageConsumer.InboxMessageId, inboxMessageConsumer.Name }, cancellationToken)).WaitAsync(cancellationToken);
+                unitOfWork.CreateCommand(sql, new { CorrelationId = correlationId, Name = name }, cancellationToken)).WaitAsync(cancellationToken);
         }
 
-        public Task MarkAsProcessedAsync(InboxMessageConsumer inboxMessageConsumer, CancellationToken cancellationToken)
+        public Task MarkAsProcessedAsync(Guid correlationId, string name, CancellationToken cancellationToken)
         {
             var sql = $"""
                 INSERT INTO {schema}."InboxMessageConsumers" ("Id", "InboxMessageId", "Name")
-                VALUES (@Id, @InboxMessageId, @Name)
+                SELECT @Id, "Id", @Name
+                FROM {schema}."InboxMessages"
+                WHERE "CorrelationId" = @CorrelationId
                 ON CONFLICT DO NOTHING
                 """;
 
             return unitOfWork.Connection.ExecuteAsync(
                 unitOfWork.CreateCommand(sql, new
                 {
-                    inboxMessageConsumer.Id,
-                    inboxMessageConsumer.InboxMessageId,
-                    inboxMessageConsumer.Name
+                    Id = Guid.NewGuid(),
+                    CorrelationId = correlationId,
+                    Name = name
                 }, cancellationToken)).WaitAsync(cancellationToken);
         }
     }

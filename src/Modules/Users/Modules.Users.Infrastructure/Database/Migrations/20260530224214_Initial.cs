@@ -33,7 +33,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_InboxMessages", x => x.Id);
-                    table.UniqueConstraint("AK_InboxMessages_CorrelationId", x => x.CorrelationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -55,7 +54,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OutboxMessages", x => x.Id);
-                    table.UniqueConstraint("AK_OutboxMessages_CorrelationId", x => x.CorrelationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -119,7 +117,7 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                         column: x => x.InboxMessageId,
                         principalSchema: "users",
                         principalTable: "InboxMessages",
-                        principalColumn: "CorrelationId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -140,7 +138,7 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                         column: x => x.OutboxMessageId,
                         principalSchema: "users",
                         principalTable: "OutboxMessages",
-                        principalColumn: "CorrelationId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 

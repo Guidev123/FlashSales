@@ -48,7 +48,6 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_InboxMessages", x => x.Id);
-                    table.UniqueConstraint("AK_InboxMessages_CorrelationId", x => x.CorrelationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,7 +69,6 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OutboxMessages", x => x.Id);
-                    table.UniqueConstraint("AK_OutboxMessages_CorrelationId", x => x.CorrelationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -108,7 +106,7 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                         column: x => x.InboxMessageId,
                         principalSchema: "catalog",
                         principalTable: "InboxMessages",
-                        principalColumn: "CorrelationId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -129,7 +127,7 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                         column: x => x.OutboxMessageId,
                         principalSchema: "catalog",
                         principalTable: "OutboxMessages",
-                        principalColumn: "CorrelationId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 

@@ -69,34 +69,38 @@ namespace FlashSales.Infrastructure.Database
             }, cancellationToken)).WaitAsync(cancellationToken);
         }
 
-        public Task<bool> IsProcessedAsync(OutboxMessageConsumer outboxMessageConsumer, CancellationToken cancellationToken)
+        public Task<bool> IsProcessedAsync(Guid correlationId, string name, CancellationToken cancellationToken)
         {
             var sql = $"""
                 SELECT EXISTS (
-                    SELECT 1 FROM {schema}."OutboxMessageConsumers"
-                    WHERE "OutboxMessageId" = @OutboxMessageId
-                      AND "Name" = @Name
+                    SELECT 1 FROM {schema}."OutboxMessageConsumers" omc
+                    WHERE omc."OutboxMessageId" = (
+                        SELECT "Id" FROM {schema}."OutboxMessages" WHERE "CorrelationId" = @CorrelationId
+                    )
+                    AND omc."Name" = @Name
                 )
                 """;
 
             return unitOfWork.Connection.ExecuteScalarAsync<bool>(
-                unitOfWork.CreateCommand(sql, new { outboxMessageConsumer.OutboxMessageId, outboxMessageConsumer.Name }, cancellationToken)).WaitAsync(cancellationToken);
+                unitOfWork.CreateCommand(sql, new { CorrelationId = correlationId, Name = name }, cancellationToken)).WaitAsync(cancellationToken);
         }
 
-        public Task MarkAsProcessedAsync(OutboxMessageConsumer outboxMessageConsumer, CancellationToken cancellationToken)
+        public Task MarkAsProcessedAsync(Guid correlationId, string name, CancellationToken cancellationToken)
         {
             var sql = $"""
                 INSERT INTO {schema}."OutboxMessageConsumers" ("Id", "OutboxMessageId", "Name")
-                VALUES (@Id, @OutboxMessageId, @Name)
+                SELECT @Id, "Id", @Name
+                FROM {schema}."OutboxMessages"
+                WHERE "CorrelationId" = @CorrelationId
                 ON CONFLICT DO NOTHING
                 """;
 
             return unitOfWork.Connection.ExecuteAsync(
                 unitOfWork.CreateCommand(sql, new
                 {
-                    outboxMessageConsumer.Id,
-                    outboxMessageConsumer.OutboxMessageId,
-                    outboxMessageConsumer.Name
+                    Id = Guid.NewGuid(),
+                    CorrelationId = correlationId,
+                    Name = name
                 }, cancellationToken)).WaitAsync(cancellationToken);
         }
     }

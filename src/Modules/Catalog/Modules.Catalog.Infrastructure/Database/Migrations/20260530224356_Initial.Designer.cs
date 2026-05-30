@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Catalog.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20260530194734_Initial")]
+    [Migration("20260530224356_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -280,7 +280,6 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                     b.HasOne("FlashSales.Application.Inbox.InboxMessage", null)
                         .WithMany()
                         .HasForeignKey("InboxMessageId")
-                        .HasPrincipalKey("CorrelationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -290,7 +289,6 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                     b.HasOne("FlashSales.Application.Outbox.OutboxMessage", null)
                         .WithMany()
                         .HasForeignKey("OutboxMessageId")
-                        .HasPrincipalKey("CorrelationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

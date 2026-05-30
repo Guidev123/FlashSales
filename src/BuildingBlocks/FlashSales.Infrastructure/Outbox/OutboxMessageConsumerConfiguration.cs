@@ -24,7 +24,6 @@ namespace FlashSales.Infrastructure.Outbox
             builder.HasOne<OutboxMessage>()
                 .WithMany()
                 .HasForeignKey(nameof(OutboxMessageConsumer.OutboxMessageId))
-                .HasPrincipalKey(nameof(OutboxMessage.CorrelationId))
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

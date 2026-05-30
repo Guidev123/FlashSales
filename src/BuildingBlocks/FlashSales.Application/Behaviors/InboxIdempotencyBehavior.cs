@@ -14,13 +14,7 @@ namespace FlashSales.Application.Behaviors
         {
             var inboxRepository = inboxRepositoryFactory.Create(typeof(TNotification));
 
-            var inboxMessageConsumer = new InboxMessageConsumer
-            {
-                InboxMessageId = notification.CorrelationId,
-                Name = notification.MessageType
-            };
-
-            var isProcessed = await inboxRepository.IsProcessedAsync(inboxMessageConsumer, cancellationToken);
+            var isProcessed = await inboxRepository.IsProcessedAsync(notification.CorrelationId, notification.MessageType, cancellationToken);
             if (isProcessed)
             {
                 return;
@@ -28,7 +22,7 @@ namespace FlashSales.Application.Behaviors
 
             await next();
 
-            await inboxRepository.MarkAsProcessedAsync(inboxMessageConsumer, cancellationToken);
+            await inboxRepository.MarkAsProcessedAsync(notification.CorrelationId, notification.MessageType, cancellationToken);
         }
     }
 }

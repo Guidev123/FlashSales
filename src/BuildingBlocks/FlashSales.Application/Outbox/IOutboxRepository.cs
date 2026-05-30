@@ -10,8 +10,8 @@ namespace FlashSales.Application.Outbox
 
         Task<IReadOnlyList<OutboxMessage>> GetAsync(int batchSize, CancellationToken cancellationToken);
 
-        Task<bool> IsProcessedAsync(OutboxMessageConsumer outboxMessageConsumer, CancellationToken cancellationToken);
+        Task<bool> IsProcessedAsync(Guid correlationId, string name, CancellationToken cancellationToken);
 
-        Task MarkAsProcessedAsync(OutboxMessageConsumer outboxMessageConsumer, CancellationToken cancellationToken);
+        Task MarkAsProcessedAsync(Guid correlationId, string name, CancellationToken cancellationToken);
     }
 }

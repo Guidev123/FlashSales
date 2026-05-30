@@ -278,7 +278,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                     b.HasOne("FlashSales.Application.Inbox.InboxMessage", null)
                         .WithMany()
                         .HasForeignKey("InboxMessageId")
-                        .HasPrincipalKey("CorrelationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -288,7 +287,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                     b.HasOne("FlashSales.Application.Outbox.OutboxMessage", null)
                         .WithMany()
                         .HasForeignKey("OutboxMessageId")
-                        .HasPrincipalKey("CorrelationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

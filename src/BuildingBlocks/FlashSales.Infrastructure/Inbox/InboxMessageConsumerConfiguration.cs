@@ -23,7 +23,6 @@ namespace FlashSales.Infrastructure.Inbox
             builder.HasOne<InboxMessage>()
                 .WithMany()
                 .HasForeignKey(nameof(InboxMessageConsumer.InboxMessageId))
-                .HasPrincipalKey(nameof(InboxMessage.CorrelationId))
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
