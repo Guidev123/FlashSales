@@ -1,5 +1,6 @@
 using FlashSales.Application.Abstractions;
 using FlashSales.Application.Authorization;
+using FlashSales.Application.Outbox;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Infrastructure.Http;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ using Modules.Users.Infrastructure.Authorization;
 using Modules.Users.Infrastructure.Database;
 using Modules.Users.Infrastructure.Database.Repositories;
 using Modules.Users.Infrastructure.Identity;
+using Modules.Users.Infrastructure.Outbox;
 using System.Reflection;
 
 namespace Modules.Users.Infrastructure
@@ -32,10 +34,11 @@ namespace Modules.Users.Infrastructure
         public static IServiceCollection AddUsersModule(this IServiceCollection services, IConfiguration configuration)
         {
             services
-                .AddHttpClientServices(configuration)
                 .AddEndpoints()
                 .AddPermissionService()
-                .AddData(configuration);
+                .AddHttpClientServices(configuration)
+                .AddData(configuration)
+                .AddOutbox(configuration);
 
             return services;
         }
@@ -58,6 +61,17 @@ namespace Modules.Users.Infrastructure
             services.AddScoped<IUserQueryService, UserQueryService>();
 
             services.Configure<PermissionsCacheOptions>(configuration.GetSection(PermissionsCacheOptions.SectionName));
+
+            return services;
+        }
+
+        private static IServiceCollection AddOutbox(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddScoped<OutboxRepository>();
+            services.AddScoped<IOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
+            services.AddSingleton<IOutboxRepositoryRegistration, UsersOutboxRepositoryRegistration>();
+            services.Configure<OutboxOptions>(configuration.GetSection(OutboxOptions.SectionName));
+            services.AddHostedService<OutboxProcessor>();
 
             return services;
         }
