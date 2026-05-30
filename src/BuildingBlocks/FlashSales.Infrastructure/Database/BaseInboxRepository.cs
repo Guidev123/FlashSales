@@ -20,7 +20,7 @@ namespace FlashSales.Infrastructure.Database
 
             return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new
             {
-                Id = integrationEvent.CorrelationId,
+                Id = Guid.NewGuid(),
                 integrationEvent.CorrelationId,
                 Type = integrationEvent.GetType().AssemblyQualifiedName!,
                 Content = JsonConvert.SerializeObject(integrationEvent, JsonSerializerSettingsExtensions.Instance),

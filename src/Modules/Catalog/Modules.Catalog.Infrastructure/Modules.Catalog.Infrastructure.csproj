@@ -13,4 +13,8 @@
     <ProjectReference Include="..\Modules.Catalog.Endpoints\Modules.Catalog.Endpoints.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Migrations\" />
+  </ItemGroup>
+
 </Project>

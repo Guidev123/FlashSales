@@ -33,6 +33,7 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_InboxMessages", x => x.Id);
+                    table.UniqueConstraint("AK_InboxMessages_CorrelationId", x => x.CorrelationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -54,6 +55,7 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OutboxMessages", x => x.Id);
+                    table.UniqueConstraint("AK_OutboxMessages_CorrelationId", x => x.CorrelationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -117,7 +119,7 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                         column: x => x.InboxMessageId,
                         principalSchema: "users",
                         principalTable: "InboxMessages",
-                        principalColumn: "Id",
+                        principalColumn: "CorrelationId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -138,7 +140,7 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                         column: x => x.OutboxMessageId,
                         principalSchema: "users",
                         principalTable: "OutboxMessages",
-                        principalColumn: "Id",
+                        principalColumn: "CorrelationId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -246,13 +248,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_InboxMessageConsumers_InboxMessageId",
-                schema: "users",
-                table: "InboxMessageConsumers",
-                column: "InboxMessageId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_InboxMessageConsumers_InboxMessageId_Name",
                 schema: "users",
                 table: "InboxMessageConsumers",
@@ -264,13 +259,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                 schema: "users",
                 table: "InboxMessages",
                 column: "CorrelationId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OutboxMessageConsumers_OutboxMessageId",
-                schema: "users",
-                table: "OutboxMessageConsumers",
-                column: "OutboxMessageId",
                 unique: true);
 
             migrationBuilder.CreateIndex(

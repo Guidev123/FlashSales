@@ -22,6 +22,7 @@ namespace Modules.Users.Application.Users.DomainEvents
             }
 
             var integrationEvent = SellerActivatedIntegrationEvent.Create(
+                notification.CorrelationId,
                 notification.UserId,
                 seller.Id,
                 $"{seller.FirstName} {seller.LastName}",

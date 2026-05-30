@@ -4,13 +4,27 @@ namespace Modules.Users.IntegrationEvents
 {
     public sealed record SellerActivatedIntegrationEvent : IntegrationEvent
     {
-        public static SellerActivatedIntegrationEvent Create(Guid userId, Guid sellerId, string name, string? profilePictureUrl, bool isActive)
+        public static SellerActivatedIntegrationEvent Create(
+            Guid correlationId,
+            Guid userId,
+            Guid sellerId,
+            string name,
+            string? profilePictureUrl,
+            bool isActive
+            )
         {
-            return new SellerActivatedIntegrationEvent(userId, sellerId, name, profilePictureUrl, isActive);
+            return new(correlationId, userId, sellerId, name, profilePictureUrl, isActive);
         }
 
-        private SellerActivatedIntegrationEvent(Guid userId, Guid sellerId, string name, string? profilePictureUrl, bool isActive)
-            : base(nameof(SellerActivatedIntegrationEvent))
+        private SellerActivatedIntegrationEvent(
+            Guid correlationId,
+            Guid userId,
+            Guid sellerId,
+            string name,
+            string? profilePictureUrl,
+            bool isActive
+            )
+            : base(correlationId, nameof(SellerActivatedIntegrationEvent))
         {
             UserId = userId;
             SellerId = sellerId;

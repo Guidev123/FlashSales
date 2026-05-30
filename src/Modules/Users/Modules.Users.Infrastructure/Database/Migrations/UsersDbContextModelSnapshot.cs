@@ -81,9 +81,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InboxMessageId")
-                        .IsUnique();
-
                     b.HasIndex("InboxMessageId", "Name")
                         .IsUnique();
 
@@ -147,9 +144,6 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OutboxMessageId")
-                        .IsUnique();
 
                     b.HasIndex("OutboxMessageId", "Name")
                         .IsUnique();
@@ -282,8 +276,9 @@ namespace Modules.Users.Infrastructure.Database.Migrations
             modelBuilder.Entity("FlashSales.Application.Inbox.InboxMessageConsumer", b =>
                 {
                     b.HasOne("FlashSales.Application.Inbox.InboxMessage", null)
-                        .WithOne()
-                        .HasForeignKey("FlashSales.Application.Inbox.InboxMessageConsumer", "InboxMessageId")
+                        .WithMany()
+                        .HasForeignKey("InboxMessageId")
+                        .HasPrincipalKey("CorrelationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -291,8 +286,9 @@ namespace Modules.Users.Infrastructure.Database.Migrations
             modelBuilder.Entity("FlashSales.Application.Outbox.OutboxMessageConsumer", b =>
                 {
                     b.HasOne("FlashSales.Application.Outbox.OutboxMessage", null)
-                        .WithOne()
-                        .HasForeignKey("FlashSales.Application.Outbox.OutboxMessageConsumer", "OutboxMessageId")
+                        .WithMany()
+                        .HasForeignKey("OutboxMessageId")
+                        .HasPrincipalKey("CorrelationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

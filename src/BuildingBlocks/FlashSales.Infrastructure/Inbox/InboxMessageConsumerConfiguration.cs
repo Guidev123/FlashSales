@@ -21,8 +21,9 @@ namespace FlashSales.Infrastructure.Inbox
                 .IsRequired();
 
             builder.HasOne<InboxMessage>()
-                .WithOne()
-                .HasForeignKey<InboxMessageConsumer>(x => x.InboxMessageId)
+                .WithMany()
+                .HasForeignKey(nameof(InboxMessageConsumer.InboxMessageId))
+                .HasPrincipalKey(nameof(InboxMessage.CorrelationId))
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

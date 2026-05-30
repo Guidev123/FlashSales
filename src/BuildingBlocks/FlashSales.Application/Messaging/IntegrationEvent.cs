@@ -7,11 +7,11 @@ namespace FlashSales.Application.Messaging
         [JsonConstructor]
         protected IntegrationEvent() { }
 
-        protected IntegrationEvent(string messageType)
+        protected IntegrationEvent(Guid correlationId, string messageType)
         {
-            CorrelationId = Guid.NewGuid();
-            OccurredOn = DateTimeOffset.UtcNow;
+            CorrelationId = correlationId;
             MessageType = messageType;
+            OccurredOn = DateTimeOffset.UtcNow;
         }
 
         public Guid CorrelationId { get; set; }
