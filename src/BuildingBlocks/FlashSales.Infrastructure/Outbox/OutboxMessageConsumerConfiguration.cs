@@ -19,7 +19,6 @@ namespace FlashSales.Infrastructure.Outbox
                 .IsRequired();
 
             builder.Property(c => c.OutboxMessageId)
-                .HasColumnType("UNIQUEIDENTIFIER")
                 .IsRequired();
 
             builder.HasOne<OutboxMessage>()

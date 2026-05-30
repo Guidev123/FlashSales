@@ -71,6 +71,7 @@ namespace Modules.Users.Infrastructure
         private static IServiceCollection AddOutbox(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<OutboxRepository>();
+            services.AddScoped<IUsersOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
             services.AddScoped<IOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
             services.AddSingleton<IOutboxRepositoryRegistration, UsersOutboxRepositoryRegistration>();
             services.Configure<OutboxOptions>(configuration.GetSection($"Users:{OutboxOptions.SectionName}"));
@@ -82,6 +83,7 @@ namespace Modules.Users.Infrastructure
         private static IServiceCollection AddInbox(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<InboxRepository>();
+            services.AddScoped<IUsersInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
             services.AddScoped<IInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
             services.AddSingleton<IInboxRepositoryRegistration, UsersInboxRepositoryRegistration>();
             services.Configure<InboxOptions>(configuration.GetSection($"Users:{InboxOptions.SectionName}"));

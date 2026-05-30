@@ -1,6 +1,7 @@
 using FlashSales.Application.Outbox;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Users.Application;
+using Modules.Users.Domain;
 using Modules.Users.Infrastructure.Database.Repositories;
 
 namespace Modules.Users.Infrastructure.Outbox
@@ -8,7 +9,8 @@ namespace Modules.Users.Infrastructure.Outbox
     internal sealed class UsersOutboxRepositoryRegistration : IOutboxRepositoryRegistration
     {
         public bool Matches(Type commandType)
-            => commandType.Assembly == AssemblyReference.Assembly;
+            => commandType.Assembly == Application.AssemblyReference.Assembly
+            || commandType.Assembly == Domain.AssemblyReference.Assembly;
 
         public IOutboxRepository Resolve(IServiceProvider sp)
             => sp.GetRequiredService<OutboxRepository>();

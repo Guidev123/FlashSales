@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Users.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
-    [Migration("20260423014000_Initial")]
+    [Migration("20260530153849_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -21,10 +21,144 @@ namespace Modules.Users.Infrastructure.Database.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("users")
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("FlashSales.Application.Inbox.InboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("JSONB");
+
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("VARCHAR(256)");
+
+                    b.Property<bool>("IsPermanentFailure")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("NextRetryAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("OccurredOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("ProcessedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CorrelationId")
+                        .IsUnique();
+
+                    b.ToTable("InboxMessages", "users");
+                });
+
+            modelBuilder.Entity("FlashSales.Application.Inbox.InboxMessageConsumer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("InboxMessageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InboxMessageId")
+                        .IsUnique();
+
+                    b.HasIndex("InboxMessageId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("InboxMessageConsumers", "users");
+                });
+
+            modelBuilder.Entity("FlashSales.Application.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("JSONB");
+
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("VARCHAR(256)");
+
+                    b.Property<bool>("IsPermanentFailure")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("NextRetryAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("OccurredOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("ProcessedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CorrelationId")
+                        .IsUnique();
+
+                    b.ToTable("OutboxMessages", "users");
+                });
+
+            modelBuilder.Entity("FlashSales.Application.Outbox.OutboxMessageConsumer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(256)");
+
+                    b.Property<Guid>("OutboxMessageId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OutboxMessageId")
+                        .IsUnique();
+
+                    b.HasIndex("OutboxMessageId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("OutboxMessageConsumers", "users");
+                });
 
             modelBuilder.Entity("Modules.Users.Domain.AccessManagement.Models.Permission", b =>
                 {
@@ -146,6 +280,24 @@ namespace Modules.Users.Infrastructure.Database.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRoles", "users");
+                });
+
+            modelBuilder.Entity("FlashSales.Application.Inbox.InboxMessageConsumer", b =>
+                {
+                    b.HasOne("FlashSales.Application.Inbox.InboxMessage", null)
+                        .WithOne()
+                        .HasForeignKey("FlashSales.Application.Inbox.InboxMessageConsumer", "InboxMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FlashSales.Application.Outbox.OutboxMessageConsumer", b =>
+                {
+                    b.HasOne("FlashSales.Application.Outbox.OutboxMessage", null)
+                        .WithOne()
+                        .HasForeignKey("FlashSales.Application.Outbox.OutboxMessageConsumer", "OutboxMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Modules.Users.Domain.AccessManagement.Models.RegistrationTypeRoles", b =>

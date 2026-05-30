@@ -12,6 +12,7 @@ using System.Text;
 namespace Modules.Users.Infrastructure.Inbox
 {
 #pragma warning disable CS9113 // eventBus will be used when topics are subscribed
+
     internal sealed class InboxConsumer(
         IEventBus eventBus,
         IServiceProvider serviceProvider,
@@ -19,7 +20,7 @@ namespace Modules.Users.Infrastructure.Inbox
         ) : BackgroundService
 #pragma warning restore CS9113
     {
-        private const string SubscriptionName = "users";
+        private const string SubscriptionName = "users.sub";
         private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(30);
 
         private readonly List<IAsyncDisposable> _subscriptions = [];
@@ -63,7 +64,7 @@ namespace Modules.Users.Infrastructure.Inbox
         {
             await using var scope = serviceProvider.CreateAsyncScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUsersUnitOfWork>();
-            var inboxRepository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
+            var inboxRepository = scope.ServiceProvider.GetRequiredService<IUsersInboxRepository>();
 
             try
             {

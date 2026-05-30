@@ -22,7 +22,6 @@ namespace Modules.Users.Endpoints
         public static class Accounts
         {
             public const string UpdateOwn = "accounts:update-own";
-            public const string SellerCreate = "seller-profile:create";
             public const string SellerReadOwn = "seller-profile:read-own";
             public const string CustomerReadOwn = "accounts:read-own";
         }

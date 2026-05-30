@@ -18,7 +18,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
         ILogger<InboxConsumer> logger
         ) : BackgroundService
     {
-        private const string SubscriptionName = "catalog";
+        private const string SubscriptionName = "catalog.sub";
         private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(30);
 
         private readonly List<IAsyncDisposable> _subscriptions = [];
@@ -68,7 +68,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
         {
             await using var scope = serviceProvider.CreateAsyncScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<ICatalogUnitOfWork>();
-            var inboxRepository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
+            var inboxRepository = scope.ServiceProvider.GetRequiredService<ICatalogInboxRepository>();
 
             try
             {

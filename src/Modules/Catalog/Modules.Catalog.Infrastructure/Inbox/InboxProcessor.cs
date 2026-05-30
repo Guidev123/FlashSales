@@ -1,4 +1,3 @@
-using FlashSales.Application.Abstractions;
 using FlashSales.Application.Extensions;
 using FlashSales.Application.Inbox;
 using FlashSales.Application.Messaging;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MidR.Interfaces;
+using Modules.Catalog.Application.Abstractions;
 using Newtonsoft.Json;
 
 namespace Modules.Catalog.Infrastructure.Inbox
@@ -41,8 +41,8 @@ namespace Modules.Catalog.Infrastructure.Inbox
         private async Task ProcessInboxAsync(CancellationToken stoppingToken)
         {
             await using var scope = serviceProvider.CreateAsyncScope();
-            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            var inboxRepository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<ICatalogUnitOfWork>();
+            var inboxRepository = scope.ServiceProvider.GetRequiredService<ICatalogInboxRepository>();
             var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
 
             logger.LogInformation("[Catalog] Beginning to process inbox messages");
@@ -98,7 +98,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
             if (exception is FlashSalesException)
             {
                 inboxMessage.IsPermanentFailure = true;
-                inboxMessage.Error = exception.Message;
+                inboxMessage.Error = exception.Message.Length > 256 ? exception.Message[..256] : exception.Message;
 
                 logger.LogWarning(
                     "[Catalog] Permanent failure on inbox message {MessageId}: {Error}",
@@ -109,7 +109,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
             }
 
             inboxMessage.RetryCount++;
-            inboxMessage.Error = exception.Message;
+            inboxMessage.Error = exception.Message.Length > 256 ? exception.Message[..256] : exception.Message;
 
             if (inboxMessage.RetryCount >= _inboxOptions.MaxRetryCount)
             {

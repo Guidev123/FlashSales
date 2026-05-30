@@ -62,6 +62,7 @@ namespace Modules.Catalog.Infrastructure
         private static IServiceCollection AddOutbox(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<OutboxRepository>();
+            services.AddScoped<ICatalogOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
             services.AddScoped<IOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
             services.AddSingleton<IOutboxRepositoryRegistration, CatalogOutboxRepositoryRegistration>();
             services.Configure<OutboxOptions>(configuration.GetSection($"Catalog:{OutboxOptions.SectionName}"));
@@ -74,6 +75,7 @@ namespace Modules.Catalog.Infrastructure
         {
             services.AddHostedService<InboxConsumer>();
             services.AddScoped<InboxRepository>();
+            services.AddScoped<ICatalogInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
             services.AddScoped<IInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
             services.AddSingleton<IInboxRepositoryRegistration, CatalogInboxRepositoryRegistration>();
             services.Configure<InboxOptions>(configuration.GetSection($"Catalog:{InboxOptions.SectionName}"));

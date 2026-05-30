@@ -1,5 +1,4 @@
-﻿using FlashSales.Application.Abstractions;
-using FlashSales.Application.Extensions;
+﻿using FlashSales.Application.Extensions;
 using FlashSales.Application.Outbox;
 using FlashSales.Domain.DomainObjects;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MidR.Interfaces;
+using Modules.Users.Application.Abstractions;
 using Newtonsoft.Json;
 
 namespace Modules.Users.Infrastructure.Outbox
@@ -40,8 +40,8 @@ namespace Modules.Users.Infrastructure.Outbox
         private async Task ProcessOutboxAsync(CancellationToken stoppingToken)
         {
             await using var scope = serviceProvider.CreateAsyncScope();
-            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            var outboxRepository = scope.ServiceProvider.GetRequiredService<IOutboxRepository>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUsersUnitOfWork>();
+            var outboxRepository = scope.ServiceProvider.GetRequiredService<IUsersOutboxRepository>();
             var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
 
             logger.LogInformation("[Users] Beginning to process outbox messages");
@@ -97,7 +97,7 @@ namespace Modules.Users.Infrastructure.Outbox
             if (exception is FlashSalesException)
             {
                 outboxMessage.IsPermanentFailure = true;
-                outboxMessage.Error = exception.Message;
+                outboxMessage.Error = exception.Message.Length > 256 ? exception.Message[..256] : exception.Message;
 
                 logger.LogWarning(
                     "[Users] Permanent failure on outbox message {MessageId}: {Error}",
@@ -108,7 +108,7 @@ namespace Modules.Users.Infrastructure.Outbox
             }
 
             outboxMessage.RetryCount++;
-            outboxMessage.Error = exception.Message;
+            outboxMessage.Error = exception.Message.Length > 256 ? exception.Message[..256] : exception.Message;
 
             if (outboxMessage.RetryCount >= _outboxOptions.MaxRetryCount)
             {
@@ -131,6 +131,5 @@ namespace Modules.Users.Infrastructure.Outbox
                 _outboxOptions.MaxRetryCount,
                 outboxMessage.NextRetryAt);
         }
-
     }
 }

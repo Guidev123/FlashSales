@@ -30,6 +30,48 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InboxMessages",
+                schema: "catalog",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CorrelationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<string>(type: "VARCHAR(200)", nullable: false),
+                    Content = table.Column<string>(type: "JSONB", nullable: false),
+                    OccurredOn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ProcessedOn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Error = table.Column<string>(type: "VARCHAR(256)", nullable: true),
+                    RetryCount = table.Column<int>(type: "integer", nullable: false),
+                    NextRetryAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsPermanentFailure = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InboxMessages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OutboxMessages",
+                schema: "catalog",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CorrelationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<string>(type: "VARCHAR(200)", nullable: false),
+                    Content = table.Column<string>(type: "JSONB", nullable: false),
+                    OccurredOn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ProcessedOn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Error = table.Column<string>(type: "VARCHAR(256)", nullable: true),
+                    RetryCount = table.Column<int>(type: "integer", nullable: false),
+                    NextRetryAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsPermanentFailure = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutboxMessages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sellers",
                 schema: "catalog",
                 columns: table => new
@@ -45,6 +87,48 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sellers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InboxMessageConsumers",
+                schema: "catalog",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    InboxMessageId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "VARCHAR(256)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InboxMessageConsumers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InboxMessageConsumers_InboxMessages_InboxMessageId",
+                        column: x => x.InboxMessageId,
+                        principalSchema: "catalog",
+                        principalTable: "InboxMessages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OutboxMessageConsumers",
+                schema: "catalog",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OutboxMessageId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "VARCHAR(256)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutboxMessageConsumers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OutboxMessageConsumers_OutboxMessages_OutboxMessageId",
+                        column: x => x.OutboxMessageId,
+                        principalSchema: "catalog",
+                        principalTable: "OutboxMessages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -111,6 +195,48 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_InboxMessageConsumers_InboxMessageId",
+                schema: "catalog",
+                table: "InboxMessageConsumers",
+                column: "InboxMessageId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InboxMessageConsumers_InboxMessageId_Name",
+                schema: "catalog",
+                table: "InboxMessageConsumers",
+                columns: new[] { "InboxMessageId", "Name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InboxMessages_CorrelationId",
+                schema: "catalog",
+                table: "InboxMessages",
+                column: "CorrelationId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutboxMessageConsumers_OutboxMessageId",
+                schema: "catalog",
+                table: "OutboxMessageConsumers",
+                column: "OutboxMessageId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutboxMessageConsumers_OutboxMessageId_Name",
+                schema: "catalog",
+                table: "OutboxMessageConsumers",
+                columns: new[] { "OutboxMessageId", "Name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutboxMessages_CorrelationId",
+                schema: "catalog",
+                table: "OutboxMessages",
+                column: "CorrelationId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductImages_ProductId_Order",
                 schema: "catalog",
                 table: "ProductImages",
@@ -147,7 +273,23 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "InboxMessageConsumers",
+                schema: "catalog");
+
+            migrationBuilder.DropTable(
+                name: "OutboxMessageConsumers",
+                schema: "catalog");
+
+            migrationBuilder.DropTable(
                 name: "ProductImages",
+                schema: "catalog");
+
+            migrationBuilder.DropTable(
+                name: "InboxMessages",
+                schema: "catalog");
+
+            migrationBuilder.DropTable(
+                name: "OutboxMessages",
                 schema: "catalog");
 
             migrationBuilder.DropTable(

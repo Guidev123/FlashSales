@@ -18,7 +18,6 @@ namespace FlashSales.Infrastructure.Inbox
                 .IsRequired();
 
             builder.Property(c => c.InboxMessageId)
-                .HasColumnType("UNIQUEIDENTIFIER")
                 .IsRequired();
 
             builder.HasOne<InboxMessage>()
