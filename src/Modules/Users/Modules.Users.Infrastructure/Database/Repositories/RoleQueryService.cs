@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using FlashSales.Infrastructure.Extensions;
 using Modules.Users.Application.Abstractions;
 using Modules.Users.Application.AccessManagement.Services;
 using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
@@ -8,8 +9,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 {
     internal sealed class RoleQueryService(IUsersUnitOfWork unitOfWork) : IRoleQueryService
     {
-        private CommandDefinition Cmd(string sql, object? param = null, CancellationToken cancellationToken = default) =>
-            new(sql, param, transaction: unitOfWork.Transaction, cancellationToken: cancellationToken);
 
         public async Task<GetRoleResponse?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
@@ -21,7 +20,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             """;
 
             var rows = await unitOfWork.Connection.QueryAsync<(string Name, string? PermissionCode)>(
-                Cmd(sql, new { Name = name }, cancellationToken));
+                unitOfWork.CreateCommand(sql, new { Name = name }, cancellationToken));
 
             var list = rows.ToList();
             if (list.Count == 0)
@@ -44,7 +43,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             """;
 
             var rows = await unitOfWork.Connection.QueryAsync<(Guid UserId, string RoleName, string? PermissionCode)>(
-                Cmd(sql, new { IdentiyProviderId = identiyProviderId }, cancellationToken));
+                unitOfWork.CreateCommand(sql, new { IdentiyProviderId = identiyProviderId }, cancellationToken));
 
             var list = rows.ToList();
             if (list.Count == 0)

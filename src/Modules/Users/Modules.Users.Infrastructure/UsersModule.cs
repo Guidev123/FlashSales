@@ -70,7 +70,7 @@ namespace Modules.Users.Infrastructure
             services.AddScoped<OutboxRepository>();
             services.AddScoped<IOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
             services.AddSingleton<IOutboxRepositoryRegistration, UsersOutboxRepositoryRegistration>();
-            services.Configure<OutboxOptions>(configuration.GetSection(OutboxOptions.SectionName));
+            services.Configure<OutboxOptions>(configuration.GetSection($"Users:{OutboxOptions.SectionName}"));
             services.AddHostedService<OutboxProcessor>();
 
             return services;

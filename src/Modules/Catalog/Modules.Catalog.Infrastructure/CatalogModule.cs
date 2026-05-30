@@ -1,5 +1,6 @@
 using FlashSales.Application.Abstractions;
 using FlashSales.Application.Behaviors;
+using FlashSales.Application.Outbox;
 using FlashSales.Endpoints.Endpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using Modules.Catalog.Domain.Sellers.Repositories;
 using Modules.Catalog.Endpoints;
 using Modules.Catalog.Infrastructure.Database;
 using Modules.Catalog.Infrastructure.Database.Repositories;
+using Modules.Catalog.Infrastructure.Outbox;
 using System.Reflection;
 
 namespace Modules.Catalog.Infrastructure
@@ -29,6 +31,7 @@ namespace Modules.Catalog.Infrastructure
         {
             services
                 .AddData(configuration)
+                .AddOutbox(configuration)
                 .AddEndpoints();
 
             return services;
@@ -49,6 +52,17 @@ namespace Modules.Catalog.Infrastructure
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ISellerRepository, SellerRepository>();
             services.AddScoped<IProductQueryService, ProductQueryService>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddOutbox(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddScoped<OutboxRepository>();
+            services.AddScoped<IOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
+            services.AddSingleton<IOutboxRepositoryRegistration, CatalogOutboxRepositoryRegistration>();
+            services.Configure<OutboxOptions>(configuration.GetSection($"Catalog:{OutboxOptions.SectionName}"));
+            services.AddHostedService<OutboxProcessor>();
 
             return services;
         }

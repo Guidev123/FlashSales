@@ -6,11 +6,11 @@
       "BaseUrl": "",
       "ConfidentialClientId": "",
       "ConfidentialClientSecret": ""
+    },
+    "Outbox": {
+      "IntervalInSeconds": 5,
+      "BatchSize": 10,
+      "MaxRetryCount": 3
     }
-  },
-  "Outbox": {
-    "IntervalInSeconds": 5,
-    "BatchSize": 10,
-    "MaxRetryCount": 3
   }
 }

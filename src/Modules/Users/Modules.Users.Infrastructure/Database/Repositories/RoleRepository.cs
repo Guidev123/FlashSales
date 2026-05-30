@@ -1,5 +1,6 @@
 using Dapper;
 using FlashSales.Domain.Results;
+using FlashSales.Infrastructure.Extensions;
 using Modules.Users.Application.Abstractions;
 using Modules.Users.Domain.AccessManagement.Models;
 using Modules.Users.Domain.AccessManagement.Repositories;
@@ -9,8 +10,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 {
     internal sealed class RoleRepository(IUsersUnitOfWork unitOfWork) : IRoleRepository
     {
-        private CommandDefinition Cmd(string sql, object? param = null, CancellationToken cancellationToken = default) =>
-            new(sql, param, transaction: unitOfWork.Transaction, cancellationToken: cancellationToken);
 
         public Task AddAsync(Role role, CancellationToken cancellationToken = default)
         {
@@ -20,7 +19,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             ON CONFLICT DO NOTHING
             """;
 
-            return unitOfWork.Connection.ExecuteAsync(Cmd(sql, new { role.Name }, cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new { role.Name }, cancellationToken));
         }
 
         public Task AddPermissionAsync(string code, CancellationToken cancellationToken = default)
@@ -31,7 +30,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             ON CONFLICT DO NOTHING
             """;
 
-            return unitOfWork.Connection.ExecuteAsync(Cmd(sql, new { Code = code }, cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new { Code = code }, cancellationToken));
         }
 
         public Task AddDefaultRoleForRegistrationTypeAsync(string roleName, RegistrationType registrationType, CancellationToken cancellationToken = default)
@@ -42,7 +41,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             ON CONFLICT DO NOTHING
             """;
 
-            return unitOfWork.Connection.ExecuteAsync(Cmd(sql, new
+            return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new
             {
                 Type = registrationType.ToString(),
                 RoleName = roleName
@@ -57,7 +56,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             ON CONFLICT DO NOTHING
             """;
 
-            return unitOfWork.Connection.ExecuteAsync(Cmd(sql, new { RoleName = roleName, UserId = userId }, cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new { RoleName = roleName, UserId = userId }, cancellationToken));
         }
 
         public Task UnassignFromUserAsync(string roleName, Guid userId, CancellationToken cancellationToken = default)
@@ -68,7 +67,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
               AND "UserId" = @UserId
             """;
 
-            return unitOfWork.Connection.ExecuteAsync(Cmd(sql, new { RoleName = roleName, UserId = userId }, cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new { RoleName = roleName, UserId = userId }, cancellationToken));
         }
 
         public Task DeleteAsync(string name, CancellationToken cancellationToken = default)
@@ -78,7 +77,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             WHERE "Name" = @Name
             """;
 
-            return unitOfWork.Connection.ExecuteAsync(Cmd(sql, new { Name = name }, cancellationToken));
+            return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new { Name = name }, cancellationToken));
         }
 
         public Task<bool> RoleExistsAsync(string name, CancellationToken cancellationToken = default)
@@ -90,7 +89,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             )
             """;
 
-            return unitOfWork.Connection.ExecuteScalarAsync<bool>(Cmd(sql, new { Name = name }, cancellationToken));
+            return unitOfWork.Connection.ExecuteScalarAsync<bool>(unitOfWork.CreateCommand(sql, new { Name = name }, cancellationToken));
         }
 
         public Task<bool> PermissionExistsAsync(string code, CancellationToken cancellationToken = default)
@@ -102,7 +101,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             )
             """;
 
-            return unitOfWork.Connection.ExecuteScalarAsync<bool>(Cmd(sql, new { Code = code }, cancellationToken));
+            return unitOfWork.Connection.ExecuteScalarAsync<bool>(unitOfWork.CreateCommand(sql, new { Code = code }, cancellationToken));
         }
 
         public Task<bool> RolePermissionExistsAsync(string roleName, string permissionCode, CancellationToken cancellationToken = default)
@@ -115,7 +114,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             )
             """;
 
-            return unitOfWork.Connection.ExecuteScalarAsync<bool>(Cmd(sql, new
+            return unitOfWork.Connection.ExecuteScalarAsync<bool>(unitOfWork.CreateCommand(sql, new
             {
                 RoleName = roleName,
                 PermissionCode = permissionCode
@@ -130,7 +129,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             ON CONFLICT DO NOTHING
             """;
 
-            return unitOfWork.Connection.ExecuteAsync(Cmd(sql, new
+            return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new
             {
                 RoleName = roleName,
                 PermissionCode = permissionCode
@@ -145,7 +144,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
               AND "PermissionCode" = @PermissionCode
             """;
 
-            return unitOfWork.Connection.ExecuteAsync(Cmd(sql, new
+            return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new
             {
                 RoleName = roleName,
                 PermissionCode = permissionCode
@@ -162,7 +161,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             """;
 
             var rows = await unitOfWork.Connection.QueryAsync<(string Name, int TotalCount)>(
-                Cmd(sql, new { PageSize = pageSize, Offset = (page - 1) * pageSize }, cancellationToken));
+                unitOfWork.CreateCommand(sql, new { PageSize = pageSize, Offset = (page - 1) * pageSize }, cancellationToken));
 
             var list = rows.ToList();
             var totalCount = list.Count > 0 ? list[0].TotalCount : 0;
@@ -185,7 +184,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             """;
 
             var roles = await unitOfWork.Connection.QueryAsync<string>(
-                Cmd(sql, new { Type = registrationType.ToString() }, cancellationToken));
+                unitOfWork.CreateCommand(sql, new { Type = registrationType.ToString() }, cancellationToken));
 
             return roles.Select(name => new Role(name)).ToList();
         }

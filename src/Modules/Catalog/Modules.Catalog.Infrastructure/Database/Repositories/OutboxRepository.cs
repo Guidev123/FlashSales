@@ -3,18 +3,17 @@ using FlashSales.Application.Extensions;
 using FlashSales.Application.Outbox;
 using FlashSales.Domain.DomainObjects;
 using FlashSales.Infrastructure.Extensions;
-using Modules.Users.Application.Abstractions;
+using Modules.Catalog.Application.Abstractions;
 using Newtonsoft.Json;
 
-namespace Modules.Users.Infrastructure.Database.Repositories
+namespace Modules.Catalog.Infrastructure.Database.Repositories
 {
-    internal sealed class OutboxRepository(IUsersUnitOfWork unitOfWork) : IOutboxRepository
+    internal sealed class OutboxRepository(ICatalogUnitOfWork unitOfWork) : IOutboxRepository
     {
-
         public Task InsertAsync(DomainEvent domainEvent, CancellationToken cancellationToken)
         {
             const string sql = """
-                INSERT INTO users."OutboxMessages"("Id", "CorrelationId", "Type", "Content", "OccurredOn", "RetryCount", "IsPermanentFailure")
+                INSERT INTO catalog."OutboxMessages"("Id", "CorrelationId", "Type", "Content", "OccurredOn", "RetryCount", "IsPermanentFailure")
                 VALUES(@Id, @CorrelationId, @Type, @Content, @OccurredOn, 0, false)
                 """;
 
@@ -33,7 +32,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             const string sql = """
                 SELECT "Id", "CorrelationId", "Type", "Content", "OccurredOn",
                        "ProcessedOn", "Error", "RetryCount", "NextRetryAt", "IsPermanentFailure"
-                FROM users."OutboxMessages"
+                FROM catalog."OutboxMessages"
                 WHERE "ProcessedOn" IS NULL
                   AND "IsPermanentFailure" = false
                   AND ("NextRetryAt" IS NULL OR "NextRetryAt" <= @Now)
@@ -50,12 +49,12 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         public Task UpdateAsync(Exception? exception, OutboxMessage outboxMessage, CancellationToken cancellationToken)
         {
             const string sql = """
-                UPDATE users."OutboxMessages"
-                SET "ProcessedOn"       = @ProcessedOn,
-                    "Error"             = @Error,
-                    "RetryCount"        = @RetryCount,
-                    "NextRetryAt"       = @NextRetryAt,
-                    "IsPermanentFailure"= @IsPermanentFailure
+                UPDATE catalog."OutboxMessages"
+                SET "ProcessedOn"        = @ProcessedOn,
+                    "Error"              = @Error,
+                    "RetryCount"         = @RetryCount,
+                    "NextRetryAt"        = @NextRetryAt,
+                    "IsPermanentFailure" = @IsPermanentFailure
                 WHERE "Id" = @Id
                 """;
 
@@ -74,7 +73,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         {
             const string sql = """
                 SELECT EXISTS (
-                    SELECT 1 FROM users."OutboxMessageConsumers"
+                    SELECT 1 FROM catalog."OutboxMessageConsumers"
                     WHERE "OutboxMessageId" = @OutboxMessageId
                       AND "Name" = @Name
                 )
@@ -87,7 +86,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         public Task MarkAsProcessedAsync(OutboxMessageConsumer outboxMessageConsumer, CancellationToken cancellationToken)
         {
             const string sql = """
-                INSERT INTO users."OutboxMessageConsumers" ("Id", "OutboxMessageId", "Name")
+                INSERT INTO catalog."OutboxMessageConsumers" ("Id", "OutboxMessageId", "Name")
                 VALUES (@Id, @OutboxMessageId, @Name)
                 ON CONFLICT DO NOTHING
                 """;
