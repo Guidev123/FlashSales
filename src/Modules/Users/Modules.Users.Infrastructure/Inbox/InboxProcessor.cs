@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using MidR.Interfaces;
 using Newtonsoft.Json;
 
-namespace Modules.Catalog.Infrastructure.Inbox
+namespace Modules.Users.Infrastructure.Inbox
 {
     internal sealed class InboxProcessor(
         ILogger<InboxProcessor> logger,
@@ -33,7 +33,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "[Catalog] Unhandled exception in inbox worker");
+                    logger.LogError(ex, "[Users] Unhandled exception in inbox worker");
                 }
             }
         }
@@ -43,9 +43,8 @@ namespace Modules.Catalog.Infrastructure.Inbox
             await using var scope = serviceProvider.CreateAsyncScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
             var inboxRepository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
-            var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
 
-            logger.LogInformation("[Catalog] Beginning to process inbox messages");
+            logger.LogInformation("[Users] Beginning to process inbox messages");
 
             await unitOfWork.BeginTransactionAsync(stoppingToken);
 
@@ -70,7 +69,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "[Catalog] Exception while processing inbox message {MessageId}", inboxMessage.Id);
+                    logger.LogError(ex, "[Users] Exception while processing inbox message {MessageId}", inboxMessage.Id);
                     exception = ex;
                 }
 
@@ -84,7 +83,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
 
             await unitOfWork.CommitAsync(stoppingToken);
 
-            logger.LogInformation("[Catalog] Completed process inbox messages");
+            logger.LogInformation("[Users] Completed process inbox messages");
         }
 
         private void ApplyRetryPolicy(InboxMessage inboxMessage, Exception? exception)
@@ -101,7 +100,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 inboxMessage.Error = exception.Message;
 
                 logger.LogWarning(
-                    "[Catalog] Permanent failure on inbox message {MessageId}: {Error}",
+                    "[Users] Permanent failure on inbox message {MessageId}: {Error}",
                     inboxMessage.Id,
                     exception.Message);
 
@@ -116,7 +115,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 inboxMessage.IsPermanentFailure = true;
 
                 logger.LogError(
-                    "[Catalog] Inbox message {MessageId} exceeded max retries ({MaxRetry}). Marked as permanent failure.",
+                    "[Users] Inbox message {MessageId} exceeded max retries ({MaxRetry}). Marked as permanent failure.",
                     inboxMessage.Id,
                     _inboxOptions.MaxRetryCount);
 
@@ -126,7 +125,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
             inboxMessage.NextRetryAt = DateTimeOffset.UtcNow.ComputeNextRetryAt(inboxMessage.RetryCount);
 
             logger.LogWarning(
-                "[Catalog] Inbox message {MessageId} scheduled for retry {RetryCount}/{MaxRetry} at {NextRetryAt}",
+                "[Users] Inbox message {MessageId} scheduled for retry {RetryCount}/{MaxRetry} at {NextRetryAt}",
                 inboxMessage.Id,
                 inboxMessage.RetryCount,
                 _inboxOptions.MaxRetryCount,

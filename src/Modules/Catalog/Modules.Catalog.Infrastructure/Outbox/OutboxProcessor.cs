@@ -122,7 +122,7 @@ namespace Modules.Catalog.Infrastructure.Outbox
                 return;
             }
 
-            outboxMessage.NextRetryAt = ComputeNextRetryAt(outboxMessage.RetryCount);
+            outboxMessage.NextRetryAt = DateTimeOffset.UtcNow.ComputeNextRetryAt(outboxMessage.RetryCount);
 
             logger.LogWarning(
                 "[Catalog] Outbox message {MessageId} scheduled for retry {RetryCount}/{MaxRetry} at {NextRetryAt}",
@@ -132,14 +132,5 @@ namespace Modules.Catalog.Infrastructure.Outbox
                 outboxMessage.NextRetryAt);
         }
 
-        private static DateTimeOffset ComputeNextRetryAt(int retryCount)
-        {
-            var baseDelay = TimeSpan.FromSeconds(Math.Pow(2, retryCount));
-
-            var jitter = TimeSpan.FromMilliseconds(
-                Random.Shared.NextDouble() * baseDelay.TotalMilliseconds * 0.2);
-
-            return DateTimeOffset.UtcNow + baseDelay + jitter;
-        }
     }
 }

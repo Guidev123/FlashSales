@@ -11,6 +11,11 @@
       "IntervalInSeconds": 5,
       "BatchSize": 10,
       "MaxRetryCount": 3
+    },
+    "Inbox": {
+      "IntervalInSeconds": 5,
+      "BatchSize": 10,
+      "MaxRetryCount": 3
     }
   }
 }

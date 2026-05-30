@@ -1,5 +1,6 @@
 using FlashSales.Application.Abstractions;
 using FlashSales.Application.Authorization;
+using FlashSales.Application.Inbox;
 using FlashSales.Application.Outbox;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Infrastructure.Http;
@@ -19,6 +20,7 @@ using Modules.Users.Infrastructure.Authorization;
 using Modules.Users.Infrastructure.Database;
 using Modules.Users.Infrastructure.Database.Repositories;
 using Modules.Users.Infrastructure.Identity;
+using Modules.Users.Infrastructure.Inbox;
 using Modules.Users.Infrastructure.Outbox;
 using System.Reflection;
 
@@ -38,7 +40,8 @@ namespace Modules.Users.Infrastructure
                 .AddPermissionService()
                 .AddHttpClientServices(configuration)
                 .AddData(configuration)
-                .AddOutbox(configuration);
+                .AddOutbox(configuration)
+                .AddInbox(configuration);
 
             return services;
         }
@@ -72,6 +75,18 @@ namespace Modules.Users.Infrastructure
             services.AddSingleton<IOutboxRepositoryRegistration, UsersOutboxRepositoryRegistration>();
             services.Configure<OutboxOptions>(configuration.GetSection($"Users:{OutboxOptions.SectionName}"));
             services.AddHostedService<OutboxProcessor>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddInbox(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddScoped<InboxRepository>();
+            services.AddScoped<IInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
+            services.AddSingleton<IInboxRepositoryRegistration, UsersInboxRepositoryRegistration>();
+            services.Configure<InboxOptions>(configuration.GetSection($"Users:{InboxOptions.SectionName}"));
+            services.AddHostedService<InboxConsumer>();
+            services.AddHostedService<InboxProcessor>();
 
             return services;
         }

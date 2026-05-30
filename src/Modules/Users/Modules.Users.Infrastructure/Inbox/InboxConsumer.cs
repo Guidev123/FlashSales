@@ -5,20 +5,21 @@ using FlashSales.Application.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Modules.Catalog.Application.Abstractions;
-using Modules.Users.IntegrationEvents;
+using Modules.Users.Application.Abstractions;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace Modules.Catalog.Infrastructure.Inbox
+namespace Modules.Users.Infrastructure.Inbox
 {
+#pragma warning disable CS9113 // eventBus will be used when topics are subscribed
     internal sealed class InboxConsumer(
         IEventBus eventBus,
         IServiceProvider serviceProvider,
         ILogger<InboxConsumer> logger
         ) : BackgroundService
+#pragma warning restore CS9113
     {
-        private const string SubscriptionName = "catalog";
+        private const string SubscriptionName = "users";
         private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(30);
 
         private readonly List<IAsyncDisposable> _subscriptions = [];
@@ -30,7 +31,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 try
                 {
                     await SubscribeAsync(stoppingToken);
-                    logger.LogInformation("[Catalog] Subscribed to integration event topics");
+                    logger.LogInformation("[Users] Subscribed to integration event topics");
 
                     await Task.Delay(Timeout.Infinite, stoppingToken);
                 }
@@ -41,7 +42,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 catch (Exception ex)
                 {
                     logger.LogWarning(ex,
-                        "[Catalog] Failed to subscribe to Service Bus. Retrying in {Delay}s...",
+                        "[Users] Failed to subscribe to Service Bus. Retrying in {Delay}s...",
                         RetryDelay.TotalSeconds);
 
                     await DisposeSubscriptionsAsync();
@@ -50,24 +51,18 @@ namespace Modules.Catalog.Infrastructure.Inbox
             }
 
             await DisposeSubscriptionsAsync();
-            logger.LogInformation("[Catalog] Unsubscribed from integration event topics");
+            logger.LogInformation("[Users] Unsubscribed from integration event topics");
         }
 
-        private async Task SubscribeAsync(CancellationToken cancellationToken)
+        private Task SubscribeAsync(CancellationToken cancellationToken)
         {
-            var sellerActivated = await eventBus.SubscribeAsync(
-                Topics.SellerActivated,
-                SubscriptionName,
-                HandleAsync,
-                cancellationToken: cancellationToken);
-
-            _subscriptions.Add(sellerActivated);
+            return Task.CompletedTask;
         }
 
         private async Task HandleAsync(ConsumedMessage message, CancellationToken cancellationToken)
         {
             await using var scope = serviceProvider.CreateAsyncScope();
-            var unitOfWork = scope.ServiceProvider.GetRequiredService<ICatalogUnitOfWork>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUsersUnitOfWork>();
             var inboxRepository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
 
             try
@@ -83,7 +78,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
             catch (Exception ex)
             {
                 logger.LogError(ex,
-                    "[Catalog] Failed to persist integration event {MessageType} [{MessageId}] to inbox",
+                    "[Users] Failed to persist integration event {MessageType} [{MessageId}] to inbox",
                     message.MessageType,
                     message.MessageId);
 
