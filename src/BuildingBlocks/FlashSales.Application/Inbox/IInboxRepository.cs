@@ -1,16 +1,14 @@
-﻿using FlashSales.Domain.DomainObjects;
+﻿using FlashSales.Application.Messaging;
 
 namespace FlashSales.Application.Inbox
 {
     public interface IInboxRepository
     {
-        Task InsertAsync(DomainEvent domainEvent, CancellationToken cancellationToken);
+        Task InsertAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
 
-        Task InsertAsync(InboxMessage inboxMessage, CancellationToken cancellationToken);
+        Task UpdateAsync(Exception? exception, InboxMessage inboxMessage, CancellationToken cancellationToken);
 
-        Task UpdateAsync(Exception? exception, InboxMessageResponse inboxMessage, CancellationToken cancellationToken);
-
-        Task<IReadOnlyList<InboxMessageResponse>> GetAsync(int batchSize, CancellationToken cancellationToken);
+        Task<IReadOnlyList<InboxMessage>> GetAsync(int batchSize, CancellationToken cancellationToken);
 
         Task<bool> IsProcessedAsync(InboxMessageConsumer inboxMessageConsumer, CancellationToken cancellationToken);
 

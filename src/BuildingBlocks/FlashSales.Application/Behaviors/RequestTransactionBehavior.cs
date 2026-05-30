@@ -1,5 +1,6 @@
 ﻿using FlashSales.Application.Abstractions;
 using FlashSales.Application.Messaging;
+using FlashSales.Application.Outbox;
 using FlashSales.Domain.Results;
 using Microsoft.Extensions.Logging;
 using MidR.Behaviors;
@@ -10,7 +11,7 @@ namespace FlashSales.Application.Behaviors
     public sealed class RequestTransactionBehavior<TRequest, TResponse>(
          IDomainEventCollector domainEventCollector,
          IUnitOfWorkFactory unitOfWorkFactory,
-         IPublisher publisher,
+         IOutboxRepositoryFactory outboxRepositoryFactory,
          ILogger<RequestTransactionBehavior<TRequest, TResponse>> logger
      ) : IRequestBehavior<TRequest, TResponse>
          where TRequest : IRequest<TResponse>, IBaseCommand
@@ -77,9 +78,11 @@ namespace FlashSales.Application.Behaviors
             var events = domainEventCollector.Flush();
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
+            var outboxRepository = outboxRepositoryFactory.Create(typeof(TRequest));
+
             foreach (var domainEvent in events)
             {
-                await publisher.PublishAsync(domainEvent, cancellationToken);
+                await outboxRepository.InsertAsync(domainEvent, cancellationToken);
             }
 
             var success = await unitOfWork.CommitAsync(cancellationToken);

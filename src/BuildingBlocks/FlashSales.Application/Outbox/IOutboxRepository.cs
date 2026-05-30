@@ -6,11 +6,9 @@ namespace FlashSales.Application.Outbox
     {
         Task InsertAsync(DomainEvent domainEvent, CancellationToken cancellationToken);
 
-        Task InsertAsync(OutboxMessage outboxMessage, CancellationToken cancellationToken);
+        Task UpdateAsync(Exception? exception, OutboxMessage outboxMessage, CancellationToken cancellationToken);
 
-        Task UpdateAsync(Exception? exception, OutboxMessageResponse outboxMessage, CancellationToken cancellationToken);
-
-        Task<IReadOnlyList<OutboxMessageResponse>> GetAsync(int batchSize, CancellationToken cancellationToken);
+        Task<IReadOnlyList<OutboxMessage>> GetAsync(int batchSize, CancellationToken cancellationToken);
 
         Task<bool> IsProcessedAsync(OutboxMessageConsumer outboxMessageConsumer, CancellationToken cancellationToken);
 
