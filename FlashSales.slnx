@@ -46,4 +46,9 @@
     <Project Path="src/Modules/Users/Modules.Users.Infrastructure/Modules.Users.Infrastructure.csproj" />
     <Project Path="src/Modules/Users/Modules.Users.IntegrationEvents/Modules.Users.IntegrationEvents.csproj" />
   </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Modules/" />
+  <Folder Name="/tests/Modules/Users/">
+    <Project Path="tests/Modules/Users/Modules.Users.IntegrationTests/Modules.Users.IntegrationTests.csproj" Id="d5ddb762-6cd8-4de7-8c3c-48ccdcc8c212" />
+  </Folder>
 </Solution>

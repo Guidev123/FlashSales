@@ -13,10 +13,9 @@ builder.Services.AddOpenApiConfig(builder.Configuration);
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddTransient<AccountActivationMiddleware>();
-builder.Configuration.AddModuleConfiguration([
-    "users",
-    "catalog"
-    ]);
+builder.Configuration.AddModuleConfiguration(
+    ["users", "catalog"],
+    builder.Environment);
 
 if (!builder.Environment.IsEnvironment("Testing"))
 {

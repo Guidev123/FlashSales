@@ -1,0 +1,15 @@
+{
+  "Users": {
+    "KeyCloak": {
+      "Resilience": {
+        "Timeout": "00:03:00",
+        "DefaultRetryDelay": "00:00:01",
+        "MaxRetriesAttempts": 1,
+        "BreakDuration": "00:00:30",
+        "SamplingDuration": "00:01:00",
+        "MinimumThroughput": 2,
+        "FailureRatio": 1.0
+      }
+    }
+  }
+}

@@ -5,7 +5,16 @@
       "CurrentRealm": "",
       "BaseUrl": "",
       "ConfidentialClientId": "",
-      "ConfidentialClientSecret": ""
+      "ConfidentialClientSecret": "",
+      "Resilience": {
+        "Timeout": "00:00:30",
+        "DefaultRetryDelay": "00:00:02",
+        "MaxRetriesAttempts": 3,
+        "BreakDuration": "00:00:30",
+        "SamplingDuration": "00:01:00",
+        "MinimumThroughput": 5,
+        "FailureRatio": 0.5
+      }
     },
     "Outbox": {
       "IntervalInSeconds": 5,

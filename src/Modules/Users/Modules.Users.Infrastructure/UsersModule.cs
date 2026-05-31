@@ -104,6 +104,9 @@ namespace Modules.Users.Infrastructure
         {
             services.Configure<KeyCloakOptions>(configuration.GetSection(KeyCloakOptions.SectionName));
 
+            services.Configure<HttpResilienceOptions>(KeyCloakOptions.SectionName,
+                configuration.GetSection($"{KeyCloakOptions.SectionName}:Resilience"));
+
             services.AddTransient<KeyCloakAuthDelegatingHandler>();
 
             services.AddHttpClient<KeyCloakClient>((serviceProvider, httpClient) =>
@@ -114,7 +117,13 @@ namespace Modules.Users.Infrastructure
             }).AddHttpMessageHandler<KeyCloakAuthDelegatingHandler>()
             .ConfigurePrimaryHttpMessageHandler(HttpMessageHandlerFactory.CreateSocketsHttpHandler)
             .SetHandlerLifetime(Timeout.InfiniteTimeSpan)
-            .AddResilienceHandler(nameof(ResiliencePipelineExtensions), pipeline => pipeline.ConfigureResilience(new HttpResilienceOptions()));
+            .AddResilienceHandler(nameof(ResiliencePipelineExtensions), (pipeline, context) =>
+            {
+                var options = context.ServiceProvider
+                    .GetRequiredService<IOptionsMonitor<HttpResilienceOptions>>()
+                    .Get(KeyCloakOptions.SectionName);
+                pipeline.ConfigureResilience(options);
+            });
 
             services.AddTransient<IIdentityProviderService, IdentityProviderService>();
 
