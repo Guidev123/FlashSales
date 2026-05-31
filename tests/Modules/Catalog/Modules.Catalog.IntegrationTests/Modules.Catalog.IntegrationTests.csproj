@@ -17,6 +17,7 @@
     <PackageReference Include="Npgsql" Version="10.0.0" />
     <PackageReference Include="Testcontainers.Azurite" Version="4.4.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.ServiceBus" Version="4.4.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
@@ -31,6 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Abstractions\servicebus.config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="modules.catalog.Testing.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

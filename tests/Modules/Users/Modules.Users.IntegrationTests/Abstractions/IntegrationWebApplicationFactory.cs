@@ -1,5 +1,5 @@
+using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
-using FlashSales.Application.Bus;
 using FlashSales.Infrastructure.Factories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -18,6 +18,7 @@ using DotNet.Testcontainers.Builders;
 using Testcontainers.Azurite;
 using Testcontainers.Keycloak;
 using Testcontainers.PostgreSql;
+using Testcontainers.ServiceBus;
 
 namespace Modules.Users.IntegrationTests.Abstractions
 {
@@ -53,14 +54,19 @@ namespace Modules.Users.IntegrationTests.Abstractions
             .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(10000))
             .Build();
 
+        private readonly ServiceBusContainer _serviceBusContainer = new ServiceBusBuilder()
+            .WithAcceptLicenseAgreement(true)
+            .WithResourceMapping(
+                new FileInfo(Path.Combine(AppContext.BaseDirectory, "Abstractions", "servicebus.config.json")),
+                new FileInfo("/ServiceBus_Emulator/ConfigFiles/Config.json"))
+            .Build();
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             string keycloakAddress = _keycloakContainer.GetBaseAddress();
             string realmUrl = $"{keycloakAddress}realms/{RealmName}";
 
             builder.UseSetting("ConnectionStrings:Postgres", _postgresContainer.GetConnectionString());
-            builder.UseSetting("ServiceBus:ConnectionString",
-                "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=dGVzdA==");
             builder.UseSetting("BlobStorage:ConnectionString", _azuriteContainer.GetConnectionString());
             builder.UseSetting("Authentication:MetadataAddress", $"{realmUrl}/.well-known/openid-configuration");
             builder.UseSetting("Authentication:TokenValidationParameters:ValidIssuer", realmUrl);
@@ -73,7 +79,7 @@ namespace Modules.Users.IntegrationTests.Abstractions
             builder.ConfigureServices(services =>
             {
                 RemoveHostedServices(services);
-                ReplaceEventBus(services);
+                ReplaceServiceBusClient(services);
                 ReplaceKeycloakOptions(services, keycloakAddress);
                 ReplaceSqlConnectionFactory(services);
                 ReplaceBlobServiceClient(services);
@@ -88,6 +94,8 @@ namespace Modules.Users.IntegrationTests.Abstractions
 
         public async Task InitializeAsync()
         {
+            await _serviceBusContainer.StartAsync();
+
             await Task.WhenAll(
                 _postgresContainer.StartAsync(),
                 _keycloakContainer.StartAsync(),
@@ -109,6 +117,7 @@ namespace Modules.Users.IntegrationTests.Abstractions
             await _postgresContainer.DisposeAsync();
             await _keycloakContainer.DisposeAsync();
             await _azuriteContainer.DisposeAsync();
+            await _serviceBusContainer.DisposeAsync();
         }
 
         public async Task ResetDatabaseAsync()
@@ -138,13 +147,13 @@ namespace Modules.Users.IntegrationTests.Abstractions
                 services.Remove(descriptor);
         }
 
-        private static void ReplaceEventBus(IServiceCollection services)
+        private void ReplaceServiceBusClient(IServiceCollection services)
         {
-            var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IEventBus));
+            var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(ServiceBusClient));
             if (descriptor is not null)
                 services.Remove(descriptor);
 
-            services.AddSingleton<IEventBus, NoOpEventBus>();
+            services.AddSingleton(new ServiceBusClient(_serviceBusContainer.GetConnectionString()));
         }
 
         private void ReplaceKeycloakOptions(IServiceCollection services, string keycloakAddress)
