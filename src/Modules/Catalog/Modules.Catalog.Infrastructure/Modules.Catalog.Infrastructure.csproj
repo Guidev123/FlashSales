@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Infrastructure\FlashSales.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Users\Modules.Users.Contracts\Modules.Users.Contracts.csproj" />
+    <ProjectReference Include="..\Modules.Catalog.Contracts\Modules.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\Modules.Catalog.Application\Modules.Catalog.Application.csproj" />
     <ProjectReference Include="..\Modules.Catalog.Endpoints\Modules.Catalog.Endpoints.csproj" />
   </ItemGroup>

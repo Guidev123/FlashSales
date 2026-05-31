@@ -41,6 +41,11 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
             return context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }
 
+        public void Update(Product product)
+        {
+            context.Products.Update(product);
+        }
+
         public Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);

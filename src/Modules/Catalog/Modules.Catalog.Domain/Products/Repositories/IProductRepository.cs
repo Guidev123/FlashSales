@@ -8,6 +8,8 @@ namespace Modules.Catalog.Domain.Products.Repositories
 
         Task<Product?> GetAsync(Guid id, CancellationToken cancellationToken = default);
 
+        void Update(Product product);
+
         Task<Product?> GetWithImagesAsync(Guid id, CancellationToken cancellationToken = default);
 
         Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default);

@@ -10,22 +10,19 @@ namespace Modules.Catalog.Application.Products.UseCases.Create
 {
     internal sealed class CreateProductCommandHandler(
         ISellerRepository sellerRepository,
-        IProductRepository productRepository
+        IProductRepository productRepository,
+        IDomainEventCollector domainEventCollector
         ) : ICommandHandler<CreateProductCommand, CreateProductResponse>
     {
         public async Task<Result<CreateProductResponse>> ExecuteAsync(CreateProductCommand request, CancellationToken cancellationToken = default)
         {
             var seller = await sellerRepository.GetByUserIdAsync(request.UserId, cancellationToken);
-            if(seller is null)
-            {
+            if (seller is null)
                 return Result.Failure<CreateProductResponse>(SellerErrors.NotFound(request.UserId));
-            }
 
             var category = await productRepository.GetCategoryByIdAsync(request.CategoryId, cancellationToken);
-            if(category is null)
-            {
+            if (category is null)
                 return Result.Failure<CreateProductResponse>(CategoryErrors.NotFound(request.CategoryId));
-            }
 
             var product = Product.Create(
                 seller.Id,
@@ -35,6 +32,8 @@ namespace Modules.Catalog.Application.Products.UseCases.Create
                 );
 
             productRepository.Add(product);
+
+            domainEventCollector.Collect(product);
 
             return new CreateProductResponse(product.Id);
         }

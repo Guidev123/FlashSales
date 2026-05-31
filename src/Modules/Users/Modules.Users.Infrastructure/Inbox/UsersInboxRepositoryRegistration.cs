@@ -9,8 +9,7 @@ namespace Modules.Users.Infrastructure.Inbox
     internal sealed class UsersInboxRepositoryRegistration : IInboxRepositoryRegistration
     {
         public bool Matches(Type commandType)
-            => commandType.Assembly == Application.AssemblyReference.Assembly
-            || commandType.Assembly == Domain.AssemblyReference.Assembly;
+            => UsersModule.Assemblies.Contains(commandType.Assembly);
 
         public IInboxRepository Resolve(IServiceProvider sp)
             => sp.GetRequiredService<InboxRepository>();

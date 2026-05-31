@@ -7,6 +7,8 @@ namespace Modules.Catalog.Endpoints
             public const string ProductsCreate = "products:create";
             public const string CategoriesCreate = "products:categories:create";
             public const string ProductsUpdate = "products:update-own";
+            public const string ProductsActivate = "products:activate-own";
+            public const string ProductsArchive = "products:archive-own";
         }
     }
 }

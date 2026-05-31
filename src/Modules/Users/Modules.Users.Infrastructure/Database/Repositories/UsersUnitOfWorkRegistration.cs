@@ -8,7 +8,7 @@ namespace Modules.Users.Infrastructure.Database.Repositories
     internal sealed class UsersUnitOfWorkRegistration : IUnitOfWorkRegistration
     {
         public bool Matches(Type commandType)
-            => commandType.Assembly == AssemblyReference.Assembly;
+            => UsersModule.Assemblies.Contains(commandType.Assembly);
 
         public IUnitOfWork Resolve(IServiceProvider sp)
             => sp.GetRequiredService<IUsersUnitOfWork>();

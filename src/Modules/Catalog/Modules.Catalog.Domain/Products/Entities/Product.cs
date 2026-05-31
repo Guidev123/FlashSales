@@ -1,5 +1,6 @@
 using FlashSales.Domain.DomainObjects;
 using FlashSales.Domain.Results;
+using Modules.Catalog.Domain.Products.DomainEvents;
 using Modules.Catalog.Domain.Products.Enums;
 using Modules.Catalog.Domain.Products.Errors;
 using Modules.Catalog.Domain.Products.ValueObjects;
@@ -33,7 +34,33 @@ namespace Modules.Catalog.Domain.Products.Entities
         {
             var product = new Product(sellerId, categoryId, name, description);
 
+            product.AddDomainEvent(ProductCreatedDomainEvent.Create(product.Id, sellerId, name));
+
             return product;
+        }
+
+        public Result Activate()
+        {
+            if (Status != ProductStatus.Draft)
+                return Result.Failure(ProductErrors.CannotActivate(Status.ToString()));
+
+            Status = ProductStatus.Active;
+
+            AddDomainEvent(ProductActivatedDomainEvent.Create(Id, SellerId, Metadata.Name));
+
+            return Result.Success();
+        }
+
+        public Result Archive()
+        {
+            if (Status != ProductStatus.Active)
+                return Result.Failure(ProductErrors.CannotArchive(Status.ToString()));
+
+            Status = ProductStatus.Archive;
+
+            AddDomainEvent(ProductArchivedDomainEvent.Create(Id, SellerId));
+
+            return Result.Success();
         }
 
         public Result<ProductImage> AddImage(string url, int order, bool isCover)

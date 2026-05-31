@@ -11,6 +11,7 @@ using MidR.DependencyInjection;
 using Modules.Catalog.Application;
 using Modules.Catalog.Application.Abstractions;
 using Modules.Catalog.Application.Products.Services;
+using Modules.Catalog.Contracts;
 using Modules.Catalog.Domain.Products.Repositories;
 using Modules.Catalog.Domain.Sellers.Repositories;
 using Modules.Catalog.Endpoints;
@@ -18,6 +19,7 @@ using Modules.Catalog.Infrastructure.Database;
 using Modules.Catalog.Infrastructure.Database.Repositories;
 using Modules.Catalog.Infrastructure.Inbox;
 using Modules.Catalog.Infrastructure.Outbox;
+using Modules.Catalog.Infrastructure.PublicApi;
 using System.Reflection;
 
 namespace Modules.Catalog.Infrastructure
@@ -25,9 +27,12 @@ namespace Modules.Catalog.Infrastructure
     public static class CatalogModule
     {
         public static readonly Assembly[] Assemblies = [
-                    AssemblyReference.Assembly,
-                    Assembly.GetExecutingAssembly()
-                    ];
+            Application.AssemblyReference.Assembly,
+            Domain.AssemblyReference.Assembly,
+            Contracts.AssemblyReference.Assembly,
+            Assembly.GetExecutingAssembly(),
+            Users.Contracts.AssemblyReference.Assembly,
+        ];
 
         public static IServiceCollection AddCatalogModule(this IServiceCollection services, IConfiguration configuration)
         {
@@ -35,7 +40,8 @@ namespace Modules.Catalog.Infrastructure
                 .AddData(configuration)
                 .AddOutbox(configuration)
                 .AddInbox(configuration)
-                .AddEndpoints();
+                .AddEndpoints()
+                .AddPublicApi();
 
             return services;
         }
@@ -87,6 +93,13 @@ namespace Modules.Catalog.Infrastructure
         private static IServiceCollection AddEndpoints(this IServiceCollection services)
         {
             services.AddEndpoints(typeof(EndpointsModule).Assembly);
+
+            return services;
+        }
+
+        private static IServiceCollection AddPublicApi(this IServiceCollection services)
+        {
+            services.AddTransient<ICatalogPublicApi, CatalogPublicApi>();
 
             return services;
         }

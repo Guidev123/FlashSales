@@ -7,9 +7,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
     internal sealed class CatalogInboxRepositoryRegistration : IInboxRepositoryRegistration
     {
         public bool Matches(Type commandType)
-            => commandType.Assembly == Application.AssemblyReference.Assembly
-            || commandType.Assembly == Domain.AssemblyReference.Assembly
-            || commandType.Assembly == Users.Contracts.AssemblyReference.Assembly;
+            => CatalogModule.Assemblies.Contains(commandType.Assembly);
 
         public IInboxRepository Resolve(IServiceProvider sp)
             => sp.GetRequiredService<InboxRepository>();

@@ -31,9 +31,11 @@ namespace Modules.Users.Infrastructure
     public static class UsersModule
     {
         public static readonly Assembly[] Assemblies = [
-                    Application.AssemblyReference.Assembly,
-                    Assembly.GetExecutingAssembly()
-            ];
+            Application.AssemblyReference.Assembly,
+            Domain.AssemblyReference.Assembly,
+            Contracts.AssemblyReference.Assembly,
+            Assembly.GetExecutingAssembly(),
+        ];
 
         public static IServiceCollection AddUsersModule(this IServiceCollection services, IConfiguration configuration)
         {

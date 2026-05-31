@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Domain\FlashSales.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

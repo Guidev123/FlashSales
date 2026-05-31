@@ -9,8 +9,7 @@ namespace Modules.Users.Infrastructure.Outbox
     internal sealed class UsersOutboxRepositoryRegistration : IOutboxRepositoryRegistration
     {
         public bool Matches(Type commandType)
-            => commandType.Assembly == Application.AssemblyReference.Assembly
-            || commandType.Assembly == Domain.AssemblyReference.Assembly;
+            => UsersModule.Assemblies.Contains(commandType.Assembly);
 
         public IOutboxRepository Resolve(IServiceProvider sp)
             => sp.GetRequiredService<OutboxRepository>();

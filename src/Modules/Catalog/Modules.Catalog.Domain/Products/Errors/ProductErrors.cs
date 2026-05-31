@@ -84,5 +84,13 @@ namespace Modules.Catalog.Domain.Products.Errors
         public static readonly Error OrderMustBeGreaterThanZero = Error.Invalid(
             "Products.OrderMustBeGreaterThanZero",
             "Image order must be greater than or equal to 0");
+
+        public static Error CannotActivate(string currentStatus) => Error.Invalid(
+            "Products.CannotActivate",
+            $"Product cannot be activated from status '{currentStatus}'");
+
+        public static Error CannotArchive(string currentStatus) => Error.Invalid(
+            "Products.CannotArchive",
+            $"Product cannot be archived from status '{currentStatus}'");
     }
 }
