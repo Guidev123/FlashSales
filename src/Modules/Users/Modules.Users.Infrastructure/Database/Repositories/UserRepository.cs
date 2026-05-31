@@ -21,7 +21,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         {
             return context
                 .SellerProfiles
-                .AsNoTracking()
                 .FirstOrDefaultAsync(
                 sp => sp.UserId == userId,
                 cancellationToken: cancellationToken

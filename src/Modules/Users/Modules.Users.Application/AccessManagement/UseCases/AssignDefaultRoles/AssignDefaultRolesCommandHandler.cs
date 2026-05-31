@@ -33,13 +33,11 @@ namespace Modules.Users.Application.AccessManagement.UseCases.AssignDefaultRoles
                 return Result.Failure(AccessManagementErrors.InvalidRoleForRegistrationType);
             }
 
-            var tasks = availableRoles.Select(c =>
+            foreach (var role in availableRoles)
             {
-                domainEventCollector.Collect(RoleAssignedToUserDomainEvent.Create(request.UserId, c.Name));
-                return roleRepository.AssignToUserAsync(c.Name, request.UserId, cancellationToken);
-            });
-
-            await Task.WhenAll(tasks).WaitAsync(cancellationToken);
+                domainEventCollector.Collect(RoleAssignedToUserDomainEvent.Create(request.UserId, role.Name));
+                await roleRepository.AssignToUserAsync(role.Name, request.UserId, cancellationToken);
+            }
 
             await cacheService.RemoveAsync(PermissionResponse.GetCacheKey(request.IdentityProviderId), cancellationToken);
 

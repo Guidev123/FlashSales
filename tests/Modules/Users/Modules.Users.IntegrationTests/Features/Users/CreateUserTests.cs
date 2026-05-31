@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Modules.Users.Application.Users.UseCases.Create;
 using Modules.Users.IntegrationTests.Abstractions;
 
-namespace Modules.Users.IntegrationTests.Features
+namespace Modules.Users.IntegrationTests.Features.Users
 {
     public sealed class CreateUserTests(IntegrationWebApplicationFactory factory)
         : BaseIntegrationTest(factory)

@@ -1,4 +1,5 @@
 using FlashSales.Application.Bus;
+using FlashSales.Application.Storage;
 using FlashSales.Infrastructure.Factories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -67,6 +68,7 @@ namespace Modules.Users.IntegrationTests.Abstractions
                 ReplaceEventBus(services);
                 ReplaceKeycloakOptions(services, keycloakAddress);
                 ReplaceSqlConnectionFactory(services);
+                ReplaceBlobStorageService(services);
             });
         }
 
@@ -146,6 +148,15 @@ namespace Modules.Users.IntegrationTests.Abstractions
 
             services.RemoveAll<IOptions<KeyCloakOptions>>();
             services.AddSingleton<IOptions<KeyCloakOptions>>(new OptionsWrapper<KeyCloakOptions>(options));
+        }
+
+        private static void ReplaceBlobStorageService(IServiceCollection services)
+        {
+            var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IBlobStorageService));
+            if (descriptor is not null)
+                services.Remove(descriptor);
+
+            services.AddSingleton<IBlobStorageService, FakeBlobStorageService>();
         }
 
         private void ReplaceSqlConnectionFactory(IServiceCollection services)
