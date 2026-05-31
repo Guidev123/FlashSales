@@ -8,44 +8,24 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Modules.Catalog.Infrastructure.Database;
 using Modules.Users.Infrastructure.Database;
-using Modules.Users.Infrastructure.Identity;
-using Modules.Users.IntegrationTests.Abstractions.Files;
 using Npgsql;
 using DotNet.Testcontainers.Builders;
 using Testcontainers.Azurite;
-using Testcontainers.Keycloak;
 using Testcontainers.PostgreSql;
 
-namespace Modules.Users.IntegrationTests.Abstractions
+namespace Modules.Catalog.IntegrationTests.Abstractions
 {
     public class IntegrationWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
-        private const string KeycloakAdminUser = "admin";
-        private const string KeycloakAdminPassword = "admin";
-        private const string ConfidentialClientId = "flash-sales-test-client";
-        private const string RealmName = "flash-sales-dev";
-        private const string BlobContainerName = "users-test";
-
-        private string _confidentialClientSecret = string.Empty;
+        private const string BlobContainerName = "catalog-test";
 
         private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16-alpine")
             .WithDatabase("flashsales_test")
             .WithUsername("postgres")
             .WithPassword("postgres")
-            .Build();
-
-        private readonly KeycloakContainer _keycloakContainer = new KeycloakBuilder()
-            .WithImage("quay.io/keycloak/keycloak:26.6.1")
-            .WithUsername(KeycloakAdminUser)
-            .WithPassword(KeycloakAdminPassword)
-            .WithResourceMapping(
-                new FileInfo(Paths.KeycloakDataImportRealmLocal),
-                new FileInfo(Paths.KeycloakDataImportRealm))
-            .WithCommand("--import-realm")
             .Build();
 
         private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
@@ -55,26 +35,29 @@ namespace Modules.Users.IntegrationTests.Abstractions
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            string keycloakAddress = _keycloakContainer.GetBaseAddress();
-            string realmUrl = $"{keycloakAddress}realms/{RealmName}";
-
             builder.UseSetting("ConnectionStrings:Postgres", _postgresContainer.GetConnectionString());
             builder.UseSetting("ServiceBus:ConnectionString",
                 "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=dGVzdA==");
             builder.UseSetting("BlobStorage:ConnectionString", _azuriteContainer.GetConnectionString());
-            builder.UseSetting("Authentication:MetadataAddress", $"{realmUrl}/.well-known/openid-configuration");
-            builder.UseSetting("Authentication:TokenValidationParameters:ValidIssuer", realmUrl);
+            builder.UseSetting("Authentication:MetadataAddress",
+                "https://test.auth/.well-known/openid-configuration");
+            builder.UseSetting("Authentication:TokenValidationParameters:ValidIssuer",
+                "https://test.auth/realms/flash-sales-dev");
+            builder.UseSetting("Users:KeyCloak:AdminUrl", "https://test.keycloak/admin/realms/");
+            builder.UseSetting("Users:KeyCloak:BaseUrl", "https://test.keycloak/realms/");
+            builder.UseSetting("Users:KeyCloak:CurrentRealm", "flash-sales-dev");
+            builder.UseSetting("Users:KeyCloak:ConfidentialClientId", "test-client");
+            builder.UseSetting("Users:KeyCloak:ConfidentialClientSecret", "test-secret");
 
             builder.ConfigureAppConfiguration(cfg =>
                 cfg.AddJsonFile(
-                    Path.Combine(AppContext.BaseDirectory, "modules.users.Testing.json"),
+                    Path.Combine(AppContext.BaseDirectory, "modules.catalog.Testing.json"),
                     optional: true));
 
             builder.ConfigureServices(services =>
             {
                 RemoveHostedServices(services);
                 ReplaceEventBus(services);
-                ReplaceKeycloakOptions(services, keycloakAddress);
                 ReplaceSqlConnectionFactory(services);
                 ReplaceBlobServiceClient(services);
             });
@@ -90,24 +73,16 @@ namespace Modules.Users.IntegrationTests.Abstractions
         {
             await Task.WhenAll(
                 _postgresContainer.StartAsync(),
-                _keycloakContainer.StartAsync(),
                 _azuriteContainer.StartAsync());
 
-            _confidentialClientSecret = await KeycloakAdminHelper.SetupTestClientAsync(
-                _keycloakContainer.GetBaseAddress(),
-                KeycloakAdminUser,
-                KeycloakAdminPassword,
-                ConfidentialClientId);
-
             await Task.WhenAll(
-                MigrateAndSeedAsync(),
+                MigrateAsync(),
                 CreateBlobContainerAsync());
         }
 
         public new async Task DisposeAsync()
         {
             await _postgresContainer.DisposeAsync();
-            await _keycloakContainer.DisposeAsync();
             await _azuriteContainer.DisposeAsync();
         }
 
@@ -117,12 +92,14 @@ namespace Modules.Users.IntegrationTests.Abstractions
             await connection.OpenAsync();
 
             await using var cmd = new NpgsqlCommand("""
-                DELETE FROM users."UserRoles";
-                DELETE FROM users."Users";
-                DELETE FROM users."OutboxMessageConsumers";
-                DELETE FROM users."OutboxMessages";
-                DELETE FROM users."InboxMessageConsumers";
-                DELETE FROM users."InboxMessages";
+                DELETE FROM catalog."ProductImages";
+                DELETE FROM catalog."Products";
+                DELETE FROM catalog."Sellers";
+                DELETE FROM catalog."Categories";
+                DELETE FROM catalog."OutboxMessageConsumers";
+                DELETE FROM catalog."OutboxMessages";
+                DELETE FROM catalog."InboxMessageConsumers";
+                DELETE FROM catalog."InboxMessages";
                 """, connection);
 
             await cmd.ExecuteNonQueryAsync();
@@ -147,21 +124,6 @@ namespace Modules.Users.IntegrationTests.Abstractions
             services.AddSingleton<IEventBus, NoOpEventBus>();
         }
 
-        private void ReplaceKeycloakOptions(IServiceCollection services, string keycloakAddress)
-        {
-            var options = new KeyCloakOptions
-            {
-                AdminUrl = $"{keycloakAddress}admin/realms/",
-                CurrentRealm = RealmName,
-                BaseUrl = $"{keycloakAddress}realms/",
-                ConfidentialClientId = ConfidentialClientId,
-                ConfidentialClientSecret = _confidentialClientSecret
-            };
-
-            services.RemoveAll<IOptions<KeyCloakOptions>>();
-            services.AddSingleton<IOptions<KeyCloakOptions>>(new OptionsWrapper<KeyCloakOptions>(options));
-        }
-
         private void ReplaceSqlConnectionFactory(IServiceCollection services)
         {
             var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(SqlConnectionFactory));
@@ -180,15 +142,13 @@ namespace Modules.Users.IntegrationTests.Abstractions
             services.AddSingleton(new BlobServiceClient(_azuriteContainer.GetConnectionString()));
         }
 
-        private async Task MigrateAndSeedAsync()
+        private async Task MigrateAsync()
         {
             using var scope = Services.CreateScope();
             var sp = scope.ServiceProvider;
 
             await sp.GetRequiredService<UsersDbContext>().Database.MigrateAsync();
             await sp.GetRequiredService<CatalogDbContext>().Database.MigrateAsync();
-
-            await SeedRolesAsync();
         }
 
         private async Task CreateBlobContainerAsync()
@@ -196,17 +156,6 @@ namespace Modules.Users.IntegrationTests.Abstractions
             var serviceClient = new BlobServiceClient(_azuriteContainer.GetConnectionString());
             var containerClient = serviceClient.GetBlobContainerClient(BlobContainerName);
             await containerClient.CreateIfNotExistsAsync();
-        }
-
-        private async Task SeedRolesAsync()
-        {
-            string script = await File.ReadAllTextAsync(Paths.RolesSeedDataSql);
-
-            await using var connection = new NpgsqlConnection(_postgresContainer.GetConnectionString());
-            await connection.OpenAsync();
-
-            await using var command = new NpgsqlCommand(script, connection);
-            await command.ExecuteNonQueryAsync();
         }
     }
 }

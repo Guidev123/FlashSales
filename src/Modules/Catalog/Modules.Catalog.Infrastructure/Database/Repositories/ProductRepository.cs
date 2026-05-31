@@ -54,7 +54,6 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
         public Task<Product?> GetWithImagesAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return context.Products
-                .AsNoTrackingWithIdentityResolution()
                 .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }

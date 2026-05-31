@@ -48,12 +48,10 @@ namespace Modules.Catalog.Domain.Products.Entities
                 return Result.Failure<ProductImage>(ProductErrors.InvalidImageOrder);
             }
 
-            AssertionConcern
-                .EnsureGreaterThanOrEqual(
-                MAX_IMAGES,
-                _images.Count,
-                ProductErrors.MaxImagesExceeded.Description
-                );
+            if (_images.Count >= MAX_IMAGES)
+            {
+                return Result.Failure<ProductImage>(ProductErrors.MaxImagesExceeded);
+            }
 
             var image = ProductImage.Create(Id, url, order, isCover);
             _images.Add(image);

@@ -1,0 +1,25 @@
+using Bogus;
+using MidR.Interfaces;
+using Modules.Catalog.Application.Products.UseCases.Create;
+using Modules.Catalog.Application.Sellers.UseCases.Create;
+
+namespace Modules.Catalog.IntegrationTests.Abstractions.Helpers
+{
+    internal static class ProductHelper
+    {
+        internal static async Task<(CreateProductResponse Product, CreateSellerCommand Seller)> CreateAsync(
+            IMediator mediator, Faker faker)
+        {
+            var seller = await SellerHelper.CreateAsync(mediator, faker);
+            var category = await CategoryHelper.CreateAsync(mediator, faker);
+
+            var result = await mediator.SendAsync(new CreateProductCommand(
+                UserId: seller.UserId,
+                Name: faker.Commerce.ProductName(),
+                Description: faker.Commerce.ProductDescription(),
+                CategoryId: category.Id));
+
+            return (result.Value, seller);
+        }
+    }
+}

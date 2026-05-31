@@ -48,6 +48,9 @@
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/Modules/" />
+  <Folder Name="/tests/Modules/Catalog/">
+    <Project Path="tests/Modules/Catalog/Modules.Catalog.IntegrationTests/Modules.Catalog.IntegrationTests.csproj" Id="89bcbb13-8926-49f8-9d08-90f3da52d763" />
+  </Folder>
   <Folder Name="/tests/Modules/Users/">
     <Project Path="tests/Modules/Users/Modules.Users.IntegrationTests/Modules.Users.IntegrationTests.csproj" Id="d5ddb762-6cd8-4de7-8c3c-48ccdcc8c212" />
   </Folder>

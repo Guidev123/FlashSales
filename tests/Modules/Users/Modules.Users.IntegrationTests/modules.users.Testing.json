@@ -11,5 +11,8 @@
         "FailureRatio": 1.0
       }
     }
+  },
+  "BlobStorage": {
+    "ContainerName": "users-test"
   }
 }
