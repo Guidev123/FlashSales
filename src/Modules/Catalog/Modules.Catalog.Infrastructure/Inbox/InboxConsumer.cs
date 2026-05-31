@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Modules.Catalog.Application.Abstractions;
-using Modules.Users.IntegrationEvents;
+using Modules.Users.Contracts.IntegrationEvents;
 using Newtonsoft.Json;
 using System.Text;
 

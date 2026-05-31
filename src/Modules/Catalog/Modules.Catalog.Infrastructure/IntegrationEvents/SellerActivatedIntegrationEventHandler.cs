@@ -1,7 +1,7 @@
 ﻿using FlashSales.Domain.DomainObjects;
 using MidR.Interfaces;
 using Modules.Catalog.Application.Sellers.UseCases.Create;
-using Modules.Users.IntegrationEvents;
+using Modules.Users.Contracts.IntegrationEvents;
 
 namespace Modules.Catalog.Infrastructure.IntegrationEvents
 {

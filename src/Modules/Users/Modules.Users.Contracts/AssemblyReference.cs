@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+using System.Reflection;
 
-namespace Modules.Users.IntegrationEvents
+namespace Modules.Users.Contracts
 {
     public static class AssemblyReference
     {

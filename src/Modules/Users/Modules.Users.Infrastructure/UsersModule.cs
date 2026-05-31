@@ -13,6 +13,7 @@ using Modules.Users.Application.Abstractions;
 using Modules.Users.Application.AccessManagement.Options;
 using Modules.Users.Application.AccessManagement.Services;
 using Modules.Users.Application.Users.Services;
+using Modules.Users.Contracts;
 using Modules.Users.Domain.AccessManagement.Repositories;
 using Modules.Users.Domain.Users.Repositories;
 using Modules.Users.Endpoints;
@@ -22,6 +23,7 @@ using Modules.Users.Infrastructure.Database.Repositories;
 using Modules.Users.Infrastructure.Identity;
 using Modules.Users.Infrastructure.Inbox;
 using Modules.Users.Infrastructure.Outbox;
+using Modules.Users.Infrastructure.PublicApi;
 using System.Reflection;
 
 namespace Modules.Users.Infrastructure
@@ -29,7 +31,7 @@ namespace Modules.Users.Infrastructure
     public static class UsersModule
     {
         public static readonly Assembly[] Assemblies = [
-                    AssemblyReference.Assembly,
+                    Application.AssemblyReference.Assembly,
                     Assembly.GetExecutingAssembly()
             ];
 
@@ -41,7 +43,8 @@ namespace Modules.Users.Infrastructure
                 .AddHttpClientServices(configuration)
                 .AddData(configuration)
                 .AddOutbox(configuration)
-                .AddInbox(configuration);
+                .AddInbox(configuration)
+                .AddPublicApi();
 
             return services;
         }
@@ -133,6 +136,13 @@ namespace Modules.Users.Infrastructure
         private static IServiceCollection AddEndpoints(this IServiceCollection services)
         {
             services.AddEndpoints(typeof(EndpointsModule).Assembly);
+
+            return services;
+        }
+
+        private static IServiceCollection AddPublicApi(this IServiceCollection services)
+        {
+            services.AddTransient<IUsersPublicApi, UsersPublicApi>();
 
             return services;
         }

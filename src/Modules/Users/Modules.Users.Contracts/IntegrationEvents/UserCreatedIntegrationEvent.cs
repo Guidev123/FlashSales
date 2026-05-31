@@ -1,6 +1,6 @@
-﻿using FlashSales.Application.Messaging;
+using FlashSales.Application.Messaging;
 
-namespace Modules.Users.IntegrationEvents
+namespace Modules.Users.Contracts.IntegrationEvents
 {
     public sealed record UserCreatedIntegrationEvent : IntegrationEvent
     {

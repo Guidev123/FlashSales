@@ -1,6 +1,6 @@
 using FlashSales.Application.Outbox;
 
-namespace Modules.Catalog.Application.Abstractions
+namespace Modules.Catalog.Infrastructure.Outbox
 {
     public interface ICatalogOutboxRepository : IOutboxRepository;
 }

@@ -9,7 +9,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
         public bool Matches(Type commandType)
             => commandType.Assembly == Application.AssemblyReference.Assembly
             || commandType.Assembly == Domain.AssemblyReference.Assembly
-            || commandType.Assembly == Users.IntegrationEvents.AssemblyReference.Assembly;
+            || commandType.Assembly == Users.Contracts.AssemblyReference.Assembly;
 
         public IInboxRepository Resolve(IServiceProvider sp)
             => sp.GetRequiredService<InboxRepository>();

@@ -4,7 +4,7 @@ using MidR.Interfaces;
 using Modules.Users.Application.Users.Services;
 using Modules.Users.Domain.Users.DomainEvents;
 using Modules.Users.Domain.Users.Errors;
-using Modules.Users.IntegrationEvents;
+using Modules.Users.Contracts.IntegrationEvents;
 
 namespace Modules.Users.Application.Users.DomainEvents
 {

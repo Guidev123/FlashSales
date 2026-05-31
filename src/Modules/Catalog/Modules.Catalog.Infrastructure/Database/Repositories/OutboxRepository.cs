@@ -1,5 +1,6 @@
 using FlashSales.Infrastructure.Database;
 using Modules.Catalog.Application.Abstractions;
+using Modules.Catalog.Infrastructure.Outbox;
 
 namespace Modules.Catalog.Infrastructure.Database.Repositories
 {

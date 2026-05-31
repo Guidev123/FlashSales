@@ -1,4 +1,4 @@
-namespace Modules.Users.IntegrationEvents
+namespace Modules.Users.Contracts.IntegrationEvents
 {
     public static class Topics
     {
