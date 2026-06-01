@@ -72,7 +72,9 @@ namespace Modules.Catalog.Infrastructure
             services.AddScoped<IOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
             services.AddSingleton<IOutboxRepositoryRegistration, CatalogOutboxRepositoryRegistration>();
             services.Configure<OutboxOptions>(configuration.GetSection($"Catalog:{OutboxOptions.SectionName}"));
-            services.AddHostedService<OutboxProcessor>();
+            services.AddSingleton<OutboxProcessor>();
+            services.AddSingleton<IOutboxBatchProcessor>(sp => sp.GetRequiredService<OutboxProcessor>());
+            services.AddHostedService(sp => sp.GetRequiredService<OutboxProcessor>());
 
             return services;
         }
@@ -85,7 +87,9 @@ namespace Modules.Catalog.Infrastructure
             services.AddScoped<IInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
             services.AddSingleton<IInboxRepositoryRegistration, CatalogInboxRepositoryRegistration>();
             services.Configure<InboxOptions>(configuration.GetSection($"Catalog:{InboxOptions.SectionName}"));
-            services.AddHostedService<InboxProcessor>();
+            services.AddSingleton<InboxProcessor>();
+            services.AddSingleton<IInboxBatchProcessor>(sp => sp.GetRequiredService<InboxProcessor>());
+            services.AddHostedService(sp => sp.GetRequiredService<InboxProcessor>());
 
             return services;
         }

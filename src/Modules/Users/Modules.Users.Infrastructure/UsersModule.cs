@@ -80,7 +80,9 @@ namespace Modules.Users.Infrastructure
             services.AddScoped<IOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
             services.AddSingleton<IOutboxRepositoryRegistration, UsersOutboxRepositoryRegistration>();
             services.Configure<OutboxOptions>(configuration.GetSection($"Users:{OutboxOptions.SectionName}"));
-            services.AddHostedService<OutboxProcessor>();
+            services.AddSingleton<OutboxProcessor>();
+            services.AddSingleton<IOutboxBatchProcessor>(sp => sp.GetRequiredService<OutboxProcessor>());
+            services.AddHostedService(sp => sp.GetRequiredService<OutboxProcessor>());
 
             return services;
         }
@@ -93,7 +95,9 @@ namespace Modules.Users.Infrastructure
             services.AddSingleton<IInboxRepositoryRegistration, UsersInboxRepositoryRegistration>();
             services.Configure<InboxOptions>(configuration.GetSection($"Users:{InboxOptions.SectionName}"));
             services.AddHostedService<InboxConsumer>();
-            services.AddHostedService<InboxProcessor>();
+            services.AddSingleton<InboxProcessor>();
+            services.AddSingleton<IInboxBatchProcessor>(sp => sp.GetRequiredService<InboxProcessor>());
+            services.AddHostedService(sp => sp.GetRequiredService<InboxProcessor>());
 
             return services;
         }

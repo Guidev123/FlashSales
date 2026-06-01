@@ -16,7 +16,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
         ILogger<InboxProcessor> logger,
         IOptions<InboxOptions> options,
         IServiceProvider serviceProvider
-        ) : BackgroundService
+        ) : BackgroundService, IInboxBatchProcessor
     {
         private readonly InboxOptions _inboxOptions = options.Value;
 
@@ -29,7 +29,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
             {
                 try
                 {
-                    await ProcessInboxAsync(stoppingToken);
+                    await ProcessBatchAsync(stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -38,20 +38,19 @@ namespace Modules.Catalog.Infrastructure.Inbox
             }
         }
 
-        private async Task ProcessInboxAsync(CancellationToken stoppingToken)
+        public async Task ProcessBatchAsync(CancellationToken cancellationToken = default)
         {
             await using var scope = serviceProvider.CreateAsyncScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<ICatalogUnitOfWork>();
             var inboxRepository = scope.ServiceProvider.GetRequiredService<ICatalogInboxRepository>();
-            var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
 
             logger.LogInformation("[Catalog] Beginning to process inbox messages");
 
-            await unitOfWork.BeginTransactionAsync(stoppingToken);
+            await unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var inboxMessages = await inboxRepository.GetAsync(
                 _inboxOptions.BatchSize,
-                stoppingToken);
+                cancellationToken);
 
             foreach (var inboxMessage in inboxMessages)
             {
@@ -66,7 +65,7 @@ namespace Modules.Catalog.Infrastructure.Inbox
                         JsonSerializerSettingsExtensions.Instance)!;
 
                     var messagePublisher = messageScope.ServiceProvider.GetRequiredService<IPublisher>();
-                    await messagePublisher.PublishAsync(integrationEvent, stoppingToken);
+                    await messagePublisher.PublishAsync(integrationEvent, cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -79,10 +78,10 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 await inboxRepository.UpdateAsync(
                     exception,
                     inboxMessage,
-                    stoppingToken);
+                    cancellationToken);
             }
 
-            await unitOfWork.CommitAsync(stoppingToken);
+            await unitOfWork.CommitAsync(cancellationToken);
 
             logger.LogInformation("[Catalog] Completed process inbox messages");
         }
@@ -132,6 +131,5 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 _inboxOptions.MaxRetryCount,
                 inboxMessage.NextRetryAt);
         }
-
     }
 }

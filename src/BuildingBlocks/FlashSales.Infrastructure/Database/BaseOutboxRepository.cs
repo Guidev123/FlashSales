@@ -15,6 +15,7 @@ namespace FlashSales.Infrastructure.Database
             var sql = $"""
                 INSERT INTO {schema}."OutboxMessages"("Id", "CorrelationId", "Type", "Content", "OccurredOn", "RetryCount", "IsPermanentFailure")
                 VALUES(@Id, @CorrelationId, @Type, @Content::jsonb, @OccurredOn, 0, false)
+                ON CONFLICT ("CorrelationId") DO NOTHING
                 """;
 
             return unitOfWork.Connection.ExecuteAsync(unitOfWork.CreateCommand(sql, new
@@ -38,6 +39,7 @@ namespace FlashSales.Infrastructure.Database
                   AND ("NextRetryAt" IS NULL OR "NextRetryAt" <= @Now)
                 ORDER BY "OccurredOn"
                 LIMIT @BatchSize
+                FOR UPDATE SKIP LOCKED
                 """;
 
             var result = await unitOfWork.Connection.QueryAsync<OutboxMessage>(
@@ -92,7 +94,7 @@ namespace FlashSales.Infrastructure.Database
                 SELECT @Id, "Id", @Name
                 FROM {schema}."OutboxMessages"
                 WHERE "CorrelationId" = @CorrelationId
-                ON CONFLICT DO NOTHING
+                ON CONFLICT ("OutboxMessageId", "Name") DO NOTHING
                 """;
 
             return unitOfWork.Connection.ExecuteAsync(

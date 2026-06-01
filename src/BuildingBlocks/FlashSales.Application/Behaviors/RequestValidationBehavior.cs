@@ -4,6 +4,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using MidR.Behaviors;
 using MidR.Interfaces;
+using System.Collections.Concurrent;
 using System.Reflection;
 
 namespace FlashSales.Application.Behaviors
@@ -12,6 +13,20 @@ namespace FlashSales.Application.Behaviors
         where TRequest : IRequest<TResponse>, IBaseCommand
         where TResponse : Result
     {
+        private static readonly MethodInfo? _validationFailureMethod = ResolveValidationFailureMethod();
+
+        private static MethodInfo? ResolveValidationFailureMethod()
+        {
+            if (!typeof(TResponse).IsGenericType ||
+                typeof(TResponse).GetGenericTypeDefinition() != typeof(Result<>))
+                return null;
+
+            Type resultType = typeof(TResponse).GetGenericArguments()[0];
+            return typeof(Result<>)
+                .MakeGenericType(resultType)
+                .GetMethod(nameof(Result<object>.ValidationFailure));
+        }
+
         public async Task<TResponse> ExecuteAsync(TRequest request, RequestDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var validationFailures = await ValidateAsync(request, cancellationToken);
@@ -21,21 +36,11 @@ namespace FlashSales.Application.Behaviors
                 return await next();
             }
 
-            if (typeof(TResponse).IsGenericType &&
-                typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
+            if (_validationFailureMethod is not null)
             {
-                Type resultType = typeof(TResponse).GetGenericArguments()[0];
-
-                MethodInfo? failureMethod = typeof(Result<>)
-                                .MakeGenericType(resultType)
-                                .GetMethod(nameof(Result<object>.ValidationFailure));
-
-                if (failureMethod is not null)
-                {
-                    var validationError = CreateValidationError(validationFailures);
-                    var result = failureMethod.Invoke(null, [validationError]);
-                    if (result is not null) return (TResponse)result;
-                }
+                var validationError = CreateValidationError(validationFailures);
+                var result = _validationFailureMethod.Invoke(null, [validationError]);
+                if (result is not null) return (TResponse)result;
             }
             else if (typeof(TResponse) == typeof(Result))
             {

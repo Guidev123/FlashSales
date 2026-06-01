@@ -1,15 +1,21 @@
 using FlashSales.Application.Inbox;
 using Microsoft.Extensions.DependencyInjection;
-using Modules.Users.Application;
-using Modules.Users.Domain;
+using MidR.Interfaces;
 using Modules.Users.Infrastructure.Database.Repositories;
+using System.Reflection;
 
 namespace Modules.Users.Infrastructure.Inbox
 {
     internal sealed class UsersInboxRepositoryRegistration : IInboxRepositoryRegistration
     {
+        private static readonly Assembly _handlerAssembly = Assembly.GetExecutingAssembly();
+        private static readonly Type[] _handlerTypes = _handlerAssembly.GetTypes();
+
         public bool Matches(Type commandType)
-            => UsersModule.Assemblies.Contains(commandType.Assembly);
+        {
+            var handlerInterface = typeof(INotificationHandler<>).MakeGenericType(commandType);
+            return _handlerTypes.Any(t => !t.IsAbstract && handlerInterface.IsAssignableFrom(t));
+        }
 
         public IInboxRepository Resolve(IServiceProvider sp)
             => sp.GetRequiredService<InboxRepository>();

@@ -39,6 +39,7 @@ namespace FlashSales.Infrastructure.Database
                   AND ("NextRetryAt" IS NULL OR "NextRetryAt" <= @Now)
                 ORDER BY "OccurredOn"
                 LIMIT @BatchSize
+                FOR UPDATE SKIP LOCKED
                 """;
 
             var result = await unitOfWork.Connection.QueryAsync<InboxMessage>(
@@ -93,7 +94,7 @@ namespace FlashSales.Infrastructure.Database
                 SELECT @Id, "Id", @Name
                 FROM {schema}."InboxMessages"
                 WHERE "CorrelationId" = @CorrelationId
-                ON CONFLICT DO NOTHING
+                ON CONFLICT ("InboxMessageId", "Name") DO NOTHING
                 """;
 
             return unitOfWork.Connection.ExecuteAsync(

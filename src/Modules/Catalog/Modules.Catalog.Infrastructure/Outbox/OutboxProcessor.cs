@@ -15,7 +15,7 @@ namespace Modules.Catalog.Infrastructure.Outbox
         ILogger<OutboxProcessor> logger,
         IOptions<OutboxOptions> options,
         IServiceProvider serviceProvider
-        ) : BackgroundService
+        ) : BackgroundService, IOutboxBatchProcessor
     {
         private readonly OutboxOptions _outboxOptions = options.Value;
 
@@ -28,7 +28,7 @@ namespace Modules.Catalog.Infrastructure.Outbox
             {
                 try
                 {
-                    await ProcessOutboxAsync(stoppingToken);
+                    await ProcessBatchAsync(stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -37,20 +37,19 @@ namespace Modules.Catalog.Infrastructure.Outbox
             }
         }
 
-        private async Task ProcessOutboxAsync(CancellationToken stoppingToken)
+        public async Task ProcessBatchAsync(CancellationToken cancellationToken = default)
         {
             await using var scope = serviceProvider.CreateAsyncScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<ICatalogUnitOfWork>();
             var outboxRepository = scope.ServiceProvider.GetRequiredService<ICatalogOutboxRepository>();
-            var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
 
             logger.LogInformation("[Catalog] Beginning to process outbox messages");
 
-            await unitOfWork.BeginTransactionAsync(stoppingToken);
+            await unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var outboxMessages = await outboxRepository.GetAsync(
                 _outboxOptions.BatchSize,
-                stoppingToken);
+                cancellationToken);
 
             foreach (var outboxMessage in outboxMessages)
             {
@@ -65,7 +64,7 @@ namespace Modules.Catalog.Infrastructure.Outbox
                         JsonSerializerSettingsExtensions.Instance)!;
 
                     var messagePublisher = messageScope.ServiceProvider.GetRequiredService<IPublisher>();
-                    await messagePublisher.PublishAsync(domainEvent, stoppingToken);
+                    await messagePublisher.PublishAsync(domainEvent, cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -78,10 +77,10 @@ namespace Modules.Catalog.Infrastructure.Outbox
                 await outboxRepository.UpdateAsync(
                     exception,
                     outboxMessage,
-                    stoppingToken);
+                    cancellationToken);
             }
 
-            await unitOfWork.CommitAsync(stoppingToken);
+            await unitOfWork.CommitAsync(cancellationToken);
 
             logger.LogInformation("[Catalog] Completed process outbox messages");
         }
@@ -131,6 +130,5 @@ namespace Modules.Catalog.Infrastructure.Outbox
                 _outboxOptions.MaxRetryCount,
                 outboxMessage.NextRetryAt);
         }
-
     }
 }
