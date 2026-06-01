@@ -10,8 +10,8 @@ namespace Modules.Catalog.Domain.Sellers.Entities
 
         private Seller(Guid userId, Guid sellerId, string name, string? profilePictureUrl, bool isActive)
         {
+            Id = sellerId;
             UserId = userId;
-            SellerId = sellerId;
             Name = name;
             ProfilePictureUrl = profilePictureUrl;
             IsActive = isActive;
@@ -22,7 +22,6 @@ namespace Modules.Catalog.Domain.Sellers.Entities
         { }
 
         public Guid UserId { get; private set; }
-        public Guid SellerId { get; private set; }
         public string Name { get; private set; } = null!;
         public string? ProfilePictureUrl { get; private set; }
         public bool IsActive { get; private set; }
@@ -42,7 +41,6 @@ namespace Modules.Catalog.Domain.Sellers.Entities
         protected override void Validate()
         {
             AssertionConcern.EnsureTrue(UserId != Guid.Empty, SellerErrors.UserIdRequired.Description);
-            AssertionConcern.EnsureTrue(SellerId != Guid.Empty, SellerErrors.SellerIdRequired.Description);
             AssertionConcern.EnsureNotEmpty(Name, SellerErrors.NameMustNotBeEmpty.Description);
             AssertionConcern.EnsureMaxLength(Name, NAME_MAX_LENGTH, SellerErrors.NameTooLong(NAME_MAX_LENGTH).Description);
         }

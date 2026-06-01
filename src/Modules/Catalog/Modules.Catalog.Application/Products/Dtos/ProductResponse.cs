@@ -5,6 +5,7 @@
         string Name,
         string Description,
         List<ProductImageResponse> Images,
-        CategoryResponse Category
+        CategoryResponse Category,
+        string Status
         );
 }

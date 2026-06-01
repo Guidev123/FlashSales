@@ -32,7 +32,7 @@ namespace Modules.IntegrationTests.Catalog.Inbox
 
             // Assert
             var seller = await CatalogDbContext.Set<Modules.Catalog.Domain.Sellers.Entities.Seller>()
-                .FirstOrDefaultAsync(s => s.SellerId == integrationEvent.SellerId);
+                .FirstOrDefaultAsync(s => s.Id == integrationEvent.SellerId);
 
             seller.Should().NotBeNull();
 

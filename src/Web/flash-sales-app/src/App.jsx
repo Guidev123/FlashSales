@@ -14,6 +14,8 @@ import CustomerProfilePage from './pages/CustomerProfilePage.jsx'
 import SellerProductsPage from './pages/SellerProductsPage.jsx'
 import CreateProductPage from './pages/CreateProductPage.jsx'
 import ProductDetailPage from './pages/ProductDetailPage.jsx'
+import ProductsPage from './pages/ProductsPage.jsx'
+import ProductPage from './pages/ProductPage.jsx'
 
 function ActivationGuard({ children }) {
   const auth = useAuth()
@@ -98,6 +100,22 @@ export default function App() {
               <RequireCustomer>
                 <CustomerProfilePage />
               </RequireCustomer>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <RequireActivated>
+                <ProductsPage />
+              </RequireActivated>
+            }
+          />
+          <Route
+            path="/products/:id"
+            element={
+              <RequireActivated>
+                <ProductPage />
+              </RequireActivated>
             }
           />
           <Route

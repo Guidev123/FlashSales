@@ -8,9 +8,10 @@ import Button from '../components/Button.jsx'
 import styles from './SellerProductsPage.module.css'
 
 const STATUS_LABEL = {
-  Draft:    { label: 'Draft',    cls: 'statusDraft'    },
-  Active:   { label: 'Active',   cls: 'statusActive'   },
-  Archived: { label: 'Archived', cls: 'statusArchived' },
+  None:    { label: 'Draft',    cls: 'statusDraft'    },
+  Draft:   { label: 'Draft',    cls: 'statusDraft'    },
+  Active:  { label: 'Active',   cls: 'statusActive'   },
+  Archive: { label: 'Archived', cls: 'statusArchived' },
 }
 
 function ProductCard({ product, onClick }) {
@@ -63,7 +64,7 @@ export default function SellerProductsPage() {
       setError('')
       try {
         const res = await apiFetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/products?page=${page}&size=12`,
+          `${import.meta.env.VITE_API_URL}/api/v1/products/mine?page=${page}&size=12`,
           { headers: { Authorization: `Bearer ${auth.user.access_token}` } }
         )
         if (!res || cancelled) return

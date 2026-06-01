@@ -22,7 +22,7 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
         {
             return context.Sellers
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.SellerId == sellerId, cancellationToken);
+                .FirstOrDefaultAsync(c => c.Id == sellerId, cancellationToken);
         }
 
         public Task<Seller?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)

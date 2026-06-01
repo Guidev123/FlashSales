@@ -23,8 +23,8 @@ namespace Modules.Catalog.Application.Products.UseCases.Archive
             if (product is null)
                 return Result.Failure(ProductErrors.NotFound(request.ProductId));
 
-            if (product.SellerId != seller.SellerId)
-                return Result.Failure(ProductErrors.SellerWithIdNotFoundOrIsNotProductOwner(seller.SellerId));
+            if (product.SellerId != seller.Id)
+                return Result.Failure(ProductErrors.SellerWithIdNotFoundOrIsNotProductOwner(seller.Id));
 
             var result = product.Archive();
             if (result.IsFailure)

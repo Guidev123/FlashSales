@@ -43,7 +43,17 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
 
         public void Update(Product product)
         {
-            context.Products.Update(product);
+            var tracked = context.ChangeTracker.Entries<Product>()
+                .FirstOrDefault(e => e.Entity.Id == product.Id);
+
+            if (tracked is not null)
+            {
+                tracked.CurrentValues.SetValues(product);
+            }
+            else
+            {
+                context.Products.Update(product);
+            }
         }
 
         public Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default)

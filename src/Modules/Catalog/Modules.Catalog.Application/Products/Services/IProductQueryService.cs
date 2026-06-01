@@ -6,6 +6,8 @@ namespace Modules.Catalog.Application.Products.Services
     {
         Task<IReadOnlyCollection<ProductResponse>> GetAllAsync(int page, int size, CancellationToken cancellationToken = default);
 
+        Task<IReadOnlyCollection<ProductResponse>> GetAllBySellerAsync(Guid sellerId, int page, int size, CancellationToken cancellationToken = default);
+
         Task<ProductResponse?> GetAsync(Guid productId, CancellationToken cancellationToken = default);
 
         Task<int> GetTotalCountAsync(CancellationToken cancellationToken = default);

@@ -14,9 +14,10 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 const STATUS_LABEL = {
-  Draft:    { label: 'Draft',    cls: 'statusDraft'    },
-  Active:   { label: 'Active',   cls: 'statusActive'   },
-  Archived: { label: 'Archived', cls: 'statusArchived' },
+  None:    { label: 'Draft',    cls: 'statusDraft'    },
+  Draft:   { label: 'Draft',    cls: 'statusDraft'    },
+  Active:  { label: 'Active',   cls: 'statusActive'   },
+  Archive: { label: 'Archived', cls: 'statusArchived' },
 }
 
 export default function ProductDetailPage() {
@@ -181,8 +182,8 @@ export default function ProductDetailPage() {
   const cover  = product.images?.find(i => i.isCover)
   const extras = product.images?.filter(i => !i.isCover) ?? []
   const status = STATUS_LABEL[product.status] ?? STATUS_LABEL.Draft
-  const isDraft    = !product.status || product.status === 'Draft'
-  const isArchived = product.status === 'Archived'
+  const isDraft    = !product.status || product.status === 'Draft' || product.status === 'None'
+  const isArchived = product.status === 'Archive'
 
   return (
     <div className={styles.page}>
@@ -211,7 +212,7 @@ export default function ProductDetailPage() {
             {actionError && (
               <span className={styles.actionError}><AlertCircle size={13} /> {actionError}</span>
             )}
-            {(isDraft || isArchived) && (
+            {isDraft && (
               <Button
                 variant="primary"
                 size="sm"

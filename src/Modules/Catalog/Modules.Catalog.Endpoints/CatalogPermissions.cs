@@ -9,6 +9,7 @@ namespace Modules.Catalog.Endpoints
             public const string ProductsUpdate = "products:update-own";
             public const string ProductsActivate = "products:activate-own";
             public const string ProductsArchive = "products:archive-own";
+            public const string ProductsView = "products:view-own";
         }
     }
 }

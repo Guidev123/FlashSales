@@ -1,18 +1,21 @@
 import { useAuth } from 'react-oidc-context'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Zap, LogOut, Rocket, UserCircle2, Package } from 'lucide-react'
 import { isActivated, isSeller } from '../lib/auth.js'
 import Button from './Button.jsx'
 import styles from './Navbar.module.css'
 
 export default function Navbar() {
-  const auth = useAuth()
+  const auth     = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const activated = isActivated(auth.user)
   const seller    = isSeller(auth.user)
 
   const handleLogout = () =>
     auth.signoutRedirect({ post_logout_redirect_uri: import.meta.env.VITE_POST_LOGOUT_URI })
+
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/')
 
   return (
     <header className={styles.header}>
@@ -21,6 +24,13 @@ export default function Navbar() {
           <div className={styles.brandIcon}><Zap size={15} strokeWidth={2.5} /></div>
           <span className={styles.brandName}>Flash Sales</span>
         </Link>
+
+        {activated && (
+          <div className={styles.navLinks}>
+            <Link to="/launches"  className={`${styles.navLink} ${isActive('/launches')  ? styles.navLinkActive : ''}`}>Launches</Link>
+            <Link to="/products"  className={`${styles.navLink} ${isActive('/products') && !location.pathname.startsWith('/seller/products') ? styles.navLinkActive : ''}`}>Products</Link>
+          </div>
+        )}
 
         <div className={styles.actions}>
           {!auth.isAuthenticated && (

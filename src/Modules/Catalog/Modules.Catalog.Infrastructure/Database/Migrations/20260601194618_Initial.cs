@@ -78,7 +78,6 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SellerId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "VARCHAR(200)", nullable: false),
                     ProfilePictureUrl = table.Column<string>(type: "VARCHAR(500)", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
@@ -239,13 +238,6 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                 schema: "catalog",
                 table: "Products",
                 columns: new[] { "SellerId", "CreatedOn" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sellers_SellerId",
-                schema: "catalog",
-                table: "Sellers",
-                column: "SellerId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sellers_UserId",

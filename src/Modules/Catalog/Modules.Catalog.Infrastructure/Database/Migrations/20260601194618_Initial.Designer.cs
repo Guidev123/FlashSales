@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Catalog.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20260530224356_Initial")]
+    [Migration("20260601194618_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -256,17 +256,10 @@ namespace Modules.Catalog.Infrastructure.Database.Migrations
                     b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("VARCHAR(500)");
 
-                    b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SellerId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Sellers_SellerId");
 
                     b.HasIndex("UserId")
                         .IsUnique()

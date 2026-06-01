@@ -15,9 +15,6 @@ namespace Modules.Catalog.Infrastructure.Database.Configurations
             builder.Property(s => s.UserId)
                 .IsRequired();
 
-            builder.Property(s => s.SellerId)
-                .IsRequired();
-
             builder.Property(s => s.Name)
                 .HasColumnType($"VARCHAR({Seller.NAME_MAX_LENGTH})")
                 .IsRequired();
@@ -31,10 +28,6 @@ namespace Modules.Catalog.Infrastructure.Database.Configurations
 
             builder.Property(s => s.CreatedOn)
                 .IsRequired();
-
-            builder.HasIndex(s => s.SellerId)
-                .IsUnique()
-                .HasDatabaseName("IX_Sellers_SellerId");
 
             builder.HasIndex(s => s.UserId)
                 .IsUnique()

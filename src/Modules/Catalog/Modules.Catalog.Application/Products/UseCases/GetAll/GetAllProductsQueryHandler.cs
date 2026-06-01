@@ -5,7 +5,7 @@ using Modules.Catalog.Application.Products.Services;
 
 namespace Modules.Catalog.Application.Products.UseCases.GetAll
 {
-    internal sealed class GetAllProductsQueryHandler(IProductQueryService productQueryService) : IQueryHandler<GetAllProductsQuery, PagedResult<ProductResponse>>
+    internal sealed class GetAllProductsBySellerQueryHandler(IProductQueryService productQueryService) : IQueryHandler<GetAllProductsQuery, PagedResult<ProductResponse>>
     {
         public async Task<Result<PagedResult<ProductResponse>>> ExecuteAsync(GetAllProductsQuery request, CancellationToken cancellationToken = default)
         {
