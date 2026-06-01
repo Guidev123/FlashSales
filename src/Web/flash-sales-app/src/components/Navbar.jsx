@@ -1,6 +1,6 @@
 import { useAuth } from 'react-oidc-context'
 import { Link, useNavigate } from 'react-router-dom'
-import { Zap, LogOut, Rocket, UserCircle2 } from 'lucide-react'
+import { Zap, LogOut, Rocket, UserCircle2, Package } from 'lucide-react'
 import { isActivated, isSeller } from '../lib/auth.js'
 import Button from './Button.jsx'
 import styles from './Navbar.module.css'
@@ -37,10 +37,16 @@ export default function Navbar() {
           {auth.isAuthenticated && activated && (
             <>
               {seller ? (
-                <Button variant="ghost" size="sm" onClick={() => navigate('/seller/profile')}>
-                  <UserCircle2 size={13} />
-                  My profile
-                </Button>
+                <>
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/seller/products')}>
+                    <Package size={13} />
+                    My products
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/seller/profile')}>
+                    <UserCircle2 size={13} />
+                    My profile
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button variant="ghost" size="sm" onClick={() => navigate('/customer/profile')}>

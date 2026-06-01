@@ -11,6 +11,9 @@ import LaunchesPage from './pages/LaunchesPage.jsx'
 import BecomeSellerPage from './pages/BecomeSellerPage.jsx'
 import SellerProfilePage from './pages/SellerProfilePage.jsx'
 import CustomerProfilePage from './pages/CustomerProfilePage.jsx'
+import SellerProductsPage from './pages/SellerProductsPage.jsx'
+import CreateProductPage from './pages/CreateProductPage.jsx'
+import ProductDetailPage from './pages/ProductDetailPage.jsx'
 
 function ActivationGuard({ children }) {
   const auth = useAuth()
@@ -95,6 +98,30 @@ export default function App() {
               <RequireCustomer>
                 <CustomerProfilePage />
               </RequireCustomer>
+            }
+          />
+          <Route
+            path="/seller/products"
+            element={
+              <RequireSeller>
+                <SellerProductsPage />
+              </RequireSeller>
+            }
+          />
+          <Route
+            path="/seller/products/new"
+            element={
+              <RequireSeller>
+                <CreateProductPage />
+              </RequireSeller>
+            }
+          />
+          <Route
+            path="/seller/products/:id"
+            element={
+              <RequireSeller>
+                <ProductDetailPage />
+              </RequireSeller>
             }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
