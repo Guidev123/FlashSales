@@ -1,13 +1,10 @@
-using FlashSales.Application.Extensions;
+using FlashSales.Application.Abstractions;
 using FlashSales.Application.Outbox;
-using FlashSales.Domain.DomainObjects;
+using FlashSales.Infrastructure.Outbox;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MidR.Interfaces;
 using Modules.Users.Application.Abstractions;
-using Newtonsoft.Json;
 
 namespace Modules.Users.Infrastructure.Outbox
 {
@@ -15,120 +12,12 @@ namespace Modules.Users.Infrastructure.Outbox
         ILogger<OutboxProcessor> logger,
         IOptions<OutboxOptions> options,
         IServiceProvider serviceProvider
-        ) : BackgroundService, IOutboxBatchProcessor
+        ) : BaseOutboxProcessor(logger, options, serviceProvider, "Users")
     {
-        private readonly OutboxOptions _outboxOptions = options.Value;
+        protected override IUnitOfWork GetUnitOfWork(IServiceProvider sp)
+            => sp.GetRequiredService<IUsersUnitOfWork>();
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            using var timer = new PeriodicTimer(
-                TimeSpan.FromSeconds(_outboxOptions.IntervalInSeconds));
-
-            while (await timer.WaitForNextTickAsync(stoppingToken))
-            {
-                try
-                {
-                    await ProcessBatchAsync(stoppingToken);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "[Users] Unhandled exception in outbox worker");
-                }
-            }
-        }
-
-        public async Task ProcessBatchAsync(CancellationToken cancellationToken = default)
-        {
-            await using var scope = serviceProvider.CreateAsyncScope();
-            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUsersUnitOfWork>();
-            var outboxRepository = scope.ServiceProvider.GetRequiredService<IUsersOutboxRepository>();
-
-            logger.LogInformation("[Users] Beginning to process outbox messages");
-
-            await unitOfWork.BeginTransactionAsync(cancellationToken);
-
-            var outboxMessages = await outboxRepository.GetAsync(
-                _outboxOptions.BatchSize,
-                cancellationToken);
-
-            foreach (var outboxMessage in outboxMessages)
-            {
-                await using var messageScope = scope.ServiceProvider.CreateAsyncScope();
-
-                Exception? exception = null;
-
-                try
-                {
-                    var domainEvent = JsonConvert.DeserializeObject<DomainEvent>(
-                        outboxMessage.Content,
-                        JsonSerializerSettingsExtensions.Instance)!;
-
-                    var messagePublisher = messageScope.ServiceProvider.GetRequiredService<IPublisher>();
-                    await messagePublisher.PublishAsync(domainEvent, cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "[Users] Exception while processing outbox message {MessageId}", outboxMessage.Id);
-                    exception = ex;
-                }
-
-                ApplyRetryPolicy(outboxMessage, exception);
-
-                await outboxRepository.UpdateAsync(
-                    exception,
-                    outboxMessage,
-                    cancellationToken);
-            }
-
-            await unitOfWork.CommitAsync(cancellationToken);
-
-            logger.LogInformation("[Users] Completed process outbox messages");
-        }
-
-        private void ApplyRetryPolicy(OutboxMessage outboxMessage, Exception? exception)
-        {
-            if (exception is null)
-            {
-                outboxMessage.ProcessedOn = DateTimeOffset.UtcNow;
-                return;
-            }
-
-            if (exception is FlashSalesException)
-            {
-                outboxMessage.IsPermanentFailure = true;
-                outboxMessage.Error = exception.Message.Length > 256 ? exception.Message[..256] : exception.Message;
-
-                logger.LogWarning(
-                    "[Users] Permanent failure on outbox message {MessageId}: {Error}",
-                    outboxMessage.Id,
-                    exception.Message);
-
-                return;
-            }
-
-            outboxMessage.RetryCount++;
-            outboxMessage.Error = exception.Message.Length > 256 ? exception.Message[..256] : exception.Message;
-
-            if (outboxMessage.RetryCount >= _outboxOptions.MaxRetryCount)
-            {
-                outboxMessage.IsPermanentFailure = true;
-
-                logger.LogError(
-                    "[Users] Outbox message {MessageId} exceeded max retries ({MaxRetry}). Marked as permanent failure.",
-                    outboxMessage.Id,
-                    _outboxOptions.MaxRetryCount);
-
-                return;
-            }
-
-            outboxMessage.NextRetryAt = DateTimeOffset.UtcNow.ComputeNextRetryAt(outboxMessage.RetryCount);
-
-            logger.LogWarning(
-                "[Users] Outbox message {MessageId} scheduled for retry {RetryCount}/{MaxRetry} at {NextRetryAt}",
-                outboxMessage.Id,
-                outboxMessage.RetryCount,
-                _outboxOptions.MaxRetryCount,
-                outboxMessage.NextRetryAt);
-        }
+        protected override IOutboxRepository GetOutboxRepository(IServiceProvider sp)
+            => sp.GetRequiredService<IUsersOutboxRepository>();
     }
 }

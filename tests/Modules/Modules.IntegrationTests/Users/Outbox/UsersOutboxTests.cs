@@ -8,7 +8,7 @@ namespace Modules.IntegrationTests.Users.Outbox
     public sealed class UsersOutboxTests(IntegrationWebApplicationFactory factory) : BaseIntegrationTest(factory)
     {
         [Fact]
-        public async Task DrainUsersOutbox_FlashSalesException_MarksAsPermanentFailure()
+        public async Task DrainOutbox_FlashSalesException_MarksAsPermanentFailure()
         {
             // Arrange — SellerActivatedDomainEvent with a UserId that has no seller profile in DB
             var domainEvent = SellerActivatedDomainEvent.Create(

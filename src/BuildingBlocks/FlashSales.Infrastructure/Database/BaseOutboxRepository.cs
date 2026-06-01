@@ -39,7 +39,7 @@ namespace FlashSales.Infrastructure.Database
                   AND ("NextRetryAt" IS NULL OR "NextRetryAt" <= @Now)
                 ORDER BY "OccurredOn"
                 LIMIT @BatchSize
-                FOR UPDATE SKIP LOCKED
+                FOR NO KEY UPDATE SKIP LOCKED
                 """;
 
             var result = await unitOfWork.Connection.QueryAsync<OutboxMessage>(

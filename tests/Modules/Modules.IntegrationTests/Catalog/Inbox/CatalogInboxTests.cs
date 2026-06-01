@@ -1,13 +1,25 @@
 using FluentAssertions;
+using FlashSales.Application.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Modules.IntegrationTests.Abstractions;
 using Modules.Users.Contracts.IntegrationEvents;
-using Npgsql;
 
 namespace Modules.IntegrationTests.Catalog.Inbox
 {
-    public sealed class CatalogInboxTests(IntegrationWebApplicationFactory factory) : BaseIntegrationTest(factory)
+    public sealed class CatalogInboxTests(IntegrationWebApplicationFactory factory)
+        : BaseInboxTests(factory)
     {
+        protected override DbContext ModuleDbContext => CatalogDbContext;
+        protected override string Schema => "catalog";
+
+        protected override IntegrationEvent BuildEvent()
+            => BuildSellerActivatedEvent();
+
+        protected override Task InsertInboxMessageAsync(IntegrationEvent evt, CancellationToken cancellationToken = default)
+            => InsertCatalogInboxMessageAsync(evt, cancellationToken);
+
+        // ── Catalog-specific ─────────────────────────────────────────────────
+
         [Fact]
         public async Task DrainInbox_HappyPath_CreatesSellerAndMarksMessageAsProcessed()
         {
@@ -33,33 +45,17 @@ namespace Modules.IntegrationTests.Catalog.Inbox
         }
 
         [Fact]
-        public async Task InsertCatalogInboxMessage_DuplicateCorrelationId_OnlyOneMessageInserted()
-        {
-            // Arrange
-            var integrationEvent = BuildSellerActivatedEvent();
-
-            // Act
-            await InsertCatalogInboxMessageAsync(integrationEvent);
-            await InsertCatalogInboxMessageAsync(integrationEvent);
-
-            // Assert
-            var count = await CatalogDbContext.Set<FlashSales.Application.Inbox.InboxMessage>().CountAsync();
-            count.Should().Be(1);
-        }
-
-        [Fact]
         public async Task DrainInbox_DuplicateSeller_MarksAsPermanentFailure()
         {
-            // Arrange — process first event normally so the seller already exists
+            // Arrange — process first event so seller already exists
             var firstEvent = BuildSellerActivatedEvent();
             await InsertCatalogInboxMessageAsync(firstEvent);
             await DrainInboxAsync();
 
-            // Second event with same SellerId + UserId but different CorrelationId triggers FlashSalesException
+            // Second event with same SellerId triggers FlashSalesException
             var duplicateEvent = BuildSellerActivatedEvent(
                 sellerId: firstEvent.SellerId,
                 userId: firstEvent.UserId);
-
             await InsertCatalogInboxMessageAsync(duplicateEvent);
 
             // Act
@@ -75,11 +71,10 @@ namespace Modules.IntegrationTests.Catalog.Inbox
         }
 
         [Fact]
-        public async Task DrainInbox_Idempotency_AlreadyProcessedMessageIsNotReprocessed()
+        public async Task DrainInbox_Idempotency_DoesNotCreateDuplicateSeller()
         {
             // Arrange
-            var integrationEvent = BuildSellerActivatedEvent();
-            await InsertCatalogInboxMessageAsync(integrationEvent);
+            await InsertCatalogInboxMessageAsync(BuildEvent());
             await DrainInboxAsync();
 
             var sellerCountBefore = await CatalogDbContext.Set<Modules.Catalog.Domain.Sellers.Entities.Seller>().CountAsync();
@@ -92,46 +87,17 @@ namespace Modules.IntegrationTests.Catalog.Inbox
             sellerCountAfter.Should().Be(sellerCountBefore);
         }
 
-        [Fact]
-        public async Task DrainInbox_TransientFailure_SchedulesRetry()
-        {
-            // Arrange
-            var integrationEvent = BuildSellerActivatedEvent();
-            await InsertCatalogInboxMessageAsync(integrationEvent);
-
-            await using var connection = new NpgsqlConnection(Factory.GetConnectionString());
-            await connection.OpenAsync();
-
-            await using var corrupt = new NpgsqlCommand(
-                """UPDATE catalog."InboxMessages" SET "Content" = jsonb_set("Content", ARRAY['$type'], '"NonExistent.Type, NonExistent"') """,
-                connection);
-            await corrupt.ExecuteNonQueryAsync();
-
-            // Act
-            await DrainInboxAsync();
-
-            // Assert
-            var inboxMessage = await CatalogDbContext.Set<FlashSales.Application.Inbox.InboxMessage>()
-                .FirstOrDefaultAsync();
-
-            inboxMessage.Should().NotBeNull();
-            inboxMessage!.ProcessedOn.Should().BeNull();
-            inboxMessage.IsPermanentFailure.Should().BeFalse();
-            inboxMessage.RetryCount.Should().Be(1);
-            inboxMessage.NextRetryAt.Should().NotBeNull();
-        }
+        // ── Helpers ───────────────────────────────────────────────────────────
 
         private static SellerActivatedIntegrationEvent BuildSellerActivatedEvent(
             Guid? sellerId = null,
             Guid? userId = null)
-        {
-            return SellerActivatedIntegrationEvent.Create(
+            => SellerActivatedIntegrationEvent.Create(
                 correlationId: Guid.NewGuid(),
                 userId: userId ?? Guid.NewGuid(),
                 sellerId: sellerId ?? Guid.NewGuid(),
                 name: "Test Seller",
                 profilePictureUrl: null,
                 isActive: true);
-        }
     }
 }
