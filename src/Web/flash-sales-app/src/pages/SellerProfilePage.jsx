@@ -1,14 +1,35 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from 'react-oidc-context'
-import { Camera, Landmark, Hash, CreditCard, Mail, User, BadgeCheck, AlertCircle } from 'lucide-react'
+import {
+  Camera, Landmark, Hash, CreditCard, Mail, User,
+  BadgeCheck, AlertCircle, Pencil, X, Check,
+} from 'lucide-react'
 import { useApiFetch } from '../hooks/useApiFetch.js'
 import Navbar from '../components/Navbar.jsx'
+import Input from '../components/Input.jsx'
+import Button from '../components/Button.jsx'
 import styles from './SellerProfilePage.module.css'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
+const ACCOUNT_TYPES = [
+  { value: 'Checking', label: 'Checking account' },
+  { value: 'Savings',  label: 'Savings account'  },
+]
+
 function formatDoc(doc) {
   return doc?.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') ?? '—'
+}
+
+function validatePayment(v) {
+  const e = {}
+  if (!v.bankCode?.trim())       e.bankCode      = 'Bank code is required'
+  else if (!/^\d{3}$/.test(v.bankCode.trim()))
+                                 e.bankCode      = 'Bank code must be 3 digits'
+  if (!v.agency?.trim())         e.agency        = 'Agency is required'
+  if (!v.accountNumber?.trim())  e.accountNumber = 'Account number is required'
+  if (!v.accountType)            e.accountType   = 'Select an account type'
+  return e
 }
 
 function Field({ label, value, icon: Icon }) {
@@ -35,6 +56,14 @@ export default function SellerProfilePage() {
   const [uploading,    setUploading]    = useState(false)
   const [uploadError,  setUploadError]  = useState('')
 
+  // payment account edit state
+  const [editingPayment, setEditingPayment] = useState(false)
+  const [payForm,        setPayForm]        = useState({ bankCode: '', agency: '', accountNumber: '', accountType: '' })
+  const [payErrors,      setPayErrors]      = useState({})
+  const [payTouched,     setPayTouched]     = useState({})
+  const [savingPay,      setSavingPay]      = useState(false)
+  const [payError,       setPayError]       = useState('')
+
   useEffect(() => {
     async function load() {
       setLoading(true)
@@ -60,6 +89,7 @@ export default function SellerProfilePage() {
     load()
   }, [auth.user?.access_token])
 
+  // ── Profile picture upload ────────────────────────────────
   async function handleFileChange(e) {
     const file = e.target.files?.[0]
     e.target.value = ''
@@ -105,6 +135,81 @@ export default function SellerProfilePage() {
     }
   }
 
+  // ── Payment account edit ──────────────────────────────────
+  function openPaymentEdit() {
+    setPayForm({
+      bankCode:      profile.paymentAccount?.bankCode      ?? '',
+      agency:        profile.paymentAccount?.agency        ?? '',
+      accountNumber: profile.paymentAccount?.accountNumber ?? '',
+      accountType:   profile.paymentAccount?.accountType   ?? '',
+    })
+    setPayErrors({})
+    setPayTouched({})
+    setPayError('')
+    setEditingPayment(true)
+  }
+
+  function cancelPaymentEdit() {
+    setEditingPayment(false)
+    setPayError('')
+  }
+
+  const setPayField = (field) => (e) => {
+    let val = e.target.value
+    if (field === 'bankCode') val = val.replace(/\D/g, '').slice(0, 3)
+    setPayForm(f => ({ ...f, [field]: val }))
+    if (payTouched[field]) {
+      const errs = validatePayment({ ...payForm, [field]: val })
+      setPayErrors(prev => ({ ...prev, [field]: errs[field] }))
+    }
+  }
+
+  const blurPay = (field) => () => {
+    setPayTouched(t => ({ ...t, [field]: true }))
+    const errs = validatePayment(payForm)
+    setPayErrors(prev => ({ ...prev, [field]: errs[field] }))
+  }
+
+  async function handleSavePayment(e) {
+    e.preventDefault()
+    const errs = validatePayment(payForm)
+    setPayErrors(errs)
+    setPayTouched(Object.keys(payForm).reduce((a, k) => ({ ...a, [k]: true }), {}))
+    if (Object.keys(errs).length) return
+
+    setSavingPay(true)
+    setPayError('')
+    try {
+      const res = await apiFetch(`${import.meta.env.VITE_API_URL}/api/v1/users/seller/payment-account`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.user.access_token}`,
+        },
+        body: JSON.stringify({
+          bankCode:      payForm.bankCode,
+          agency:        payForm.agency,
+          accountNumber: payForm.accountNumber,
+          accountType:   payForm.accountType,
+        }),
+      })
+      if (!res) return
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setPayError(body.message || 'Could not save changes. Please try again.')
+        return
+      }
+
+      setProfile(p => ({ ...p, paymentAccount: { ...payForm } }))
+      setEditingPayment(false)
+    } catch {
+      setPayError('Could not reach the server. Check your connection.')
+    } finally {
+      setSavingPay(false)
+    }
+  }
+
+  // ── Loading / error states ────────────────────────────────
   if (loading) {
     return (
       <div className={styles.page}>
@@ -142,6 +247,7 @@ export default function SellerProfilePage() {
 
       <div className={styles.inner}>
 
+        {/* ── Profile header ─────────────────────────────── */}
         <div className={styles.profileHeader}>
           <div className={styles.avatarSection}>
             <button
@@ -191,6 +297,7 @@ export default function SellerProfilePage() {
 
         <div className={styles.grid}>
 
+          {/* ── Personal information (read-only) ─────────── */}
           <div className={styles.infoCard}>
             <p className={styles.cardLabel}>Personal information</p>
             <div className={styles.fields}>
@@ -200,14 +307,105 @@ export default function SellerProfilePage() {
             </div>
           </div>
 
+          {/* ── Bank details (editable) ───────────────────── */}
           <div className={styles.infoCard}>
-            <p className={styles.cardLabel}>Bank details</p>
-            <div className={styles.fields}>
-              <Field label="Bank code"      value={profile.paymentAccount?.bankCode}      icon={Landmark} />
-              <Field label="Agency"         value={profile.paymentAccount?.agency}        icon={Landmark} />
-              <Field label="Account number" value={profile.paymentAccount?.accountNumber} icon={CreditCard} />
-              <Field label="Account type"   value={profile.paymentAccount?.accountType}   icon={CreditCard} />
+            <div className={styles.cardHeader}>
+              <p className={styles.cardLabel}>Bank details</p>
+              {!editingPayment && (
+                <button className={styles.editBtn} onClick={openPaymentEdit} aria-label="Edit bank details">
+                  <Pencil size={13} /> Edit
+                </button>
+              )}
             </div>
+
+            {editingPayment ? (
+              <form onSubmit={handleSavePayment} noValidate className={styles.editForm}>
+                {payError && (
+                  <div className={styles.errorBox} style={{ marginBottom: 4 }}>
+                    <AlertCircle size={15} /> {payError}
+                  </div>
+                )}
+
+                <div className={styles.twoCol}>
+                  <Input
+                    label="Bank code"
+                    name="bankCode"
+                    placeholder="001"
+                    icon={Landmark}
+                    value={payForm.bankCode}
+                    onChange={setPayField('bankCode')}
+                    onBlur={blurPay('bankCode')}
+                    error={payErrors.bankCode}
+                    hint="3-digit BACEN code"
+                  />
+                  <Input
+                    label="Agency"
+                    name="agency"
+                    placeholder="0001"
+                    icon={Landmark}
+                    value={payForm.agency}
+                    onChange={setPayField('agency')}
+                    onBlur={blurPay('agency')}
+                    error={payErrors.agency}
+                  />
+                </div>
+
+                <Input
+                  label="Account number"
+                  name="accountNumber"
+                  placeholder="00000000-0"
+                  icon={CreditCard}
+                  value={payForm.accountNumber}
+                  onChange={setPayField('accountNumber')}
+                  onBlur={blurPay('accountNumber')}
+                  error={payErrors.accountNumber}
+                />
+
+                <div>
+                  <label className={styles.radioLabel}>Account type</label>
+                  <div className={styles.radioGroup}>
+                    {ACCOUNT_TYPES.map(opt => (
+                      <label
+                        key={opt.value}
+                        className={`${styles.radioOption} ${payForm.accountType === opt.value ? styles.radioSelected : ''}`}
+                      >
+                        <input
+                          type="radio"
+                          name="accountType"
+                          value={opt.value}
+                          checked={payForm.accountType === opt.value}
+                          onChange={() => {
+                            setPayForm(f => ({ ...f, accountType: opt.value }))
+                            setPayErrors(prev => ({ ...prev, accountType: undefined }))
+                          }}
+                          className={styles.radioInput}
+                        />
+                        {opt.label}
+                      </label>
+                    ))}
+                  </div>
+                  {payErrors.accountType && (
+                    <span className={styles.radioError}>{payErrors.accountType}</span>
+                  )}
+                </div>
+
+                <div className={styles.editActions}>
+                  <Button type="submit" variant="primary" size="sm" loading={savingPay}>
+                    <Check size={13} /> Save changes
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={cancelPaymentEdit} disabled={savingPay}>
+                    <X size={13} /> Cancel
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <div className={styles.fields}>
+                <Field label="Bank code"      value={profile.paymentAccount?.bankCode}      icon={Landmark} />
+                <Field label="Agency"         value={profile.paymentAccount?.agency}        icon={Landmark} />
+                <Field label="Account number" value={profile.paymentAccount?.accountNumber} icon={CreditCard} />
+                <Field label="Account type"   value={profile.paymentAccount?.accountType}   icon={CreditCard} />
+              </div>
+            )}
           </div>
 
         </div>

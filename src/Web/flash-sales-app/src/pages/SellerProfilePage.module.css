@@ -159,6 +159,92 @@
   color: var(--text-muted);
 }
 
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.editBtn:hover { color: var(--text-primary); border-color: var(--accent); }
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.editActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.radioLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.radioOption {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+  user-select: none;
+}
+
+.radioOption:hover { border-color: var(--accent); color: var(--text-primary); }
+
+.radioSelected {
+  border-color: var(--accent);
+  background: rgba(249,115,22,.07);
+  color: var(--text-primary);
+}
+
+.radioInput { display: none; }
+
+.radioError {
+  display: block;
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 6px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
