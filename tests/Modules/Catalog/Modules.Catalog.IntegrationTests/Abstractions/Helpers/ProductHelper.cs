@@ -1,8 +1,8 @@
 using Bogus;
 using MidR.Interfaces;
-using Modules.Catalog.Application.Products.UseCases.Activate;
-using Modules.Catalog.Application.Products.UseCases.Create;
-using Modules.Catalog.Application.Sellers.UseCases.Create;
+using Modules.Catalog.Application.Products.Features.Create;
+using Modules.Catalog.Application.Products.Features.Activate;
+using Modules.Catalog.Application.Sellers.Features.Create;
 
 namespace Modules.Catalog.IntegrationTests.Abstractions.Helpers
 {

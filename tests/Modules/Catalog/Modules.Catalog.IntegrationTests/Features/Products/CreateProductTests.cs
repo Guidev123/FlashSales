@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Modules.Catalog.Application.Products.UseCases.Create;
+using Modules.Catalog.Application.Products.Features.Create;
 using Modules.Catalog.Domain.Products.Errors;
 using Modules.Catalog.Domain.Sellers.Errors;
 using Modules.Catalog.IntegrationTests.Abstractions;

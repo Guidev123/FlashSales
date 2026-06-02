@@ -1,0 +1,17 @@
+﻿using FlashSales.Application.Messaging;
+using FlashSales.Domain.Results;
+using Modules.Users.Application.AccessManagement.Services;
+using Modules.Users.Domain.AccessManagement.Repositories;
+
+namespace Modules.Users.Application.AccessManagement.Features.CreateRole
+{
+    internal sealed class CreateRoleCommandHandler(IRoleRepository roleRepository) : ICommandHandler<CreateRoleCommand>
+    {
+        public async Task<Result> ExecuteAsync(CreateRoleCommand request, CancellationToken cancellationToken = default)
+        {
+            await roleRepository.AddAsync(new(request.Name), cancellationToken);
+
+            return Result.Success();
+        }
+    }
+}

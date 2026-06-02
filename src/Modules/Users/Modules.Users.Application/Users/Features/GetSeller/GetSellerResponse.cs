@@ -1,0 +1,19 @@
+﻿namespace Modules.Users.Application.Users.Features.GetSeller
+{
+    public sealed record GetSellerResponse(
+        Guid Id,
+        string Email,
+        string Document,
+        string FirstName,
+        string LastName,
+        PaymentAccountResponse PaymentAccount,
+        string? ProfilePictureUrl
+        );
+
+    public sealed record PaymentAccountResponse(
+        string BankCode,
+        string Agency,
+        string AccountNumber,
+        string AccountType
+        );
+}

@@ -1,6 +1,7 @@
 using Bogus;
 using MidR.Interfaces;
-using Modules.Users.Application.Users.UseCases.Create;
+using Modules.Users.Application.Users.Features.Create;
+using Modules.Users.Application.Users.Features.Create;
 
 namespace Modules.Users.IntegrationTests.Abstractions.Helpers
 {

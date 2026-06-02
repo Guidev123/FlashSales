@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Catalog.Application.Products.UseCases.Archive;
+using Modules.Catalog.Application.Products.Features.Archive;
 using System.Security.Claims;
 
 namespace Modules.Catalog.Endpoints.Products

@@ -1,6 +1,6 @@
 using FlashSales.Domain.DomainObjects;
 using MidR.Interfaces;
-using Modules.Catalog.Application.Sellers.UseCases.UpdateProfilePicture;
+using Modules.Catalog.Application.Sellers.Features.UpdateProfilePicture;
 using Modules.Users.Contracts.IntegrationEvents;
 
 namespace Modules.Catalog.Infrastructure.IntegrationEvents

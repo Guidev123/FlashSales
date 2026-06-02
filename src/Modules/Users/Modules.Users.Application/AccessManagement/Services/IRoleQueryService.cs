@@ -1,5 +1,5 @@
-﻿using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
-using Modules.Users.Application.AccessManagement.UseCases.GetRole;
+﻿using Modules.Users.Application.AccessManagement.Features.GetPermissions;
+using Modules.Users.Application.AccessManagement.Features.GetRole;
 
 namespace Modules.Users.Application.AccessManagement.Services
 {

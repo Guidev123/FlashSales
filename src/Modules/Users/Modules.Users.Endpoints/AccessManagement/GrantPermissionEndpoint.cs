@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.UseCases.GrantPermission;
+using Modules.Users.Application.AccessManagement.Features.GrantPermission;
 
 namespace Modules.Users.Endpoints.AccessManagement
 {

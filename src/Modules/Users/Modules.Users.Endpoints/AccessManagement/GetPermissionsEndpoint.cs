@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
+using Modules.Users.Application.AccessManagement.Features.GetPermissions;
 using System.Security.Claims;
 
 namespace Modules.Users.Endpoints.AccessManagement

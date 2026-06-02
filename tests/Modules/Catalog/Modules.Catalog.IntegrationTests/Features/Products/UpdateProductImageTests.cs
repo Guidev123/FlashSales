@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Modules.Catalog.Application.Products.UseCases.CreateProductImage;
-using Modules.Catalog.Application.Products.UseCases.UpdateProductImage;
+using Modules.Catalog.Application.Products.Features.CreateProductImage;
+using Modules.Catalog.Application.Products.Features.UpdateProductImage;
 using Modules.Catalog.Domain.Products.Errors;
 using Modules.Catalog.Domain.Sellers.Errors;
 using Modules.Catalog.IntegrationTests.Abstractions;

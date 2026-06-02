@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.UseCases.GetAllRoles;
+using Modules.Users.Application.AccessManagement.Features.GetAllRoles;
 
 namespace Modules.Users.Endpoints.AccessManagement
 {

@@ -1,5 +1,5 @@
 ﻿using Modules.Users.Application.Users.Dtos;
-using Modules.Users.Application.Users.UseCases.GetSeller;
+using Modules.Users.Application.Users.Features.GetSeller;
 
 namespace Modules.Users.Application.Users.Services
 {

@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Modules.Catalog.Application.Products.UseCases.CreateCategory;
+using Modules.Catalog.Application.Products.Features.CreateCategory;
 using Modules.Catalog.IntegrationTests.Abstractions;
 
 namespace Modules.Catalog.IntegrationTests.Features.Products

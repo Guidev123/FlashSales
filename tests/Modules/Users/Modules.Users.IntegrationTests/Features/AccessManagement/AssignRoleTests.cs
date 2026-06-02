@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Modules.Users.Application.AccessManagement.UseCases.AssignRole;
+using Modules.Users.Application.AccessManagement.Features.AssignRole;
 using Modules.Users.Domain.AccessManagement.Errors;
 using Modules.Users.Domain.Users.Errors;
 using Modules.Users.IntegrationTests.Abstractions;

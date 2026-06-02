@@ -1,7 +1,7 @@
 using FluentAssertions;
-using Modules.Users.Application.AccessManagement.UseCases.CreateRole;
-using Modules.Users.Application.AccessManagement.UseCases.GetRole;
-using Modules.Users.Application.AccessManagement.UseCases.GrantPermission;
+using Modules.Users.Application.AccessManagement.Features.CreateRole;
+using Modules.Users.Application.AccessManagement.Features.GetRole;
+using Modules.Users.Application.AccessManagement.Features.GrantPermission;
 using Modules.Users.Domain.AccessManagement.Errors;
 using Modules.Users.IntegrationTests.Abstractions;
 

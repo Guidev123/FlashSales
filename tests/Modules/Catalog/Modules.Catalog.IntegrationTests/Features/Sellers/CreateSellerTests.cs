@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Modules.Catalog.Application.Sellers.UseCases.Create;
+using Modules.Catalog.Application.Sellers.Features.Create;
 using Modules.Catalog.Domain.Sellers.Errors;
 using Modules.Catalog.IntegrationTests.Abstractions;
 

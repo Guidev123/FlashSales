@@ -5,7 +5,7 @@ using FlashSales.Infrastructure.Cache;
 using Microsoft.Extensions.Options;
 using MidR.Interfaces;
 using Modules.Users.Application.AccessManagement.Options;
-using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
+using Modules.Users.Application.AccessManagement.Features.GetPermissions;
 
 namespace Modules.Users.Infrastructure.Authorization
 {

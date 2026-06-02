@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using Modules.Users.Application.AccessManagement.UseCases.AssignDefaultRoles;
-using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
+using Modules.Users.Application.AccessManagement.Features.AssignDefaultRoles;
+using Modules.Users.Application.AccessManagement.Features.GetPermissions;
 using Modules.Users.Domain.AccessManagement.Errors;
 using Modules.Users.IntegrationTests.Abstractions;
 using Modules.Users.IntegrationTests.Abstractions.Helpers;

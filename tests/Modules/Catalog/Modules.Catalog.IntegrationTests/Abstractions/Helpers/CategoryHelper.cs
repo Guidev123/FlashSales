@@ -1,6 +1,7 @@
 using Bogus;
 using MidR.Interfaces;
-using Modules.Catalog.Application.Products.UseCases.CreateCategory;
+using Modules.Catalog.Application.Products.Features.CreateCategory;
+using Modules.Catalog.Application.Products.Features.CreateCategory;
 
 namespace Modules.Catalog.IntegrationTests.Abstractions.Helpers
 {

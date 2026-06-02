@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Modules.Catalog.Application.Products.UseCases.GetAll;
+using Modules.Catalog.Application.Products.Features.GetAll;
 using Modules.Catalog.IntegrationTests.Abstractions;
 using Modules.Catalog.IntegrationTests.Abstractions.Helpers;
 

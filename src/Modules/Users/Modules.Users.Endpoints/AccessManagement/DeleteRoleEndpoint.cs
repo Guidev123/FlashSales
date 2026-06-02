@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.UseCases.DeleteRole;
+using Modules.Users.Application.AccessManagement.Features.DeleteRole;
 
 namespace Modules.Users.Endpoints.AccessManagement
 {

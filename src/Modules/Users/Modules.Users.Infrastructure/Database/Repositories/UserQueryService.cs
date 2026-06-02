@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Modules.Users.Application.Abstractions;
 using Modules.Users.Application.Users.Dtos;
+using Modules.Users.Application.Users.Features.GetSeller;
 using Modules.Users.Application.Users.Services;
-using Modules.Users.Application.Users.UseCases.GetSeller;
 
 namespace Modules.Users.Infrastructure.Database.Repositories
 {

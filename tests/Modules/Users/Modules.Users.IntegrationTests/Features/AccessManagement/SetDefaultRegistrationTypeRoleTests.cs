@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Modules.Users.Application.AccessManagement.UseCases.CreateRole;
-using Modules.Users.Application.AccessManagement.UseCases.SetDefaultRegistrationTypeRole;
+using Modules.Users.Application.AccessManagement.Features.CreateRole;
+using Modules.Users.Application.AccessManagement.Features.SetDefaultRegistrationTypeRole;
 using Modules.Users.Domain.Users.Enum;
 using Modules.Users.IntegrationTests.Abstractions;
 

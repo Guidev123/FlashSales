@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Modules.Users.Application.AccessManagement.UseCases.AssignDefaultRoles;
+using Modules.Users.Application.AccessManagement.Features.AssignDefaultRoles;
 using Modules.Users.Domain.Users.Errors;
 using Modules.Users.IntegrationTests.Abstractions;
 using Modules.Users.IntegrationTests.Abstractions.Helpers;

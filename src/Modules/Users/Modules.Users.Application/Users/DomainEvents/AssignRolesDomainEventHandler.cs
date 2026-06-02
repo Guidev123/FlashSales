@@ -1,6 +1,6 @@
 ﻿using FlashSales.Domain.DomainObjects;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.UseCases.AssignDefaultRoles;
+using Modules.Users.Application.AccessManagement.Features.AssignDefaultRoles;
 using Modules.Users.Domain.Users.DomainEvents;
 
 namespace Modules.Users.Application.Users.DomainEvents

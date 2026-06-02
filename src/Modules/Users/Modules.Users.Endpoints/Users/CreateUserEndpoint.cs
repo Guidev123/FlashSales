@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.Users.UseCases.Create;
+using Modules.Users.Application.Users.Features.Create;
 
 namespace Modules.Users.Endpoints.Users
 {

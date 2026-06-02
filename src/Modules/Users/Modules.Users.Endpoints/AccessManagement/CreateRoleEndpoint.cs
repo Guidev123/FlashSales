@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.UseCases.CreateRole;
+using Modules.Users.Application.AccessManagement.Features.CreateRole;
 
 namespace Modules.Users.Endpoints.AccessManagement
 {

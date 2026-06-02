@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using FlashSales.Infrastructure.Extensions;
 using Modules.Users.Application.Abstractions;
+using Modules.Users.Application.AccessManagement.Features.GetPermissions;
+using Modules.Users.Application.AccessManagement.Features.GetRole;
 using Modules.Users.Application.AccessManagement.Services;
-using Modules.Users.Application.AccessManagement.UseCases.GetPermissions;
-using Modules.Users.Application.AccessManagement.UseCases.GetRole;
 
 namespace Modules.Users.Infrastructure.Database.Repositories
 {

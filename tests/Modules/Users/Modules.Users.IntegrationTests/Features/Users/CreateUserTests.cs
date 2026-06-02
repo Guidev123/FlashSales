@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Modules.Users.Application.Users.UseCases.Create;
+using Modules.Users.Application.Users.Features.Create;
 using Modules.Users.IntegrationTests.Abstractions;
 
 namespace Modules.Users.IntegrationTests.Features.Users

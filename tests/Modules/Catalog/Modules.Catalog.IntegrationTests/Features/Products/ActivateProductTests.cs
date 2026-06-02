@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Modules.Catalog.Application.Products.UseCases.Activate;
-using Modules.Catalog.Application.Products.UseCases.Get;
+using Modules.Catalog.Application.Products.Features.Activate;
+using Modules.Catalog.Application.Products.Features.Get;
 using Modules.Catalog.Domain.Products.Errors;
 using Modules.Catalog.IntegrationTests.Abstractions;
 using Modules.Catalog.IntegrationTests.Abstractions.Helpers;

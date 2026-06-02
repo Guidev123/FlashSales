@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.AccessManagement.UseCases.SetDefaultRegistrationTypeRole;
+using Modules.Users.Application.AccessManagement.Features.SetDefaultRegistrationTypeRole;
 using Modules.Users.Domain.Users.Enum;
 
 namespace Modules.Users.Endpoints.AccessManagement

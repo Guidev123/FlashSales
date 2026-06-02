@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Users.Application.Users.UseCases.UpdateUserProfile;
+using Modules.Users.Application.Users.Features.UpdateUserProfile;
 using System.Security.Claims;
 
 namespace Modules.Users.Endpoints.Users

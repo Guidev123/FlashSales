@@ -1,6 +1,6 @@
 ﻿using FlashSales.Domain.DomainObjects;
 using MidR.Interfaces;
-using Modules.Catalog.Application.Sellers.UseCases.Create;
+using Modules.Catalog.Application.Sellers.Features.Create;
 using Modules.Users.Contracts.IntegrationEvents;
 
 namespace Modules.Catalog.Infrastructure.IntegrationEvents

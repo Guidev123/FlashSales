@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Catalog.Application.Products.UseCases.CreateProductImage;
+using Modules.Catalog.Application.Products.Features.CreateProductImage;
 using System.Security.Claims;
 
 namespace Modules.Catalog.Endpoints.Products

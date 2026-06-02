@@ -1,5 +1,5 @@
 using MidR.Interfaces;
-using Modules.Catalog.Application.Sellers.UseCases.UpdateName;
+using Modules.Catalog.Application.Sellers.Features.UpdateName;
 using Modules.Users.Contracts.IntegrationEvents;
 
 namespace Modules.Catalog.Infrastructure.IntegrationEvents

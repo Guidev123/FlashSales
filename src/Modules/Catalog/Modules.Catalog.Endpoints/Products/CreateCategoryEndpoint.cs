@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
-using Modules.Catalog.Application.Products.UseCases.CreateCategory;
+using Modules.Catalog.Application.Products.Features.CreateCategory;
 
 namespace Modules.Catalog.Endpoints.Products
 {

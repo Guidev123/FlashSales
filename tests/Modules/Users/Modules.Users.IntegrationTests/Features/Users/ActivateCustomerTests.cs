@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Modules.Users.Application.Users.UseCases.ActivateCustomer;
+using Modules.Users.Application.Users.Features.ActivateCustomer;
 using Modules.Users.IntegrationTests.Abstractions;
 using Modules.Users.IntegrationTests.Abstractions.Helpers;
 

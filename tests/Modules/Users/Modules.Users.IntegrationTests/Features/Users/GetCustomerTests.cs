@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Modules.Users.Application.Users.UseCases.GetCustomer;
+using Modules.Users.Application.Users.Features.GetCustomer;
 using Modules.Users.Domain.Users.Errors;
 using Modules.Users.IntegrationTests.Abstractions;
 using Modules.Users.IntegrationTests.Abstractions.Helpers;

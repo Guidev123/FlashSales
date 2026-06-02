@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Modules.Catalog.Application.Products.UseCases.Create;
-using Modules.Catalog.Application.Products.UseCases.CreateCategory;
-using Modules.Catalog.Application.Sellers.UseCases.Create;
+using Modules.Catalog.Application.Products.Features.Create;
+using Modules.Catalog.Application.Products.Features.CreateCategory;
+using Modules.Catalog.Application.Sellers.Features.Create;
 using Modules.IntegrationTests.Abstractions;
 
 namespace Modules.IntegrationTests.Catalog.Outbox
