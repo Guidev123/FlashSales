@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Modules.Catalog.Domain.Products.Entities;
 using Modules.Catalog.Domain.Products.Repositories;
 
@@ -23,47 +23,37 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
 
         public Task<bool> CategoryExistsAsync(string name, CancellationToken cancellationToken = default)
         {
-            return context.Categories.AsNoTracking().AnyAsync(c => c.Name == name, cancellationToken: cancellationToken);
+            return context.Categories.AnyAsync(c => c.Name == name, cancellationToken: cancellationToken);
         }
 
         public Task<List<Product>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return context.Products.AsNoTracking().ToListAsync(cancellationToken);
+            return context.Products.ToListAsync(cancellationToken);
         }
 
         public Task<List<Category>> GetAllCategoriesAsync(CancellationToken cancellationToken = default)
         {
-            return context.Categories.AsNoTracking().ToListAsync(cancellationToken);
+            return context.Categories.ToListAsync(cancellationToken);
         }
 
         public Task<Product?> GetAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            return context.Products.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }
 
         public void Update(Product product)
         {
-            var tracked = context.ChangeTracker.Entries<Product>()
-                .FirstOrDefault(e => e.Entity.Id == product.Id);
-
-            if (tracked is not null)
-            {
-                tracked.CurrentValues.SetValues(product);
-            }
-            else
-            {
-                context.Products.Update(product);
-            }
+            context.Products.Update(product);
         }
 
         public Task<Category?> GetCategoryByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+            return context.Categories.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
         }
 
         public Task<Category?> GetCategoryByNameAsync(string name, CancellationToken cancellationToken = default)
         {
-            return context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Name == name, cancellationToken);
+            return context.Categories.FirstOrDefaultAsync(c => c.Name == name, cancellationToken);
         }
 
         public Task<Product?> GetWithImagesAsync(Guid id, CancellationToken cancellationToken = default)

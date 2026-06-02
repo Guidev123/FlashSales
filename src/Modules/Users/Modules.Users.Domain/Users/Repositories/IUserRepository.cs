@@ -1,4 +1,4 @@
-﻿using Modules.Users.Domain.Users.Entities;
+using Modules.Users.Domain.Users.Entities;
 
 namespace Modules.Users.Domain.Users.Repositories
 {

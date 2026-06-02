@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using FlashSales.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Modules.Users.Application.Abstractions;
@@ -14,22 +14,12 @@ namespace Modules.Users.Infrastructure.Database.Repositories
     {
         public Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            return context.Users.AsNoTracking().AnyAsync(u => u.Id == userId, cancellationToken: cancellationToken);
-        }
-
-        public Task<SellerProfile?> GetSellerAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            return context
-                .SellerProfiles
-                .FirstOrDefaultAsync(
-                sp => sp.UserId == userId,
-                cancellationToken: cancellationToken
-                );
+            return context.Users.AnyAsync(u => u.Id == userId, cancellationToken: cancellationToken);
         }
 
         public Task<bool> ExistsAsync(string email, CancellationToken cancellationToken = default)
         {
-            return context.Users.AsNoTracking().AnyAsync(u => u.Email.Address == email, cancellationToken: cancellationToken);
+            return context.Users.AnyAsync(u => u.Email.Address == email, cancellationToken: cancellationToken);
         }
 
         public Task<bool> IsSellerAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -50,6 +40,21 @@ namespace Modules.Users.Infrastructure.Database.Repositories
                 }, cancellationToken: cancellationToken));
         }
 
+        public Task<User?> GetAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            return context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: cancellationToken);
+        }
+
+        public Task<SellerProfile?> GetSellerAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            return context.SellerProfiles.FirstOrDefaultAsync(sp => sp.UserId == userId, cancellationToken: cancellationToken);
+        }
+
+        public Task<SellerProfile?> GetSellerProfileAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            return context.SellerProfiles.FirstOrDefaultAsync(sp => sp.UserId == userId, cancellationToken: cancellationToken);
+        }
+
         public void Add(User user)
         {
             foreach (var role in user.Roles)
@@ -62,17 +67,12 @@ namespace Modules.Users.Infrastructure.Database.Repositories
 
         public void Update(User user)
         {
-            var tracked = context.ChangeTracker.Entries<User>()
-                .FirstOrDefault(e => e.Entity.Id == user.Id);
+            foreach (var role in user.Roles)
+            {
+                context.Attach(role);
+            }
 
-            if (tracked is not null)
-            {
-                tracked.CurrentValues.SetValues(user);
-            }
-            else
-            {
-                context.Users.Update(user);
-            }
+            context.Users.Update(user);
         }
 
         public void AddSeller(SellerProfile sellerProfile)
@@ -83,16 +83,6 @@ namespace Modules.Users.Infrastructure.Database.Repositories
         public void UpdateSeller(SellerProfile sellerProfile)
         {
             context.SellerProfiles.Update(sellerProfile);
-        }
-
-        public Task<User?> GetAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            return context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: cancellationToken);
-        }
-
-        public Task<SellerProfile?> GetSellerProfileAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            return context.SellerProfiles.AsNoTracking().FirstOrDefaultAsync(sp => sp.UserId == userId, cancellationToken: cancellationToken);
         }
     }
 }
