@@ -61,7 +61,21 @@ namespace Modules.Catalog.Infrastructure.Inbox
                 HandleAsync,
                 cancellationToken: cancellationToken);
 
+            var sellerProfilePictureUpdated = await eventBus.SubscribeAsync(
+                Topics.SellerProfilePictureUpdated,
+                SubscriptionName,
+                HandleAsync,
+                cancellationToken: cancellationToken);
+
+            var userProfileUpdated = await eventBus.SubscribeAsync(
+                Topics.UserProfileUpdated,
+                SubscriptionName,
+                HandleAsync,
+                cancellationToken: cancellationToken);
+
             _subscriptions.Add(sellerActivated);
+            _subscriptions.Add(sellerProfilePictureUpdated);
+            _subscriptions.Add(userProfileUpdated);
         }
 
         private async Task HandleAsync(ConsumedMessage message, CancellationToken cancellationToken)

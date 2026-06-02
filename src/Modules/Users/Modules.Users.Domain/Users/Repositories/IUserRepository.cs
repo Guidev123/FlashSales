@@ -18,6 +18,8 @@ namespace Modules.Users.Domain.Users.Repositories
 
         void Add(User user);
 
+        void Update(User user);
+
         void AddSeller(SellerProfile sellerProfile);
 
         void UpdateSeller(SellerProfile sellerProfile);

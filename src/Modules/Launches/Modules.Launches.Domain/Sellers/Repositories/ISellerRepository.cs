@@ -11,5 +11,7 @@ namespace Modules.Launches.Domain.Sellers.Repositories
         Task<bool> ExistsAsync(Guid sellerId, CancellationToken cancellationToken);
 
         void Add(Seller seller);
+
+        void Update(Seller seller);
     }
 }

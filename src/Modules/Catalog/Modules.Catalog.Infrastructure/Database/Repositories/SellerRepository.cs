@@ -11,6 +11,21 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
             context.Sellers.Add(seller);
         }
 
+        public void Update(Seller seller)
+        {
+            var tracked = context.ChangeTracker.Entries<Seller>()
+                .FirstOrDefault(e => e.Entity.Id == seller.Id);
+
+            if (tracked is not null)
+            {
+                tracked.CurrentValues.SetValues(seller);
+            }
+            else
+            {
+                context.Sellers.Update(seller);
+            }
+        }
+
         public Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken)
         {
             return context.Sellers

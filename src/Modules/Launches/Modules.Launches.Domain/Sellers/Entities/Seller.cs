@@ -30,6 +30,17 @@ namespace Modules.Launches.Domain.Sellers.Entities
             return new Seller(userId, sellerId, name, profilePictureUrl, isActive);
         }
 
+        public void UpdateName(string name)
+        {
+            Name = name;
+            Validate();
+        }
+
+        public void UpdateProfilePicture(string? profilePictureUrl)
+        {
+            ProfilePictureUrl = profilePictureUrl;
+        }
+
         protected override void Validate()
         {
             AssertionConcern.EnsureTrue(UserId != Guid.Empty, SellerErrors.UserIdRequired.Description);

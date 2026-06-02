@@ -38,6 +38,17 @@ namespace Modules.Catalog.Domain.Sellers.Entities
             return seller;
         }
 
+        public void UpdateName(string name)
+        {
+            Name = name;
+            Validate();
+        }
+
+        public void UpdateProfilePicture(string? profilePictureUrl)
+        {
+            ProfilePictureUrl = profilePictureUrl;
+        }
+
         protected override void Validate()
         {
             AssertionConcern.EnsureTrue(UserId != Guid.Empty, SellerErrors.UserIdRequired.Description);

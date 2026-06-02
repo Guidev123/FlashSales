@@ -11,5 +11,7 @@ namespace Modules.Catalog.Domain.Sellers.Repositories
         Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken);
 
         void Add(Seller seller);
+
+        void Update(Seller seller);
     }
 }

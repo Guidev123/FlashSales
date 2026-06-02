@@ -8,7 +8,8 @@ namespace Modules.Users.Application.Users.UseCases.UpdateProfilePicture
 {
     internal sealed class UpdateSellerProfilePictureCommandHandler(
         IUserRepository userRepository,
-        IBlobStorageService blobStorageService
+        IBlobStorageService blobStorageService,
+        IDomainEventCollector domainEventCollector
         ) : ICommandHandler<UpdateSellerProfilePictureCommand, UpdateSellerProfilePictureResponse>
     {
         public async Task<Result<UpdateSellerProfilePictureResponse>> ExecuteAsync(UpdateSellerProfilePictureCommand request, CancellationToken cancellationToken = default)
@@ -27,6 +28,8 @@ namespace Modules.Users.Application.Users.UseCases.UpdateProfilePicture
 
             seller.SetProfilePictureUrl(result.Value);
             userRepository.UpdateSeller(seller);
+
+            domainEventCollector.Collect(seller);
 
             return new UpdateSellerProfilePictureResponse(seller.ProfilePictureUrl!);
         }

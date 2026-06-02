@@ -60,6 +60,21 @@ namespace Modules.Users.Infrastructure.Database.Repositories
             context.Users.Add(user);
         }
 
+        public void Update(User user)
+        {
+            var tracked = context.ChangeTracker.Entries<User>()
+                .FirstOrDefault(e => e.Entity.Id == user.Id);
+
+            if (tracked is not null)
+            {
+                tracked.CurrentValues.SetValues(user);
+            }
+            else
+            {
+                context.Users.Update(user);
+            }
+        }
+
         public void AddSeller(SellerProfile sellerProfile)
         {
             context.SellerProfiles.Add(sellerProfile);

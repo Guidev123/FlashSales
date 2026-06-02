@@ -40,6 +40,12 @@ namespace Modules.Users.Domain.Users.Entities
         public void SetProfilePictureUrl(string profilePictureUrl)
         {
             ProfilePictureUrl = profilePictureUrl;
+            AddDomainEvent(SellerProfilePictureUpdatedDomainEvent.Create(UserId, Id, ProfilePictureUrl));
+        }
+
+        public void UpdatePaymentAccount(PaymentAccount paymentAccount)
+        {
+            PaymentAccount = paymentAccount;
         }
 
         protected override void Validate()

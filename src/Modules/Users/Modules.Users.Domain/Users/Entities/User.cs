@@ -40,6 +40,13 @@ namespace Modules.Users.Domain.Users.Entities
             return user;
         }
 
+        public void UpdateProfile(string name, DateTimeOffset birthDate)
+        {
+            Name = name;
+            Age = birthDate;
+            AddDomainEvent(UserProfileUpdatedDomainEvent.Create(Id, Name.FirstName, Name.LastName));
+        }
+
         protected override void Validate()
         {
             AssertionConcern.EnsureNotNull(Email, UserErrors.EmailMustBeNotEmpty.Description);

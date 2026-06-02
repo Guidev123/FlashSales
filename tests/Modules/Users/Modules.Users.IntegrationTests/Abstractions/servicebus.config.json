@@ -35,6 +35,22 @@
                 "Name": "launches.sub"
               }
             ]
+          },
+          {
+            "Name": "flash-sales.users.seller-profile-picture-updated",
+            "Subscriptions": [
+              {
+                "Name": "catalog.sub"
+              }
+            ]
+          },
+          {
+            "Name": "flash-sales.users.user-profile-updated",
+            "Subscriptions": [
+              {
+                "Name": "catalog.sub"
+              }
+            ]
           }
         ]
       }
