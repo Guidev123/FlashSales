@@ -1,107 +1,156 @@
-﻿using FlashSales.Domain.DomainObjects;
-using FlashSales.Domain.ValueObjects;
+using FlashSales.Domain.DomainObjects;
+using FlashSales.Domain.Results;
+using Modules.Launches.Domain.Launches.DomainEvents;
+using Modules.Launches.Domain.Launches.Enums;
+using Modules.Launches.Domain.Launches.Errors;
+using Modules.Launches.Domain.Launches.ValueObjects;
 
 namespace Modules.Launches.Domain.Launches.Entities
 {
     public sealed class Launch : Entity, IAggregateRoot
     {
+        private Launch(Guid sellerId, Guid productId, string title, string description)
+        {
+            SellerId = sellerId;
+            ProductId = productId;
+            Metadata = LaunchMetadata.Create(title, description);
+            Status = LaunchStatus.Draft;
+            Validate();
+        }
+
+        private Launch()
+        { }
+
         public Guid SellerId { get; private set; }
         public Guid ProductId { get; private set; }
         public LaunchMetadata Metadata { get; private set; } = null!;
-        public LaunchPrice Price { get; private set; } = null!;
-        public LaunchStock Stock { get; private set; } = null!;
-        public LaunchSchedule Schedule { get; private set; } = null!;
+        public LaunchPrice? Price { get; private set; }
+        public LaunchStock? Stock { get; private set; }
+        public LaunchSchedule? Schedule { get; private set; }
         public LaunchStatus Status { get; private set; }
 
+        public static Launch Create(Guid sellerId, Guid productId, string title, string description)
+        {
+            var launch = new Launch(sellerId, productId, title, description);
+
+            launch.AddDomainEvent(LaunchCreatedDomainEvent.Create(launch.Id, sellerId, productId, title));
+
+            return launch;
+        }
+
+        public Result SetSchedule(LaunchPrice price, LaunchStock stock, LaunchSchedule schedule)
+        {
+            if (Status != LaunchStatus.Draft)
+                return Result.Failure(LaunchErrors.InvalidStatusTransition(Status.ToString(), LaunchStatus.Scheduled.ToString()));
+
+            if (schedule.StartAt <= DateTimeOffset.UtcNow)
+                return Result.Failure(LaunchErrors.InvalidSchedule);
+
+            Price = price;
+            Stock = stock;
+            Schedule = schedule;
+            Status = LaunchStatus.Scheduled;
+
+            AddDomainEvent(LaunchScheduledDomainEvent.Create(
+                Id,
+                price.DiscountedPrice,
+                price.OriginalPrice,
+                stock.TotalQuantity,
+                schedule.StartAt,
+                schedule.EndAt));
+
+            return Result.Success();
+        }
+
+        public Result Activate()
+        {
+            if (Status != LaunchStatus.Scheduled)
+                return Result.Failure(LaunchErrors.InvalidStatusTransition(Status.ToString(), LaunchStatus.Active.ToString()));
+
+            Status = LaunchStatus.Active;
+
+            AddDomainEvent(LaunchActivatedDomainEvent.Create(
+                Id,
+                SellerId,
+                ProductId,
+                Metadata.Title,
+                Price!.DiscountedPrice,
+                Price.OriginalPrice,
+                Stock!.TotalQuantity,
+                Schedule!.StartAt,
+                Schedule.EndAt));
+
+            return Result.Success();
+        }
+
+        public Result End()
+        {
+            if (Status != LaunchStatus.Active)
+                return Result.Failure(LaunchErrors.InvalidStatusTransition(Status.ToString(), LaunchStatus.Ended.ToString()));
+
+            Status = LaunchStatus.Ended;
+
+            AddDomainEvent(LaunchEndedDomainEvent.Create(Id, Stock!.ReservedQuantity));
+
+            return Result.Success();
+        }
+
+        public Result Cancel()
+        {
+            if (Status == LaunchStatus.Active || Status == LaunchStatus.Ended || Status == LaunchStatus.SoldOut)
+                return Result.Failure(LaunchErrors.CannotCancelAfterActivation);
+
+            if (Status != LaunchStatus.Draft && Status != LaunchStatus.Scheduled)
+                return Result.Failure(LaunchErrors.InvalidStatusTransition(Status.ToString(), LaunchStatus.Cancelled.ToString()));
+
+            Status = LaunchStatus.Cancelled;
+
+            AddDomainEvent(LaunchCancelledDomainEvent.Create(Id, SellerId));
+
+            return Result.Success();
+        }
+
+        public Result ReserveStock(int quantity, Guid orderId)
+        {
+            if (Status != LaunchStatus.Active)
+                return Result.Failure(LaunchErrors.InvalidStatusTransition(Status.ToString(), "ReserveStock"));
+
+            if (Stock!.AvailableQuantity < quantity)
+                return Result.Failure(LaunchErrors.InsufficientStock);
+
+            Stock = LaunchStock.Create(Stock.TotalQuantity, Stock.ReservedQuantity + quantity);
+
+            AddDomainEvent(StockReservedDomainEvent.Create(Id, quantity, orderId));
+
+            if (Stock.AvailableQuantity == 0)
+            {
+                Status = LaunchStatus.SoldOut;
+                AddDomainEvent(LaunchSoldOutDomainEvent.Create(Id, Stock.ReservedQuantity));
+            }
+
+            return Result.Success();
+        }
+
+        public Result ReleaseStock(int quantity, Guid orderId)
+        {
+            if (Status != LaunchStatus.SoldOut && Status != LaunchStatus.Active)
+                return Result.Failure(LaunchErrors.InvalidStatusTransition(Status.ToString(), "ReleaseStock"));
+
+            Stock = LaunchStock.Create(Stock!.TotalQuantity, Stock.ReservedQuantity - quantity);
+
+            if (Status == LaunchStatus.SoldOut)
+                Status = LaunchStatus.Active;
+
+            AddDomainEvent(StockReleasedDomainEvent.Create(Id, quantity, orderId));
+
+            return Result.Success();
+        }
+
         protected override void Validate()
         {
-            throw new NotImplementedException();
-        }
-    }
-
-    public enum LaunchStatus
-    {
-        None,
-        Draft,
-        Scheduled,
-        Active,
-        Ended,
-        SoldOut,
-        Cancelled
-    }
-
-    public sealed record LaunchMetadata : ValueObject
-    {
-        public LaunchMetadata(string title, string description)
-        {
-            Title = title;
-            Description = description;
-        }
-
-        private LaunchMetadata()
-        { }
-
-        public string Title { get; } = null!;
-        public string Description { get; } = null!;
-
-        protected override void Validate()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public sealed record LaunchPrice : ValueObject
-    {
-        public LaunchPrice(decimal discountedPrice, decimal originalPrice)
-        {
-            DiscountedPrice = discountedPrice;
-            OriginalPrice = originalPrice;
-        }
-
-        private LaunchPrice()
-        { }
-
-        public decimal DiscountedPrice { get; } = default!;
-        public decimal OriginalPrice { get; } = default!;
-        protected override void Validate()
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public sealed record LaunchStock : ValueObject
-    {
-        public LaunchStock(int totalQuantity, int reservedQuantity)
-        {
-            TotalQuantity = totalQuantity;
-            ReservedQuantity = reservedQuantity;
-        }
-
-        private LaunchStock()
-        { }
-
-        public int TotalQuantity { get; } = default!;
-        public int ReservedQuantity { get; } = default!;
-        protected override void Validate()
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public sealed record LaunchSchedule : ValueObject
-    {
-        public LaunchSchedule(DateTimeOffset startAt, DateTimeOffset endAt)
-        {
-            StartAt = startAt;
-            EndAt = endAt;
-        }
-
-        private LaunchSchedule()
-        { }
-
-        public DateTimeOffset StartAt { get; } = default!;
-        public DateTimeOffset EndAt { get; } = default!;
-        protected override void Validate()
-        {
-            throw new NotImplementedException();
+            AssertionConcern.EnsureTrue(SellerId != Guid.Empty, LaunchErrors.SellerIdRequired.Description);
+            AssertionConcern.EnsureTrue(ProductId != Guid.Empty, LaunchErrors.ProductIdRequired.Description);
+            AssertionConcern.EnsureNotNull(Metadata, LaunchErrors.TitleRequired.Description);
         }
     }
 }
