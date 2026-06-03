@@ -1,14 +1,10 @@
 using FlashSales.Application.Abstractions;
-using FlashSales.Application.Behaviors;
-using FlashSales.Application.Inbox;
-using FlashSales.Application.Outbox;
 using FlashSales.Endpoints.Endpoints;
-using FluentValidation;
+using FlashSales.Infrastructure.Extensions;
 using FlashSales.Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MidR.DependencyInjection;
 using Modules.Catalog.Application;
 using Modules.Catalog.Application.Abstractions;
 using Modules.Catalog.Application.Products.Services;
@@ -19,7 +15,6 @@ using Modules.Catalog.Endpoints;
 using Modules.Catalog.Infrastructure.Database;
 using Modules.Catalog.Infrastructure.Database.Repositories;
 using Modules.Catalog.Infrastructure.Inbox;
-using Modules.Catalog.Infrastructure.Outbox;
 using Modules.Catalog.Infrastructure.PublicApi;
 using System.Reflection;
 
@@ -58,8 +53,7 @@ namespace Modules.Catalog.Infrastructure
                 cfg.AddInterceptors(sp.GetRequiredService<DomainEventsInterceptor>());
             });
 
-            services.AddScoped<ICatalogUnitOfWork, UnitOfWork>();
-            services.AddSingleton<IUnitOfWorkRegistration, CatalogUnitOfWorkRegistration>();
+            services.AddModuleUnitOfWork<ICatalogUnitOfWork, UnitOfWork>(Assemblies);
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ISellerRepository, SellerRepository>();
             services.AddScoped<IProductQueryService, ProductQueryService>();
@@ -69,44 +63,27 @@ namespace Modules.Catalog.Infrastructure
 
         private static IServiceCollection AddOutbox(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<OutboxRepository>();
-            services.AddScoped<ICatalogOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
-            services.AddScoped<IOutboxRepository>(sp => sp.GetRequiredService<OutboxRepository>());
-            services.AddSingleton<IOutboxRepositoryRegistration, CatalogOutboxRepositoryRegistration>();
-            services.Configure<OutboxOptions>(configuration.GetSection($"Catalog:{OutboxOptions.SectionName}"));
-            services.AddSingleton<OutboxProcessor>();
-            services.AddSingleton<IOutboxBatchProcessor>(sp => sp.GetRequiredService<OutboxProcessor>());
-            services.AddHostedService(sp => sp.GetRequiredService<OutboxProcessor>());
-
+            services.AddModuleOutbox<ICatalogUnitOfWork>(configuration, "Catalog", Schemas.Catalog, Assemblies);
             return services;
         }
 
         private static IServiceCollection AddInbox(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHostedService<InboxConsumer>();
-            services.AddScoped<InboxRepository>();
-            services.AddScoped<ICatalogInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
-            services.AddScoped<IInboxRepository>(sp => sp.GetRequiredService<InboxRepository>());
-            services.AddSingleton<IInboxRepositoryRegistration, CatalogInboxRepositoryRegistration>();
-            services.Configure<InboxOptions>(configuration.GetSection($"Catalog:{InboxOptions.SectionName}"));
-            services.AddSingleton<InboxProcessor>();
-            services.AddSingleton<IInboxBatchProcessor>(sp => sp.GetRequiredService<InboxProcessor>());
-            services.AddHostedService(sp => sp.GetRequiredService<InboxProcessor>());
-
+            services.AddModuleInbox<ICatalogUnitOfWork>(
+                configuration, "Catalog", Schemas.Catalog, Assembly.GetExecutingAssembly());
             return services;
         }
 
         private static IServiceCollection AddEndpoints(this IServiceCollection services)
         {
             services.AddEndpoints(typeof(EndpointsModule).Assembly);
-
             return services;
         }
 
         private static IServiceCollection AddPublicApi(this IServiceCollection services)
         {
             services.AddTransient<ICatalogPublicApi, CatalogPublicApi>();
-
             return services;
         }
     }

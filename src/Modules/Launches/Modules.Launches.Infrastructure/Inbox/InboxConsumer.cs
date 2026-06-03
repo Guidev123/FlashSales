@@ -5,6 +5,7 @@ using FlashSales.Application.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using FlashSales.Infrastructure.Database;
 using Modules.Launches.Application.Abstractions;
 using Modules.Users.Contracts.IntegrationEvents;
 using Newtonsoft.Json;
@@ -68,7 +69,7 @@ namespace Modules.Launches.Infrastructure.Inbox
         {
             await using var scope = serviceProvider.CreateAsyncScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<ILaunchesUnitOfWork>();
-            var inboxRepository = scope.ServiceProvider.GetRequiredService<ILaunchesInboxRepository>();
+            var inboxRepository = scope.ServiceProvider.GetRequiredService<ModuleInboxRepository<ILaunchesUnitOfWork>>();
 
             try
             {
