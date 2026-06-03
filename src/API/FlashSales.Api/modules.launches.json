@@ -1,5 +1,5 @@
 {
-  "Catalog": {
+  "Launches": {
     "Outbox": {
       "IntervalInSeconds": 5,
       "BatchSize": 10,
