@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /src/Web/flash-sales-app/.env
 /src/API/FlashSales.Api/modules.catalog.Development.json
 /src/API/FlashSales.Api/modules.users.Development.json
+/src/API/FlashSales.Api/modules.launches.Development.json
