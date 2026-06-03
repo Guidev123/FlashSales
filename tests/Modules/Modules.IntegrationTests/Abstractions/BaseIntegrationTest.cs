@@ -3,14 +3,13 @@ using FlashSales.Application.Inbox;
 using FlashSales.Application.Messaging;
 using FlashSales.Application.Outbox;
 using FlashSales.Domain.DomainObjects;
+using FlashSales.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 using MidR.Interfaces;
 using Modules.Catalog.Application.Abstractions;
 using Modules.Catalog.Infrastructure.Database;
-using Modules.Catalog.Infrastructure.Inbox;
 using Modules.Users.Application.Abstractions;
 using Modules.Users.Infrastructure.Database;
-using Modules.Users.Infrastructure.Outbox;
 
 namespace Modules.IntegrationTests.Abstractions
 {
@@ -61,7 +60,7 @@ namespace Modules.IntegrationTests.Abstractions
             using var scope = Factory.Services.CreateScope();
             var sp = scope.ServiceProvider;
             var unitOfWork = sp.GetRequiredService<ICatalogUnitOfWork>();
-            var inboxRepository = sp.GetRequiredService<ICatalogInboxRepository>();
+            var inboxRepository = sp.GetRequiredService<ModuleInboxRepository<ICatalogUnitOfWork>>();
             await unitOfWork.BeginTransactionAsync(cancellationToken);
             await inboxRepository.InsertAsync(integrationEvent, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -72,7 +71,7 @@ namespace Modules.IntegrationTests.Abstractions
             using var scope = Factory.Services.CreateScope();
             var sp = scope.ServiceProvider;
             var unitOfWork = sp.GetRequiredService<IUsersUnitOfWork>();
-            var outboxRepository = sp.GetRequiredService<IUsersOutboxRepository>();
+            var outboxRepository = sp.GetRequiredService<ModuleOutboxRepository<IUsersUnitOfWork>>();
             await unitOfWork.BeginTransactionAsync(cancellationToken);
             await outboxRepository.InsertAsync(domainEvent, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);

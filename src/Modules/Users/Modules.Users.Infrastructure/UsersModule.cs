@@ -20,7 +20,6 @@ using Modules.Users.Infrastructure.Authorization;
 using Modules.Users.Infrastructure.Database;
 using Modules.Users.Infrastructure.Database.Repositories;
 using Modules.Users.Infrastructure.Identity;
-using Modules.Users.Infrastructure.Inbox;
 using Modules.Users.Infrastructure.PublicApi;
 using System.Reflection;
 
@@ -79,7 +78,6 @@ namespace Modules.Users.Infrastructure
 
         private static IServiceCollection AddInbox(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddHostedService<InboxConsumer>();
             services.AddModuleInbox<IUsersUnitOfWork>(
                 configuration, "Users", Schemas.Users, Assembly.GetExecutingAssembly());
             return services;

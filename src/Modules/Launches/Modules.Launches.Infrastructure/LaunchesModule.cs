@@ -9,7 +9,6 @@ using Modules.Launches.Domain.Launches.Repositories;
 using Modules.Launches.Domain.Sellers.Repositories;
 using Modules.Launches.Infrastructure.Database;
 using Modules.Launches.Infrastructure.Database.Repositories;
-using Modules.Launches.Infrastructure.Inbox;
 using System.Reflection;
 
 namespace Modules.Launches.Infrastructure
@@ -60,9 +59,9 @@ namespace Modules.Launches.Infrastructure
 
         private static IServiceCollection AddInbox(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddHostedService<InboxConsumer>();
             services.AddModuleInbox<ILaunchesUnitOfWork>(
-                configuration, "Launches", Schemas.Launches, Assembly.GetExecutingAssembly());
+                configuration, "Launches", Schemas.Launches, Assembly.GetExecutingAssembly(),
+                Users.Contracts.IntegrationEvents.Topics.SellerActivated);
             return services;
         }
     }

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Modules.Catalog.Infrastructure.Database;
+using Modules.Launches.Infrastructure.Database;
 using Modules.Users.Infrastructure.Database;
 using Npgsql;
 using DotNet.Testcontainers.Builders;
@@ -102,6 +103,12 @@ namespace Modules.IntegrationTests.Abstractions
                 DELETE FROM users."OutboxMessages";
                 DELETE FROM users."InboxMessageConsumers";
                 DELETE FROM users."InboxMessages";
+                DELETE FROM launches."Launches";
+                DELETE FROM launches."Sellers";
+                DELETE FROM launches."OutboxMessageConsumers";
+                DELETE FROM launches."OutboxMessages";
+                DELETE FROM launches."InboxMessageConsumers";
+                DELETE FROM launches."InboxMessages";
                 """, connection);
 
             await cmd.ExecuteNonQueryAsync();
@@ -161,6 +168,7 @@ namespace Modules.IntegrationTests.Abstractions
 
             await sp.GetRequiredService<UsersDbContext>().Database.MigrateAsync();
             await sp.GetRequiredService<CatalogDbContext>().Database.MigrateAsync();
+            await sp.GetRequiredService<LaunchesDbContext>().Database.MigrateAsync();
         }
     }
 }

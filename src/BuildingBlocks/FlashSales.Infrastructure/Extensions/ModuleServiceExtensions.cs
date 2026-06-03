@@ -1,4 +1,5 @@
 using FlashSales.Application.Abstractions;
+using FlashSales.Application.Bus;
 using FlashSales.Application.Inbox;
 using FlashSales.Application.Outbox;
 using FlashSales.Infrastructure.Database;
@@ -67,7 +68,8 @@ namespace FlashSales.Infrastructure.Extensions
             IConfiguration configuration,
             string moduleName,
             string schema,
-            Assembly handlerAssembly)
+            Assembly handlerAssembly,
+            params string[] topics)
             where TUnitOfWork : class, IUnitOfWork
         {
             services.AddScoped<ModuleInboxRepository<TUnitOfWork>>(sp =>
@@ -94,6 +96,20 @@ namespace FlashSales.Infrastructure.Extensions
 
             services.AddHostedService(
                 sp => sp.GetRequiredService<ModuleInboxProcessor<TUnitOfWork>>());
+
+            var subscriptionName = $"{moduleName.ToLower()}.sub";
+
+            services.AddSingleton<ModuleInboxConsumer<TUnitOfWork>>(sp =>
+                new ModuleInboxConsumer<TUnitOfWork>(
+                    sp.GetRequiredService<IEventBus>(),
+                    sp,
+                    sp.GetRequiredService<ILogger<ModuleInboxConsumer<TUnitOfWork>>>(),
+                    moduleName,
+                    subscriptionName,
+                    topics));
+
+            services.AddHostedService(
+                sp => sp.GetRequiredService<ModuleInboxConsumer<TUnitOfWork>>());
 
             return services;
         }

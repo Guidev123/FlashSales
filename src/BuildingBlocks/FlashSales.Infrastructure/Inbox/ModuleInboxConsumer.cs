@@ -1,29 +1,27 @@
+using FlashSales.Application.Abstractions;
 using FlashSales.Application.Bus;
 using FlashSales.Application.Extensions;
-using FlashSales.Application.Inbox;
 using FlashSales.Application.Messaging;
+using FlashSales.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using FlashSales.Infrastructure.Database;
-using Modules.Users.Application.Abstractions;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace Modules.Users.Infrastructure.Inbox
+namespace FlashSales.Infrastructure.Inbox
 {
-#pragma warning disable CS9113 // eventBus will be used when topics are subscribed
-
-    internal sealed class InboxConsumer(
+    public sealed class ModuleInboxConsumer<TUnitOfWork>(
         IEventBus eventBus,
         IServiceProvider serviceProvider,
-        ILogger<InboxConsumer> logger
-        ) : BackgroundService
-#pragma warning restore CS9113
+        ILogger<ModuleInboxConsumer<TUnitOfWork>> logger,
+        string moduleName,
+        string subscriptionName,
+        string[] topics
+    ) : BackgroundService
+        where TUnitOfWork : IUnitOfWork
     {
-        private const string SubscriptionName = "users.sub";
         private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(30);
-
         private readonly List<IAsyncDisposable> _subscriptions = [];
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -33,7 +31,7 @@ namespace Modules.Users.Infrastructure.Inbox
                 try
                 {
                     await SubscribeAsync(stoppingToken);
-                    logger.LogInformation("[Users] Subscribed to integration event topics");
+                    logger.LogInformation("[{Module}] Subscribed to integration event topics", moduleName);
 
                     await Task.Delay(Timeout.Infinite, stoppingToken);
                 }
@@ -44,7 +42,8 @@ namespace Modules.Users.Infrastructure.Inbox
                 catch (Exception ex)
                 {
                     logger.LogWarning(ex,
-                        "[Users] Failed to subscribe to Service Bus. Retrying in {Delay}s...",
+                        "[{Module}] Failed to subscribe to Service Bus. Retrying in {Delay}s...",
+                        moduleName,
                         RetryDelay.TotalSeconds);
 
                     await DisposeSubscriptionsAsync();
@@ -53,19 +52,28 @@ namespace Modules.Users.Infrastructure.Inbox
             }
 
             await DisposeSubscriptionsAsync();
-            logger.LogInformation("[Users] Unsubscribed from integration event topics");
+            logger.LogInformation("[{Module}] Unsubscribed from integration event topics", moduleName);
         }
 
-        private Task SubscribeAsync(CancellationToken cancellationToken)
+        private async Task SubscribeAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            foreach (var topic in topics)
+            {
+                var subscription = await eventBus.SubscribeAsync(
+                    topic,
+                    subscriptionName,
+                    HandleAsync,
+                    cancellationToken: cancellationToken);
+
+                _subscriptions.Add(subscription);
+            }
         }
 
         private async Task HandleAsync(ConsumedMessage message, CancellationToken cancellationToken)
         {
             await using var scope = serviceProvider.CreateAsyncScope();
-            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUsersUnitOfWork>();
-            var inboxRepository = scope.ServiceProvider.GetRequiredService<ModuleInboxRepository<IUsersUnitOfWork>>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<TUnitOfWork>();
+            var inboxRepository = scope.ServiceProvider.GetRequiredService<ModuleInboxRepository<TUnitOfWork>>();
 
             try
             {
@@ -80,7 +88,8 @@ namespace Modules.Users.Infrastructure.Inbox
             catch (Exception ex)
             {
                 logger.LogError(ex,
-                    "[Users] Failed to persist integration event {MessageType} [{MessageId}] to inbox",
+                    "[{Module}] Failed to persist integration event {MessageType} [{MessageId}] to inbox",
+                    moduleName,
                     message.MessageType,
                     message.MessageId);
 

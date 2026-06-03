@@ -14,7 +14,6 @@ using Modules.Catalog.Domain.Sellers.Repositories;
 using Modules.Catalog.Endpoints;
 using Modules.Catalog.Infrastructure.Database;
 using Modules.Catalog.Infrastructure.Database.Repositories;
-using Modules.Catalog.Infrastructure.Inbox;
 using Modules.Catalog.Infrastructure.PublicApi;
 using System.Reflection;
 
@@ -69,9 +68,11 @@ namespace Modules.Catalog.Infrastructure
 
         private static IServiceCollection AddInbox(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddHostedService<InboxConsumer>();
             services.AddModuleInbox<ICatalogUnitOfWork>(
-                configuration, "Catalog", Schemas.Catalog, Assembly.GetExecutingAssembly());
+                configuration, "Catalog", Schemas.Catalog, Assembly.GetExecutingAssembly(),
+                Users.Contracts.IntegrationEvents.Topics.SellerActivated,
+                Users.Contracts.IntegrationEvents.Topics.SellerProfilePictureUpdated,
+                Users.Contracts.IntegrationEvents.Topics.UserProfileUpdated);
             return services;
         }
 
