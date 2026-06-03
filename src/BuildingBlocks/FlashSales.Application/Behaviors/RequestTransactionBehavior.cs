@@ -75,8 +75,9 @@ namespace FlashSales.Application.Behaviors
         {
             if (!isOutermost) return response;
 
-            var events = domainEventCollector.Flush();
             await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            var events = domainEventCollector.Flush();
 
             var outboxRepository = outboxRepositoryFactory.Create(typeof(TRequest));
 

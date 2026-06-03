@@ -15,7 +15,6 @@ namespace Modules.Users.Application.Users.Features.ActivateSeller
     internal sealed class ActivateSellerCommandHandler(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        IDomainEventCollector domainEventCollector,
         IIdentityProviderService identityProviderService,
         ICacheService cacheService
         ) : ICommandHandler<ActivateSellerCommand>
@@ -48,8 +47,6 @@ namespace Modules.Users.Application.Users.Features.ActivateSeller
             await roleRepository.AssignToUserAsync("seller", request.UserId, cancellationToken);
             await identityProviderService.ActivateSellerAsync(request.IdentityProviderId, cancellationToken);
             await cacheService.RemoveAsync(PermissionResponse.GetCacheKey(request.IdentityProviderId), cancellationToken);
-
-            domainEventCollector.Collect(seller);
 
             return Result.Success();
         }

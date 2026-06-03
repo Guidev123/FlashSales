@@ -10,8 +10,7 @@ namespace Modules.Catalog.Application.Products.Features.Create
 {
     internal sealed class CreateProductCommandHandler(
         ISellerRepository sellerRepository,
-        IProductRepository productRepository,
-        IDomainEventCollector domainEventCollector
+        IProductRepository productRepository
         ) : ICommandHandler<CreateProductCommand, CreateProductResponse>
     {
         public async Task<Result<CreateProductResponse>> ExecuteAsync(CreateProductCommand request, CancellationToken cancellationToken = default)
@@ -32,8 +31,6 @@ namespace Modules.Catalog.Application.Products.Features.Create
                 );
 
             productRepository.Add(product);
-
-            domainEventCollector.Collect(product);
 
             return new CreateProductResponse(product.Id);
         }

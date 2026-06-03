@@ -9,8 +9,7 @@ namespace Modules.Catalog.Application.Products.Features.Archive
 {
     internal sealed class ArchiveProductCommandHandler(
         ISellerRepository sellerRepository,
-        IProductRepository productRepository,
-        IDomainEventCollector domainEventCollector
+        IProductRepository productRepository
         ) : ICommandHandler<ArchiveProductCommand>
     {
         public async Task<Result> ExecuteAsync(ArchiveProductCommand request, CancellationToken cancellationToken = default)
@@ -31,7 +30,6 @@ namespace Modules.Catalog.Application.Products.Features.Archive
                 return result;
 
             productRepository.Update(product);
-            domainEventCollector.Collect(product);
 
             return Result.Success();
         }

@@ -4,6 +4,7 @@ using FlashSales.Application.Inbox;
 using FlashSales.Application.Outbox;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Infrastructure.Http;
+using FlashSales.Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,12 +54,13 @@ namespace Modules.Users.Infrastructure
 
         private static IServiceCollection AddData(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<UsersDbContext>(cfg =>
+            services.AddDbContext<UsersDbContext>((sp, cfg) =>
             {
                 cfg.UseNpgsql(configuration.GetConnectionString("Postgres"), npgSqlCfg =>
                 {
                     npgSqlCfg.MigrationsHistoryTable("__EFMigrationsHistory", Schemas.Users);
                 });
+                cfg.AddInterceptors(sp.GetRequiredService<DomainEventsInterceptor>());
             });
 
             services.AddScoped<IUsersUnitOfWork, UnitOfWork>();

@@ -10,8 +10,7 @@ namespace Modules.Users.Application.Users.Features.Create
 {
     internal sealed class CreateUserCommandHandler(
         IUserRepository userRepository,
-        IIdentityProviderService identityProviderService,
-        IDomainEventCollector domainEventCollector
+        IIdentityProviderService identityProviderService
         ) : ICommandHandler<CreateUserCommand, CreateUserResponse>
     {
         public async Task<Result<CreateUserResponse>> ExecuteAsync(CreateUserCommand request, CancellationToken cancellationToken = default)
@@ -43,8 +42,6 @@ namespace Modules.Users.Application.Users.Features.Create
                 identityProviderResult.Value);
 
             userRepository.Add(user);
-
-            domainEventCollector.Collect(user);
 
             return new CreateUserResponse(
                 user.Id,

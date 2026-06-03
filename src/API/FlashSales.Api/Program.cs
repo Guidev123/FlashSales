@@ -4,6 +4,7 @@ using FlashSales.Endpoints.Configurations;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Infrastructure;
 using Modules.Catalog.Infrastructure;
+using Modules.Launches.Infrastructure;
 using Modules.Users.Infrastructure;
 using Serilog;
 
@@ -45,7 +46,8 @@ builder.Services
         ..CatalogModule.Assemblies
     ])
     .AddUsersModule(builder.Configuration)
-    .AddCatalogModule(builder.Configuration);
+    .AddCatalogModule(builder.Configuration)
+    .AddLaunchesModule(builder.Configuration);
 
 var app = builder.Build();
 

@@ -9,8 +9,7 @@ namespace Modules.Users.Application.Users.Features.UpdateUserProfile
 {
     internal sealed class UpdateUserProfileCommandHandler(
         IUserRepository userRepository,
-        IIdentityProviderService identityProviderService,
-        IDomainEventCollector domainEventCollector
+        IIdentityProviderService identityProviderService
         ) : ICommandHandler<UpdateUserProfileCommand>
     {
         public async Task<Result> ExecuteAsync(UpdateUserProfileCommand request, CancellationToken cancellationToken = default)
@@ -40,8 +39,6 @@ namespace Modules.Users.Application.Users.Features.UpdateUserProfile
             {
                 return Result.Failure(UserErrors.FailedToSetAttributesInIdentityProvider);
             }
-
-            domainEventCollector.Collect(user);
 
             return Result.Success();
         }

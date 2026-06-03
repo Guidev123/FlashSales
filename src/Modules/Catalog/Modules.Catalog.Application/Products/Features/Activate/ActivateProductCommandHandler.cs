@@ -9,8 +9,7 @@ namespace Modules.Catalog.Application.Products.Features.Activate
 {
     internal sealed class ActivateProductCommandHandler(
         ISellerRepository sellerRepository,
-        IProductRepository productRepository,
-        IDomainEventCollector domainEventCollector
+        IProductRepository productRepository
         ) : ICommandHandler<ActivateProductCommand>
     {
         public async Task<Result> ExecuteAsync(ActivateProductCommand request, CancellationToken cancellationToken = default)
@@ -31,7 +30,6 @@ namespace Modules.Catalog.Application.Products.Features.Activate
                 return result;
 
             productRepository.Update(product);
-            domainEventCollector.Collect(product);
 
             return Result.Success();
         }

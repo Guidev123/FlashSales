@@ -15,6 +15,7 @@ using FlashSales.Infrastructure.Bus;
 using FlashSales.Infrastructure.Cache;
 using FlashSales.Infrastructure.Factories;
 using FlashSales.Infrastructure.Inbox;
+using FlashSales.Infrastructure.Interceptors;
 using FlashSales.Infrastructure.Outbox;
 using FlashSales.Infrastructure.Storage;
 using FluentValidation;
@@ -62,6 +63,7 @@ namespace FlashSales.Infrastructure
                     });
             services.AddSingleton(TimeProvider.System);
             services.AddScoped<IDomainEventCollector, DomainEventCollector>();
+            services.AddScoped<DomainEventsInterceptor>();
             services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
             services.AddScoped<IOutboxRepositoryFactory, OutboxRepositoryFactory>();
             services.AddScoped<IInboxRepositoryFactory, InboxRepositoryFactory>();

@@ -6,6 +6,8 @@ namespace FlashSales.Application.Messaging
     {
         void Collect(Entity entity);
 
+        void Collect(List<DomainEvent> domainEvents);
+
         void Collect(DomainEvent domainEvent);
 
         IReadOnlyList<DomainEvent> Flush();
@@ -22,6 +24,8 @@ namespace FlashSales.Application.Messaging
         }
 
         public void Collect(DomainEvent domainEvent) => _events.Add(domainEvent);
+
+        public void Collect(List<DomainEvent> domainEvents) => _events.AddRange(domainEvents);
 
         public IReadOnlyList<DomainEvent> Flush()
         {
