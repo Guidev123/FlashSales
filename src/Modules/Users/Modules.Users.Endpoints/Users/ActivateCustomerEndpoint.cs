@@ -1,4 +1,4 @@
-﻿using FlashSales.Domain.Results;
+using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using FlashSales.Infrastructure.Authentication;
@@ -31,7 +31,14 @@ namespace Modules.Users.Endpoints.Users
                 return result.Match(Results.NoContent, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
               .RequireAuthorization()
-              .WithDescription("Activate customer account");
+              .WithSummary("Activate a customer account")
+              .WithDescription(
+                  "Completes the customer onboarding for the authenticated user by recording their date of birth. " +
+                  "Can only be called once per account. Requires a valid bearer token.")
+              .Produces(StatusCodes.Status204NoContent)
+              .ProducesProblem(StatusCodes.Status400BadRequest)
+              .ProducesProblem(StatusCodes.Status409Conflict)
+              .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 }

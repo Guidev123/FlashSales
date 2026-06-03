@@ -32,7 +32,16 @@ namespace Modules.Users.Endpoints.Users
                 return result.Match(Results.NoContent, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
               .RequireAuthorization(UsersPermissions.Accounts.UpdateOwn)
-              .WithDescription("Update seller payment account");
+              .WithSummary("Update the seller's payment account")
+              .WithDescription(
+                  "Replaces the bank details of the currently authenticated seller. " +
+                  "BankCode must be exactly 3 digits (BACEN code). " +
+                  "AccountType must be 'Checking' or 'Savings'.")
+              .Produces(StatusCodes.Status204NoContent)
+              .ProducesProblem(StatusCodes.Status400BadRequest)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status403Forbidden)
+              .ProducesProblem(StatusCodes.Status404NotFound);
         }
 
         record Request(

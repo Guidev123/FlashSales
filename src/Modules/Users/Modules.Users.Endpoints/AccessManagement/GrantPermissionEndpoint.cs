@@ -1,4 +1,4 @@
-﻿using FlashSales.Domain.Results;
+using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
 using Modules.Users.Application.AccessManagement.Features.GrantPermission;
+using System.ComponentModel;
 
 namespace Modules.Users.Endpoints.AccessManagement
 {
@@ -15,7 +16,7 @@ namespace Modules.Users.Endpoints.AccessManagement
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapPost("api/v1/roles/{name}/permissions", async (
-                string name,
+                [Description("Name of the role to grant the permission to.")] string name,
                [FromBody] string permissionCode,
                 ISender sender,
                 CancellationToken cancellationToken) =>
@@ -24,8 +25,17 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(Results.Created, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Adds a permission for a role")
-              .RequireAuthorization(UsersPermissions.Permissions.Grant);
+              .RequireAuthorization(UsersPermissions.Permissions.Grant)
+              .WithSummary("Grant a permission to a role")
+              .WithDescription(
+                  "Assigns an existing permission code to the specified role. " +
+                  "The permission code must already exist in the system. " +
+                  "The request body must be a plain JSON string (e.g. \"products:create\").")
+              .Produces(StatusCodes.Status201Created)
+              .ProducesProblem(StatusCodes.Status400BadRequest)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status403Forbidden)
+              .ProducesProblem(StatusCodes.Status404NotFound);
         }
     }
 }

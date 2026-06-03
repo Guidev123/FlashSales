@@ -1,4 +1,4 @@
-﻿using FlashSales.Domain.Results;
+using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using FlashSales.Infrastructure.Authentication;
@@ -21,8 +21,14 @@ namespace Modules.Users.Endpoints.AccessManagement
 
                 return result.Match(() => Results.Ok(result.Value), ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Get permissions of authenticated user")
-              .RequireAuthorization();
+              .RequireAuthorization()
+              .WithSummary("Get the authenticated user's permissions")
+              .WithDescription(
+                  "Returns the internal user ID and the complete list of roles with their associated permissions " +
+                  "for the currently authenticated user. Used to bootstrap client-side authorization.")
+              .Produces<GetUserPermissionsResponse>(StatusCodes.Status200OK)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status404NotFound);
         }
     }
 }

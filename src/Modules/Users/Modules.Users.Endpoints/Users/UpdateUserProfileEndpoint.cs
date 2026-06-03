@@ -31,7 +31,16 @@ namespace Modules.Users.Endpoints.Users
                 return result.Match(Results.NoContent, ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
               .RequireAuthorization(UsersPermissions.Accounts.UpdateOwn)
-              .WithDescription("Update user profile (name and birth date)");
+              .WithSummary("Update the authenticated user's profile")
+              .WithDescription(
+                  "Updates the full name and date of birth of the currently authenticated user. " +
+                  "Name must include at least a first and last name separated by a space. " +
+                  "The user must be at least 16 years old. Changes are also propagated to the identity provider.")
+              .Produces(StatusCodes.Status204NoContent)
+              .ProducesProblem(StatusCodes.Status400BadRequest)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status403Forbidden)
+              .ProducesProblem(StatusCodes.Status404NotFound);
         }
 
         record Request(string Name, DateTimeOffset BirthDate);

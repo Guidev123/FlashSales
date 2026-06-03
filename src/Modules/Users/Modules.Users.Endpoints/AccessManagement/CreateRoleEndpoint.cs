@@ -1,4 +1,4 @@
-﻿using FlashSales.Domain.Results;
+using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using Microsoft.AspNetCore.Builder;
@@ -24,8 +24,16 @@ namespace Modules.Users.Endpoints.AccessManagement
                     () => Results.Created($"api/v1/roles/{request.Name}", request.Name),
                     ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Create a role")
-              .RequireAuthorization(UsersPermissions.Roles.Create);
+              .RequireAuthorization(UsersPermissions.Roles.Create)
+              .WithSummary("Create a new role")
+              .WithDescription(
+                  "Creates a new role in the system. Role names must be unique and are used as identifiers " +
+                  "in subsequent requests. The role is also provisioned in the identity provider.")
+              .Produces<string>(StatusCodes.Status201Created)
+              .ProducesProblem(StatusCodes.Status400BadRequest)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status403Forbidden)
+              .ProducesProblem(StatusCodes.Status409Conflict);
         }
     }
 }

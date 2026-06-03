@@ -1,4 +1,4 @@
-﻿using FlashSales.Domain.Results;
+using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using Microsoft.AspNetCore.Builder;
@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
 using Modules.Users.Application.AccessManagement.Features.GetRole;
+using System.ComponentModel;
 
 namespace Modules.Users.Endpoints.AccessManagement
 {
@@ -14,7 +15,7 @@ namespace Modules.Users.Endpoints.AccessManagement
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapGet("api/v1/roles/{name}", async (
-                string name,
+                [Description("Unique name of the role (e.g. 'seller', 'admin').")] string name,
                 ISender sender,
                 CancellationToken cancellationToken) =>
             {
@@ -24,8 +25,13 @@ namespace Modules.Users.Endpoints.AccessManagement
                     role => Results.Ok(role),
                     ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Obtain a specific role and its permissions")
-              .RequireAuthorization(UsersPermissions.Roles.Read);
+              .RequireAuthorization(UsersPermissions.Roles.Read)
+              .WithSummary("Get a role by name")
+              .WithDescription("Returns a single role and the list of permission codes currently assigned to it.")
+              .Produces<GetRoleResponse>(StatusCodes.Status200OK)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status403Forbidden)
+              .ProducesProblem(StatusCodes.Status404NotFound);
         }
     }
 }

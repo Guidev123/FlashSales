@@ -1,4 +1,4 @@
-﻿using FlashSales.Domain.Results;
+using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using FlashSales.Infrastructure.Authentication;
@@ -26,7 +26,14 @@ namespace Modules.Users.Endpoints.Users
             }).DisableAntiforgery()
               .WithTags(EndpointsModule.Module)
               .RequireAuthorization(UsersPermissions.Accounts.SellerReadOwn)
-              .WithDescription("Get seller profile");
+              .WithSummary("Get the authenticated seller's profile")
+              .WithDescription(
+                  "Returns the full profile of the currently authenticated seller, including personal information, " +
+                  "payment account details (bank code, agency, account number, and account type), and profile picture URL.")
+              .Produces<GetSellerResponse>(StatusCodes.Status200OK)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status403Forbidden)
+              .ProducesProblem(StatusCodes.Status404NotFound);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using FlashSales.Domain.Results;
+using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using FlashSales.Infrastructure.Authentication;
@@ -33,7 +33,16 @@ namespace Modules.Users.Endpoints.Users
             }).DisableAntiforgery()
               .WithTags(EndpointsModule.Module)
               .RequireAuthorization(UsersPermissions.Accounts.UpdateOwn)
-              .WithDescription("Update seller profile picture");
+              .WithSummary("Update the seller's profile picture")
+              .WithDescription(
+                  "Uploads a new profile picture for the currently authenticated seller. " +
+                  "Accepted formats: JPEG, PNG, WebP. Maximum file size: 5 MB. " +
+                  "The image is stored in blob storage and the URL is propagated to all modules that replicate seller data.")
+              .Produces(StatusCodes.Status204NoContent)
+              .ProducesProblem(StatusCodes.Status400BadRequest)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status403Forbidden)
+              .ProducesProblem(StatusCodes.Status404NotFound);
         }
     }
 }

@@ -1,12 +1,13 @@
-﻿using FlashSales.Domain.Results;
+using FlashSales.Domain.Results;
 using FlashSales.Endpoints.Endpoints;
 using FlashSales.Endpoints.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MidR.Interfaces;
 using Modules.Users.Application.AccessManagement.Features.GetAllRoles;
+using Modules.Users.Domain.AccessManagement.Models;
+using System.ComponentModel;
 
 namespace Modules.Users.Endpoints.AccessManagement
 {
@@ -17,8 +18,8 @@ namespace Modules.Users.Endpoints.AccessManagement
             app.MapGet("api/v1/roles", async (
                 ISender sender,
                 CancellationToken cancellationToken,
-                int pageNumber = 1,
-                int pageSize = 10) =>
+                [Description("Page number (1-based). Defaults to 1.")] int pageNumber = 1,
+                [Description("Number of records per page. Defaults to 10.")] int pageSize = 10) =>
             {
                 var result = await sender.SendAsync(new GetAllRolesQuery(pageSize, pageNumber), cancellationToken);
 
@@ -26,8 +27,14 @@ namespace Modules.Users.Endpoints.AccessManagement
                     role => Results.Ok(role),
                     ApiResults.Problem);
             }).WithTags(EndpointsModule.Module)
-              .WithDescription("Get all roles")
-              .RequireAuthorization(UsersPermissions.Roles.Read);
+              .RequireAuthorization(UsersPermissions.Roles.Read)
+              .WithSummary("List all roles")
+              .WithDescription(
+                  "Returns a paginated list of all roles defined in the system. " +
+                  "Use pageNumber and pageSize query parameters to control pagination.")
+              .Produces<PagedResult<Role>>(StatusCodes.Status200OK)
+              .ProducesProblem(StatusCodes.Status401Unauthorized)
+              .ProducesProblem(StatusCodes.Status403Forbidden);
         }
     }
 }
