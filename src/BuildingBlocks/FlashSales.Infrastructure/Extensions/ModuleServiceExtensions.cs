@@ -44,13 +44,13 @@ namespace FlashSales.Infrastructure.Extensions
             services.AddSingleton<IOutboxRepositoryRegistration>(
                 new ModuleOutboxRepositoryRegistration<TUnitOfWork>(assemblies));
 
-            services.Configure<OutboxOptions>(
+            services.Configure<OutboxOptions>(moduleName,
                 configuration.GetSection($"{moduleName}:{OutboxOptions.SectionName}"));
 
             services.AddSingleton<ModuleOutboxProcessor<TUnitOfWork>>(sp =>
                 new ModuleOutboxProcessor<TUnitOfWork>(
                     sp.GetRequiredService<ILogger<ModuleOutboxProcessor<TUnitOfWork>>>(),
-                    sp.GetRequiredService<IOptions<OutboxOptions>>(),
+                    sp.GetRequiredService<IOptionsMonitor<OutboxOptions>>(),
                     sp,
                     moduleName));
 
@@ -81,13 +81,13 @@ namespace FlashSales.Infrastructure.Extensions
             services.AddSingleton<IInboxRepositoryRegistration>(
                 new ModuleInboxRepositoryRegistration<TUnitOfWork>(handlerAssembly));
 
-            services.Configure<InboxOptions>(
+            services.Configure<InboxOptions>(moduleName,
                 configuration.GetSection($"{moduleName}:{InboxOptions.SectionName}"));
 
             services.AddSingleton<ModuleInboxProcessor<TUnitOfWork>>(sp =>
                 new ModuleInboxProcessor<TUnitOfWork>(
                     sp.GetRequiredService<ILogger<ModuleInboxProcessor<TUnitOfWork>>>(),
-                    sp.GetRequiredService<IOptions<InboxOptions>>(),
+                    sp.GetRequiredService<IOptionsMonitor<InboxOptions>>(),
                     sp,
                     moduleName));
 

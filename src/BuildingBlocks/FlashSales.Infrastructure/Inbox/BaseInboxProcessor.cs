@@ -14,11 +14,11 @@ namespace FlashSales.Infrastructure.Inbox
 {
     public abstract class BaseInboxProcessor(
         ILogger logger,
-        IOptions<InboxOptions> options,
+        IOptionsMonitor<InboxOptions> options,
         IServiceProvider serviceProvider,
         string moduleName) : BackgroundService, IInboxBatchProcessor
     {
-        private readonly InboxOptions _inboxOptions = options.Value;
+        private InboxOptions _inboxOptions => options.Get(moduleName);
 
         protected abstract IUnitOfWork GetUnitOfWork(IServiceProvider sp);
         protected abstract IInboxRepository GetInboxRepository(IServiceProvider sp);

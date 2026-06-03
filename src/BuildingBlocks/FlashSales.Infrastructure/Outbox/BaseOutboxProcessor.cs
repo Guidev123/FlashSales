@@ -13,11 +13,11 @@ namespace FlashSales.Infrastructure.Outbox
 {
     public abstract class BaseOutboxProcessor(
         ILogger logger,
-        IOptions<OutboxOptions> options,
+        IOptionsMonitor<OutboxOptions> options,
         IServiceProvider serviceProvider,
         string moduleName) : BackgroundService, IOutboxBatchProcessor
     {
-        private readonly OutboxOptions _outboxOptions = options.Value;
+        private OutboxOptions _outboxOptions => options.Get(moduleName);
 
         protected abstract IUnitOfWork GetUnitOfWork(IServiceProvider sp);
         protected abstract IOutboxRepository GetOutboxRepository(IServiceProvider sp);

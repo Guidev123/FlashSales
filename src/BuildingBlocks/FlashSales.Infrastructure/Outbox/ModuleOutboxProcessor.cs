@@ -9,7 +9,7 @@ namespace FlashSales.Infrastructure.Outbox
 {
     public sealed class ModuleOutboxProcessor<TUnitOfWork>(
         ILogger<ModuleOutboxProcessor<TUnitOfWork>> logger,
-        IOptions<OutboxOptions> options,
+        IOptionsMonitor<OutboxOptions> options,
         IServiceProvider serviceProvider,
         string moduleName
     ) : BaseOutboxProcessor(logger, options, serviceProvider, moduleName)

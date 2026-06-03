@@ -9,7 +9,7 @@ namespace FlashSales.Infrastructure.Inbox
 {
     public sealed class ModuleInboxProcessor<TUnitOfWork>(
         ILogger<ModuleInboxProcessor<TUnitOfWork>> logger,
-        IOptions<InboxOptions> options,
+        IOptionsMonitor<InboxOptions> options,
         IServiceProvider serviceProvider,
         string moduleName
     ) : BaseInboxProcessor(logger, options, serviceProvider, moduleName)
