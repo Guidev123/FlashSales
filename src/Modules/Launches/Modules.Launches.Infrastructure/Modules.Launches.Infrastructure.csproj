@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Infrastructure\FlashSales.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Users\Modules.Users.Contracts\Modules.Users.Contracts.csproj" />
     <ProjectReference Include="..\Modules.Launches.Application\Modules.Launches.Application.csproj" />
     <ProjectReference Include="..\Modules.Launches.Endpoints\Modules.Launches.Endpoints.csproj" />
   </ItemGroup>
