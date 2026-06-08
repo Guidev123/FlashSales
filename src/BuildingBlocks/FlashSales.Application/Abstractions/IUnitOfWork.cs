@@ -6,9 +6,9 @@ namespace FlashSales.Application.Abstractions
     {
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
 
-        Task<bool> CommitAsync(CancellationToken cancellationToken = default);
+        Task<CommitResult> CommitAsync(CancellationToken cancellationToken = default);
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<CommitResult> SaveChangesAsync(CancellationToken cancellationToken = default);
 
         Task RollbackAsync(CancellationToken cancellationToken = default);
 

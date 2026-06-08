@@ -20,5 +20,10 @@ namespace Modules.Launches.Infrastructure.Database.Repositories
         {
             return context.Launches.FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
         }
+
+        public void Update(Launch launch)
+        {
+            context.Launches.Update(launch);
+        }
     }
 }

@@ -1,6 +1,8 @@
 using FlashSales.Application.Abstractions;
+using FlashSales.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql;
 using System.Data;
 
 namespace FlashSales.Infrastructure.Database
@@ -18,19 +20,29 @@ namespace FlashSales.Infrastructure.Database
             _contextTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
         }
 
-        public async Task<bool> CommitAsync(CancellationToken cancellationToken = default)
+        public async Task<CommitResult> CommitAsync(CancellationToken cancellationToken = default)
         {
             try
             {
                 await _contextTransaction!.CommitAsync(cancellationToken);
                 await _contextTransaction.DisposeAsync();
                 _contextTransaction = null;
-                return true;
+                return CommitResult.Success();
             }
-            catch
+            catch (DbUpdateConcurrencyException)
             {
                 await RollbackAsync(cancellationToken);
-                return false;
+                return CommitResult.ConcurrencyConflict();
+            }
+            catch (DbUpdateException ex)
+            {
+                await RollbackAsync(cancellationToken);
+                return ex.ToCommitResult();
+            }
+            catch (NpgsqlException)
+            {
+                await RollbackAsync(cancellationToken);
+                return CommitResult.ConnectionFailure();
             }
         }
 
@@ -42,18 +54,41 @@ namespace FlashSales.Infrastructure.Database
             _contextTransaction = null;
         }
 
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-            => context.SaveChangesAsync(cancellationToken);
+        public async Task<CommitResult> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await context.SaveChangesAsync(cancellationToken);
+                return CommitResult.Success();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                await RollbackAsync(cancellationToken);
+                return CommitResult.ConcurrencyConflict();
+            }
+            catch (DbUpdateException ex)
+            {
+                await RollbackAsync(cancellationToken);
+                return ex.ToCommitResult();
+            }
+            catch (NpgsqlException)
+            {
+                await RollbackAsync(cancellationToken);
+                return CommitResult.ConnectionFailure();
+            }
+        }
 
         public async ValueTask DisposeAsync()
         {
             if (_contextTransaction is not null) await _contextTransaction.DisposeAsync();
             await context.DisposeAsync();
+            GC.SuppressFinalize(this);
         }
 
         public void Dispose()
         {
             _contextTransaction?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

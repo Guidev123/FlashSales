@@ -21,6 +21,10 @@ namespace FlashSales.Application.Behaviors
             "Database.TransactionFailedError",
             "Failed to commit transaction");
 
+        private static readonly Error SaveChangesFailedError = Error.Problem(
+            "Database.SaveChangesFailedError",
+            "Failed to save changes");
+
         public async Task<TResponse> ExecuteAsync(
             TRequest request,
             RequestDelegate<TResponse> next,
@@ -75,7 +79,16 @@ namespace FlashSales.Application.Behaviors
         {
             if (!isOutermost) return response;
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            var saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+            if (saveChangesResult.IsFailure)
+            {
+                if (logger.IsEnabled(LogLevel.Warning))
+                {
+                    logger.LogWarning("Save Changes failed for {RequestType}", typeof(TRequest).Name);
+                }
+
+                return (TResponse)Result.Failure(SaveChangesFailedError);
+            }
 
             var events = domainEventCollector.Flush();
 
@@ -86,8 +99,8 @@ namespace FlashSales.Application.Behaviors
                 await outboxRepository.InsertAsync(domainEvent, cancellationToken);
             }
 
-            var success = await unitOfWork.CommitAsync(cancellationToken);
-            if (!success)
+            var commitResult = await unitOfWork.CommitAsync(cancellationToken);
+            if (commitResult.IsFailure)
             {
                 if (logger.IsEnabled(LogLevel.Warning))
                 {

@@ -9,5 +9,7 @@ namespace Modules.Launches.Domain.Launches.Repositories
         Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken);
 
         void Add(Launch launch);
+
+        void Update(Launch launch);
     }
 }

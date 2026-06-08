@@ -9,6 +9,9 @@
             "Subscriptions": [
               {
                 "Name": "catalog.sub"
+              },
+              {
+                "Name": "launches.sub"
               }
             ]
           },

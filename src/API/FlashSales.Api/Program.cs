@@ -1,78 +1,8 @@
-using FlashSales.Api.Extensions;
-using FlashSales.Api.Middlewares;
-using FlashSales.Endpoints.Configurations;
-using FlashSales.Endpoints.Endpoints;
-using FlashSales.Infrastructure;
-using Modules.Catalog.Infrastructure;
-using Modules.Launches.Infrastructure;
-using Modules.Users.Infrastructure;
-using Serilog;
+using FlashSales.Api.Configurations;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddOpenApiConfig(builder.Configuration);
-builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddTransient<AccountActivationMiddleware>();
-builder.Configuration.AddModuleConfiguration(
-    ["users", "catalog"],
-    builder.Environment);
-
-if (!builder.Environment.IsEnvironment("Testing"))
-{
-    builder.Host.UseSerilog((context, loggerConfig)
-        => loggerConfig.ReadFrom.Configuration(context.Configuration));
-}
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowWebApp", policy =>
-    {
-        if (builder.Configuration["WebAppEndpoints"] is null) return;
-
-        var origins = builder.Configuration["WebAppEndpoints"]!.Split(',');
-
-        policy
-            .WithOrigins([.. origins])
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-
-builder.Services
-    .AddInfrastructureModule(builder.Configuration,
-    [
-        ..UsersModule.Assemblies,
-        ..CatalogModule.Assemblies
-    ])
-    .AddUsersModule(builder.Configuration)
-    .AddCatalogModule(builder.Configuration)
-    .AddLaunchesModule(builder.Configuration);
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseOpenApiConfig(builder.Configuration);
-}
-
-if (!app.Environment.IsEnvironment("Testing"))
-{
-    app.UseSerilogRequestLogging();
-}
-
-app.UseExceptionHandler();
-
-app.UseHttpsRedirection();
-
-app.UseCors("AllowWebApp");
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseMiddleware<AccountActivationMiddleware>();
-
-app.MapEndpoints();
-
-app.Run();
+WebApplication
+    .CreateBuilder(args)
+    .AddConfiguration()
+    .Build()
+    .UseConfiguration()
+    .Run();

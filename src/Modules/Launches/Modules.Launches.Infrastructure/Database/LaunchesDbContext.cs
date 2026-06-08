@@ -1,6 +1,5 @@
 ﻿using FlashSales.Domain.DomainObjects;
-using FlashSales.Infrastructure.Inbox;
-using FlashSales.Infrastructure.Outbox;
+using FlashSales.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Modules.Launches.Domain.Launches.Entities;
 using Modules.Launches.Domain.Sellers.Entities;
@@ -20,10 +19,7 @@ namespace Modules.Launches.Infrastructure.Database
             modelBuilder.Ignore<DomainEvent>();
 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-            modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
-            modelBuilder.ApplyConfiguration(new OutboxMessageConsumerConfiguration());
-            modelBuilder.ApplyConfiguration(new InboxMessageConfiguration());
-            modelBuilder.ApplyConfiguration(new InboxMessageConsumerConfiguration());
+            modelBuilder.AddOutboxAndInbox();
 
             base.OnModelCreating(modelBuilder);
         }

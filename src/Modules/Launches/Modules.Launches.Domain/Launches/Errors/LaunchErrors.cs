@@ -8,11 +8,15 @@ namespace Modules.Launches.Domain.Launches.Errors
             "Launches.NotFound",
             $"Launch with id {id} was not found");
 
-        public static Error InvalidStatusTransition(string current, string attempted) => Error.Invalid(
+        public static readonly Error SomethingHasFailedToReserveStock = Error.Problem(
+            "",
+            "Something has failed to reserve stock. Please try again later");
+
+        public static Error InvalidStatusTransition(string current, string attempted) => Error.Problem(
             "Launches.InvalidStatusTransition",
             $"Cannot transition from '{current}' to '{attempted}'");
 
-        public static readonly Error InsufficientStock = Error.Invalid(
+        public static readonly Error InsufficientStock = Error.Problem(
             "Launches.InsufficientStock",
             "There are no available units");
 
@@ -24,7 +28,7 @@ namespace Modules.Launches.Domain.Launches.Errors
             "Launches.InvalidSchedule",
             "Schedule is invalid: start date must be in the future and before end date");
 
-        public static readonly Error CannotCancelAfterActivation = Error.Invalid(
+        public static readonly Error CannotCancelAfterActivation = Error.Problem(
             "Launches.CannotCancelAfterActivation",
             "Cannot cancel a launch that is active, ended or sold out");
 
@@ -39,5 +43,9 @@ namespace Modules.Launches.Domain.Launches.Errors
         public static readonly Error TitleRequired = Error.Invalid(
             "Launches.TitleRequired",
             "Title must not be empty");
+
+        public static Error NotOwnedBySeller(Guid launchId, Guid sellerId) => Error.Problem(
+            "Launches.NotOwnedBySeller",
+            $"Launch with id {launchId} is not owned by seller with id {sellerId}");
     }
 }

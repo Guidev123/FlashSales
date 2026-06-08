@@ -8,6 +8,10 @@ namespace Modules.Launches.Domain.Sellers.Errors
             "LaunchesSellers.NotFound",
             $"Seller with id {sellerId} was not found");
 
+        public static Error NotFoundByUserId(Guid userId) => Error.NotFound(
+            "LaunchesSellers.NotFoundByUserId",
+            $"Seller with user id {userId} was not found");
+
         public static Error AlreadyExists(Guid userId, Guid sellerId) => Error.Conflict(
             "LaunchesSellers.AlreadyExists",
             $"Seller with user id {userId} and seller id {sellerId} already exists");
