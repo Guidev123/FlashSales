@@ -1,5 +1,9 @@
 {
   "Launches": {
+    "Jobs": {
+      "ActivatorIntervalInSeconds": 30,
+      "EnderIntervalInSeconds": 30
+    },
     "Outbox": {
       "IntervalInSeconds": 5,
       "BatchSize": 10,

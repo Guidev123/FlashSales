@@ -11,5 +11,9 @@ namespace Modules.Launches.Domain.Launches.Repositories
         void Add(Launch launch);
 
         void Update(Launch launch);
+
+        Task<IReadOnlyCollection<Guid>> GetScheduledReadyToActivateAsync(CancellationToken cancellationToken);
+
+        Task<IReadOnlyCollection<Guid>> GetActiveReadyToEndAsync(CancellationToken cancellationToken);
     }
 }

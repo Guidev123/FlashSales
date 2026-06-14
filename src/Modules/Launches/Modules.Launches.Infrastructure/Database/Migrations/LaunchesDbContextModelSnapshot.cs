@@ -182,6 +182,32 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
                     b.ToTable("Launches", "launches");
                 });
 
+            modelBuilder.Entity("Modules.Launches.Domain.Launches.Entities.StockReservation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LaunchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaunchId", "OrderId")
+                        .IsUnique();
+
+                    b.ToTable("StockReservations", "launches");
+                });
+
             modelBuilder.Entity("Modules.Launches.Domain.Sellers.Entities.Seller", b =>
                 {
                     b.Property<Guid>("Id")
@@ -329,6 +355,20 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
                     b.Navigation("Schedule");
 
                     b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("Modules.Launches.Domain.Launches.Entities.StockReservation", b =>
+                {
+                    b.HasOne("Modules.Launches.Domain.Launches.Entities.Launch", null)
+                        .WithMany("StockReservations")
+                        .HasForeignKey("LaunchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Modules.Launches.Domain.Launches.Entities.Launch", b =>
+                {
+                    b.Navigation("StockReservations");
                 });
 #pragma warning restore 612, 618
         }

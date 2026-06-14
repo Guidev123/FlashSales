@@ -120,6 +120,29 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StockReservations",
+                schema: "launches",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    LaunchId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    CreatedOn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockReservations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StockReservations_Launches_LaunchId",
+                        column: x => x.LaunchId,
+                        principalSchema: "launches",
+                        principalTable: "Launches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OutboxMessageConsumers",
                 schema: "launches",
                 columns: table => new
@@ -180,6 +203,13 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
                 table: "Sellers",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockReservations_LaunchId_OrderId",
+                schema: "launches",
+                table: "StockReservations",
+                columns: new[] { "LaunchId", "OrderId" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -187,10 +217,6 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
         {
             migrationBuilder.DropTable(
                 name: "InboxMessageConsumers",
-                schema: "launches");
-
-            migrationBuilder.DropTable(
-                name: "Launches",
                 schema: "launches");
 
             migrationBuilder.DropTable(
@@ -202,11 +228,19 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
                 schema: "launches");
 
             migrationBuilder.DropTable(
+                name: "StockReservations",
+                schema: "launches");
+
+            migrationBuilder.DropTable(
                 name: "InboxMessages",
                 schema: "launches");
 
             migrationBuilder.DropTable(
                 name: "OutboxMessages",
+                schema: "launches");
+
+            migrationBuilder.DropTable(
+                name: "Launches",
                 schema: "launches");
         }
     }

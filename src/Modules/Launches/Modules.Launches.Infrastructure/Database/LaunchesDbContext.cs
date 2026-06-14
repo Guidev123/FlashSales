@@ -11,6 +11,7 @@ namespace Modules.Launches.Infrastructure.Database
     {
         public DbSet<Launch> Launches { get; set; } = default!;
         public DbSet<Seller> Sellers { get; set; } = default!;
+        public DbSet<StockReservation> StockReservations { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

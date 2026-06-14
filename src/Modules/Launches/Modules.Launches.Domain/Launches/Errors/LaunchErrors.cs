@@ -9,7 +9,7 @@ namespace Modules.Launches.Domain.Launches.Errors
             $"Launch with id {id} was not found");
 
         public static readonly Error SomethingHasFailedToReserveStock = Error.Problem(
-            "",
+            "Launches.SomethingHasFailedToReserveStock",
             "Something has failed to reserve stock. Please try again later");
 
         public static Error InvalidStatusTransition(string current, string attempted) => Error.Problem(
@@ -47,5 +47,17 @@ namespace Modules.Launches.Domain.Launches.Errors
         public static Error NotOwnedBySeller(Guid launchId, Guid sellerId) => Error.Problem(
             "Launches.NotOwnedBySeller",
             $"Launch with id {launchId} is not owned by seller with id {sellerId}");
+
+        public static readonly Error LaunchIdCannotBeEmpty = Error.Invalid(
+            "Launches.LaunchIdCannotBeEmpty",
+            "Launch Id can not be empty");
+
+        public static readonly Error OrderIdCannotBeEmpty = Error.Invalid(
+            "Launches.OrderIdCannotBeEmpty",
+            "Order Id can not be empty");
+
+        public static readonly Error QuantityMustBeAtLeastOne = Error.Invalid(
+            "Launches.QuantityMustBeAtLeastOne",
+            "Quantity must be at least 1");
     }
 }

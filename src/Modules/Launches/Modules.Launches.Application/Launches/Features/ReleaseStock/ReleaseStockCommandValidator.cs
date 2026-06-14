@@ -1,11 +1,11 @@
 using FluentValidation;
 using Modules.Launches.Domain.Launches.Errors;
 
-namespace Modules.Launches.Application.Launches.Features.ReserveStock
+namespace Modules.Launches.Application.Launches.Features.ReleaseStock
 {
-    internal sealed class ReserveStockCommandValidator : AbstractValidator<ReserveStockCommand>
+    internal sealed class ReleaseStockCommandValidator : AbstractValidator<ReleaseStockCommand>
     {
-        public ReserveStockCommandValidator()
+        public ReleaseStockCommandValidator()
         {
             RuleFor(x => x.LaunchId)
                 .NotEqual(Guid.Empty)

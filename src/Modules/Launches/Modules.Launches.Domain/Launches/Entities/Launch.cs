@@ -9,6 +9,8 @@ namespace Modules.Launches.Domain.Launches.Entities
 {
     public sealed class Launch : Entity, IAggregateRoot
     {
+        private readonly List<StockReservation> _stockReservations = [];
+
         private Launch(Guid sellerId, Guid productId, string title, string description)
         {
             SellerId = sellerId;
@@ -28,6 +30,7 @@ namespace Modules.Launches.Domain.Launches.Entities
         public LaunchStock? Stock { get; private set; }
         public LaunchSchedule? Schedule { get; private set; }
         public LaunchStatus Status { get; private set; }
+        public IReadOnlyCollection<StockReservation> StockReservations => _stockReservations.AsReadOnly();
 
         public static Launch Create(Guid sellerId, Guid productId, string title, string description)
         {
@@ -115,10 +118,14 @@ namespace Modules.Launches.Domain.Launches.Entities
             if (Status != LaunchStatus.Active)
                 return Result.Failure(LaunchErrors.InvalidStatusTransition(Status.ToString(), "ReserveStock"));
 
+            if (_stockReservations.Any(r => r.OrderId == orderId))
+                return Result.Success();
+
             if (Stock!.AvailableQuantity < quantity)
                 return Result.Failure(LaunchErrors.InsufficientStock);
 
             Stock = LaunchStock.Create(Stock.TotalQuantity, Stock.ReservedQuantity + quantity);
+            _stockReservations.Add(StockReservation.Create(Id, orderId, quantity));
 
             AddDomainEvent(StockReservedDomainEvent.Create(Id, quantity, orderId));
 
@@ -136,6 +143,12 @@ namespace Modules.Launches.Domain.Launches.Entities
             if (Status != LaunchStatus.SoldOut && Status != LaunchStatus.Active)
                 return Result.Failure(LaunchErrors.InvalidStatusTransition(Status.ToString(), "ReleaseStock"));
 
+            var reservation = _stockReservations.FirstOrDefault(r => r.OrderId == orderId);
+
+            if (reservation is null)
+                return Result.Success();
+
+            _stockReservations.Remove(reservation);
             Stock = LaunchStock.Create(Stock!.TotalQuantity, Stock.ReservedQuantity - quantity);
 
             if (Status == LaunchStatus.SoldOut)

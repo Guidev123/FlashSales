@@ -19,6 +19,7 @@
   </Folder>
   <Folder Name="/src/Modules/Launches/">
     <Project Path="src/Modules/Launches/Modules.Launches.Application/Modules.Launches.Application.csproj" />
+    <Project Path="src/Modules/Launches/Modules.Launches.Contracts/Modules.Launches.Contracts.csproj" Id="fb795f63-7afc-4d43-b003-120c9de5e1b6" />
     <Project Path="src/Modules/Launches/Modules.Launches.Domain/Modules.Launches.Domain.csproj" />
     <Project Path="src/Modules/Launches/Modules.Launches.Endpoints/Modules.Launches.Endpoints.csproj" />
     <Project Path="src/Modules/Launches/Modules.Launches.Infrastructure/Modules.Launches.Infrastructure.csproj" />

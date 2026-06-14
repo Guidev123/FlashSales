@@ -84,6 +84,13 @@ namespace Modules.Launches.Infrastructure.Database.Configurations
                     .IsRequired();
             });
 
+            builder.HasMany(l => l.StockReservations)
+                .WithOne()
+                .HasForeignKey(r => r.LaunchId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Navigation(l => l.StockReservations).HasField("_stockReservations");
+
             builder.HasIndex(l => new { l.SellerId, l.Status });
         }
     }

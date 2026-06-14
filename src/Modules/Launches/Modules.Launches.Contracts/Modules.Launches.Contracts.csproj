@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Application\FlashSales.Application.csproj" />
-    <ProjectReference Include="..\Modules.Launches.Domain\Modules.Launches.Domain.csproj" />
-    <ProjectReference Include="..\Modules.Launches.Contracts\Modules.Launches.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
