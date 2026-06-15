@@ -4,6 +4,11 @@ namespace FlashSales.Application.Abstractions
 {
     public sealed class CommitResult
     {
+        public const string UniqueViolationCode = "Persistence.UniqueViolation";
+        public const string ForeignKeyViolationCode = "Persistence.ForeignKeyViolation";
+        public const string ConcurrencyConflictCode = "Persistence.ConcurrencyConflict";
+        public const string ConnectionFailureCode = "Persistence.ConnectionFailure";
+
         private CommitResult(
             bool isSuccess = true,
             PersistenceErrors errorType = PersistenceErrors.None,
@@ -26,28 +31,28 @@ namespace FlashSales.Application.Abstractions
             false,
             PersistenceErrors.ConcurrencyConflict,
             Error.Conflict(
-                "Persistence.ConcurrencyConflict",
+                ConcurrencyConflictCode,
                 "The record was modified by another process. Please retry the operation."));
 
         public static CommitResult UniqueViolation() => new(
             false,
             PersistenceErrors.UniqueViolation,
             Error.Conflict(
-                "Persistence.UniqueViolation",
+                UniqueViolationCode,
                 "A record with the same unique key already exists."));
 
         public static CommitResult ForeignKeyViolation() => new(
             false,
             PersistenceErrors.ForegeinKeyViolation,
             Error.Problem(
-                "Persistence.ForeignKeyViolation",
+                ForeignKeyViolationCode,
                 "The operation references a record that does not exist."));
 
         public static CommitResult ConnectionFailure() => new(
             false,
             PersistenceErrors.ConnectionFailure,
             Error.Problem(
-                "Persistence.ConnectionFailure",
+                ConnectionFailureCode,
                 "A database connection failure occurred. Please try again later."));
     }
 

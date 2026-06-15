@@ -152,6 +152,12 @@ services:
     networks:
       - backend
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/5672' 2>/dev/null && echo ok || exit 1"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
 volumes:
   keycloak_pgdata:

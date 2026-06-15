@@ -84,10 +84,11 @@ namespace FlashSales.Application.Behaviors
             {
                 if (logger.IsEnabled(LogLevel.Warning))
                 {
-                    logger.LogWarning("Save Changes failed for {RequestType}", typeof(TRequest).Name);
+                    logger.LogWarning("Save Changes failed for {RequestType} — {ErrorCode}",
+                        typeof(TRequest).Name, saveChangesResult.Error!.Code);
                 }
 
-                return (TResponse)Result.Failure(SaveChangesFailedError);
+                return (TResponse)Result.Failure(saveChangesResult.Error!);
             }
 
             var events = domainEventCollector.Flush();

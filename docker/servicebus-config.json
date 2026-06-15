@@ -44,6 +44,9 @@
             "Subscriptions": [
               {
                 "Name": "catalog.sub"
+              },
+              {
+                "Name": "launches.sub"
               }
             ]
           },
@@ -52,6 +55,9 @@
             "Subscriptions": [
               {
                 "Name": "catalog.sub"
+              },
+              {
+                "Name": "launches.sub"
               }
             ]
           }

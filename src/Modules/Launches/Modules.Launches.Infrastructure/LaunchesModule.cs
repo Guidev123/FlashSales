@@ -71,7 +71,9 @@ namespace Modules.Launches.Infrastructure
         {
             services.AddModuleInbox<ILaunchesUnitOfWork>(
                 configuration, "Launches", Schemas.Launches, Assembly.GetExecutingAssembly(),
-                Users.Contracts.IntegrationEvents.Topics.SellerActivated);
+                Users.Contracts.IntegrationEvents.Topics.SellerActivated,
+                Users.Contracts.IntegrationEvents.Topics.UserProfileUpdated,
+                Users.Contracts.IntegrationEvents.Topics.SellerProfilePictureUpdated);
             return services;
         }
 

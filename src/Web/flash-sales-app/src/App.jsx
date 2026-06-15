@@ -8,6 +8,7 @@ import CallbackPage from './pages/CallbackPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import ActivateSocialPage from './pages/ActivateSocialPage.jsx'
 import LaunchesPage from './pages/LaunchesPage.jsx'
+import LaunchPage from './pages/LaunchPage.jsx'
 import BecomeSellerPage from './pages/BecomeSellerPage.jsx'
 import SellerProfilePage from './pages/SellerProfilePage.jsx'
 import CustomerProfilePage from './pages/CustomerProfilePage.jsx'
@@ -16,6 +17,9 @@ import CreateProductPage from './pages/CreateProductPage.jsx'
 import ProductDetailPage from './pages/ProductDetailPage.jsx'
 import ProductsPage from './pages/ProductsPage.jsx'
 import ProductPage from './pages/ProductPage.jsx'
+import SellerLaunchesPage from './pages/SellerLaunchesPage.jsx'
+import CreateLaunchPage from './pages/CreateLaunchPage.jsx'
+import SellerLaunchDetailPage from './pages/SellerLaunchDetailPage.jsx'
 
 function ActivationGuard({ children }) {
   const auth = useAuth()
@@ -70,78 +74,60 @@ export default function App() {
           <Route path="/callback" element={<CallbackPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/activate/social" element={<ActivateSocialPage />} />
+
           <Route
             path="/launches"
-            element={
-              <RequireActivated>
-                <LaunchesPage />
-              </RequireActivated>
-            }
+            element={<RequireActivated><LaunchesPage /></RequireActivated>}
+          />
+          <Route
+            path="/launches/:id"
+            element={<RequireActivated><LaunchPage /></RequireActivated>}
           />
           <Route
             path="/become-seller"
-            element={
-              <RequireActivated>
-                <BecomeSellerPage />
-              </RequireActivated>
-            }
+            element={<RequireActivated><BecomeSellerPage /></RequireActivated>}
           />
           <Route
             path="/seller/profile"
-            element={
-              <RequireSeller>
-                <SellerProfilePage />
-              </RequireSeller>
-            }
+            element={<RequireSeller><SellerProfilePage /></RequireSeller>}
           />
           <Route
             path="/customer/profile"
-            element={
-              <RequireCustomer>
-                <CustomerProfilePage />
-              </RequireCustomer>
-            }
+            element={<RequireCustomer><CustomerProfilePage /></RequireCustomer>}
           />
           <Route
             path="/products"
-            element={
-              <RequireActivated>
-                <ProductsPage />
-              </RequireActivated>
-            }
+            element={<RequireActivated><ProductsPage /></RequireActivated>}
           />
           <Route
             path="/products/:id"
-            element={
-              <RequireActivated>
-                <ProductPage />
-              </RequireActivated>
-            }
+            element={<RequireActivated><ProductPage /></RequireActivated>}
           />
           <Route
             path="/seller/products"
-            element={
-              <RequireSeller>
-                <SellerProductsPage />
-              </RequireSeller>
-            }
+            element={<RequireSeller><SellerProductsPage /></RequireSeller>}
           />
           <Route
             path="/seller/products/new"
-            element={
-              <RequireSeller>
-                <CreateProductPage />
-              </RequireSeller>
-            }
+            element={<RequireSeller><CreateProductPage /></RequireSeller>}
           />
           <Route
             path="/seller/products/:id"
-            element={
-              <RequireSeller>
-                <ProductDetailPage />
-              </RequireSeller>
-            }
+            element={<RequireSeller><ProductDetailPage /></RequireSeller>}
           />
+          <Route
+            path="/seller/launches"
+            element={<RequireSeller><SellerLaunchesPage /></RequireSeller>}
+          />
+          <Route
+            path="/seller/launches/new"
+            element={<RequireSeller><CreateLaunchPage /></RequireSeller>}
+          />
+          <Route
+            path="/seller/launches/:id"
+            element={<RequireSeller><SellerLaunchDetailPage /></RequireSeller>}
+          />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </ActivationGuard>
