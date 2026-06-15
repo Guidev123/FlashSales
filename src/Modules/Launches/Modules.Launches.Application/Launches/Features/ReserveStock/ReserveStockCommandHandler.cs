@@ -2,6 +2,7 @@ using FlashSales.Application.Abstractions;
 using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
 using Modules.Launches.Application.Abstractions;
+using Modules.Launches.Domain.Launches.Enums;
 using Modules.Launches.Domain.Launches.Errors;
 using Modules.Launches.Domain.Launches.Repositories;
 
@@ -24,7 +25,11 @@ namespace Modules.Launches.Application.Launches.Features.ReserveStock
 
                 var reserveResult = launch.ReserveStock(request.Quantity, request.OrderId);
                 if (reserveResult.IsFailure)
-                    return Result.Failure(reserveResult.Error!);
+                {
+                    return launch.Status == LaunchStatus.SoldOut
+                        ? Result.Failure(LaunchErrors.InsufficientStock)
+                        : Result.Failure(reserveResult.Error!);
+                }
 
                 launchRepository.Update(launch);
 

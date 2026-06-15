@@ -31,7 +31,7 @@ namespace Modules.Launches.Infrastructure.Database.Configurations
             builder.Property<uint>("Version")
                 .HasColumnName("xmin")
                 .HasColumnType("xid")
-                .IsConcurrencyToken();
+                .IsRowVersion();
 
             builder.OwnsOne(l => l.Metadata, metadata =>
             {
@@ -68,6 +68,7 @@ namespace Modules.Launches.Infrastructure.Database.Configurations
                 stock.Property(s => s.ReservedQuantity)
                     .HasColumnName("ReservedQuantity")
                     .HasDefaultValue(0)
+                    .ValueGeneratedNever()
                     .IsRequired();
 
                 stock.Ignore(s => s.AvailableQuantity);

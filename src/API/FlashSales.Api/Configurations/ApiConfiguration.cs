@@ -96,7 +96,8 @@ public static class ApiConfiguration
             .AddInfrastructureModule(builder.Configuration,
             [
                 ..UsersModule.Assemblies,
-                ..CatalogModule.Assemblies
+                ..CatalogModule.Assemblies,
+                ..LaunchesModule.Assemblies
             ])
             .AddUsersModule(builder.Configuration)
             .AddCatalogModule(builder.Configuration)

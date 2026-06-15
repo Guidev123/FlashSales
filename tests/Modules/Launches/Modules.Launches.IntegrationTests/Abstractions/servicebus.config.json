@@ -1,0 +1,46 @@
+{
+  "UserConfig": {
+    "Namespaces": [
+      {
+        "Name": "sbemulatorns",
+        "Topics": [
+          {
+            "Name": "flash-sales.users.seller-activated",
+            "Subscriptions": [
+              {
+                "Name": "launches.sub"
+              }
+            ]
+          },
+          {
+            "Name": "flash-sales.launches.launch-activated",
+            "Subscriptions": [
+              {
+                "Name": "notifications.sub"
+              }
+            ]
+          },
+          {
+            "Name": "flash-sales.launches.launch-ended",
+            "Subscriptions": [
+              {
+                "Name": "notifications.sub"
+              }
+            ]
+          },
+          {
+            "Name": "flash-sales.launches.launch-cancelled",
+            "Subscriptions": [
+              {
+                "Name": "notifications.sub"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Logging": {
+      "Type": "Console"
+    }
+  }
+}

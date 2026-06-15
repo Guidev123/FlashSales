@@ -26,6 +26,12 @@ namespace Modules.Launches.Infrastructure.Database.Repositories
 
         public void Update(Launch launch)
         {
+            foreach (var reservation in launch.StockReservations)
+            {
+                if (context.Entry(reservation).State == EntityState.Detached)
+                    context.Add(reservation);
+            }
+
             context.Launches.Update(launch);
         }
 

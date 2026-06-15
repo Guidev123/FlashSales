@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Launches.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(LaunchesDbContext))]
-    [Migration("20260614201400_Initial")]
+    [Migration("20260615114431_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -175,6 +175,7 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
@@ -333,7 +334,6 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
                                 .HasColumnType("uuid");
 
                             b1.Property<int>("ReservedQuantity")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
                                 .HasDefaultValue(0)
                                 .HasColumnName("ReservedQuantity");

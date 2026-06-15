@@ -52,7 +52,7 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
                     StartAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     EndAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Status = table.Column<string>(type: "VARCHAR(50)", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     CreatedOn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

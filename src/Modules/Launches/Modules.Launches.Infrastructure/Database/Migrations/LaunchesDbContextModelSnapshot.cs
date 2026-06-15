@@ -172,6 +172,7 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
@@ -330,7 +331,6 @@ namespace Modules.Launches.Infrastructure.Database.Migrations
                                 .HasColumnType("uuid");
 
                             b1.Property<int>("ReservedQuantity")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
                                 .HasDefaultValue(0)
                                 .HasColumnName("ReservedQuantity");

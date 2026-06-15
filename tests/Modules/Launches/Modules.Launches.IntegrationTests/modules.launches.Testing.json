@@ -1,0 +1,8 @@
+{
+  "Launches": {
+    "Jobs": {
+      "ActivatorIntervalInSeconds": 30,
+      "EnderIntervalInSeconds": 30
+    }
+  }
+}
