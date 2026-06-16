@@ -1,10 +1,13 @@
+using FlashSales.Application.Inbox;
 using FlashSales.Domain.DomainObjects;
+using MidR.Abstractions;
 using MidR.Interfaces;
 using Modules.Launches.Application.Sellers.Features.Create;
 using Modules.Users.Contracts.IntegrationEvents;
 
 namespace Modules.Launches.Infrastructure.IntegrationEvents
 {
+    [DirectQueue(InboxRoutes.Launches)]
     internal sealed class SellerActivatedIntegrationEventHandler(ISender sender)
         : INotificationHandler<SellerActivatedIntegrationEvent>
     {
