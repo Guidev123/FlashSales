@@ -31,7 +31,8 @@ namespace Modules.Launches.Endpoints.Launches
                 return result.Match(() =>
                 Results.Created($"api/v1/launches/{result.Value.Id}",
                 result.Value), ApiResults.Problem);
-            }).RequireAuthorization(LaunchesPermissions.Launches.Create);
+            }).WithTags(EndpointsModule.Module)
+            .RequireAuthorization(LaunchesPermissions.Launches.Create);
         }
 
         record CreateLaunchRequest(

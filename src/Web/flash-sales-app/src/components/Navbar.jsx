@@ -25,12 +25,10 @@ export default function Navbar() {
           <span className={styles.brandName}>Flash Sales</span>
         </Link>
 
-        {activated && (
-          <div className={styles.navLinks}>
-            <Link to="/launches"  className={`${styles.navLink} ${isActive('/launches')  ? styles.navLinkActive : ''}`}>Launches</Link>
-            <Link to="/products"  className={`${styles.navLink} ${isActive('/products') && !location.pathname.startsWith('/seller/products') ? styles.navLinkActive : ''}`}>Products</Link>
-          </div>
-        )}
+        <div className={styles.navLinks}>
+          <Link to="/launches"  className={`${styles.navLink} ${isActive('/launches')  ? styles.navLinkActive : ''}`}>Launches</Link>
+          <Link to="/products"  className={`${styles.navLink} ${isActive('/products') && !location.pathname.startsWith('/seller/products') ? styles.navLinkActive : ''}`}>Products</Link>
+        </div>
 
         <div className={styles.actions}>
           {!auth.isAuthenticated && (

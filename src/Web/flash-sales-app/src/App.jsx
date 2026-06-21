@@ -75,14 +75,8 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/activate/social" element={<ActivateSocialPage />} />
 
-          <Route
-            path="/launches"
-            element={<RequireActivated><LaunchesPage /></RequireActivated>}
-          />
-          <Route
-            path="/launches/:id"
-            element={<RequireActivated><LaunchPage /></RequireActivated>}
-          />
+          <Route path="/launches" element={<LaunchesPage />} />
+          <Route path="/launches/:id" element={<LaunchPage />} />
           <Route
             path="/become-seller"
             element={<RequireActivated><BecomeSellerPage /></RequireActivated>}
@@ -95,14 +89,8 @@ export default function App() {
             path="/customer/profile"
             element={<RequireCustomer><CustomerProfilePage /></RequireCustomer>}
           />
-          <Route
-            path="/products"
-            element={<RequireActivated><ProductsPage /></RequireActivated>}
-          />
-          <Route
-            path="/products/:id"
-            element={<RequireActivated><ProductPage /></RequireActivated>}
-          />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:id" element={<ProductPage />} />
           <Route
             path="/seller/products"
             element={<RequireSeller><SellerProductsPage /></RequireSeller>}

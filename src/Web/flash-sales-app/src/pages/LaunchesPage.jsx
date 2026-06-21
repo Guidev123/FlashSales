@@ -87,7 +87,7 @@ export default function LaunchesPage() {
   const auth     = useAuth()
   const navigate = useNavigate()
   const apiFetch = useApiFetch()
-  const name = auth.user?.profile?.given_name || auth.user?.profile?.name || 'there'
+  const name = auth.user?.profile?.given_name || auth.user?.profile?.name || null
 
   const [launches, setLaunches] = useState([])
   const [loading,  setLoading]  = useState(true)
@@ -101,7 +101,7 @@ export default function LaunchesPage() {
       try {
         const res = await apiFetch(
           `${import.meta.env.VITE_API_URL}/api/v1/launches?page=1&size=50`,
-          { headers: { Authorization: `Bearer ${auth.user.access_token}` } }
+          auth.user ? { headers: { Authorization: `Bearer ${auth.user.access_token}` } } : {}
         )
         if (!res || cancelled) return
         if (!res.ok) { setError('Could not load launches. Please try again.'); return }
@@ -115,7 +115,7 @@ export default function LaunchesPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [auth.user?.access_token])
+  }, [])
 
   const live     = launches.filter(l => l.status === 'Active')
   const upcoming = launches.filter(l => l.status === 'Scheduled')
@@ -127,7 +127,7 @@ export default function LaunchesPage() {
       <div className={styles.inner}>
         <div className={styles.pageHeader}>
           <div>
-            <h1 className={styles.pageTitle}>Hey, {name.split(' ')[0]}</h1>
+            <h1 className={styles.pageTitle}>{name ? `Hey, ${name.split(' ')[0]}` : 'Launches'}</h1>
             <p className={styles.pageSub}>Browse active and upcoming launches below.</p>
           </div>
           <div className={styles.summaryPills}>

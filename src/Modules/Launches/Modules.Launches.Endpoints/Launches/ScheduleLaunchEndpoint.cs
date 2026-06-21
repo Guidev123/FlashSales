@@ -33,7 +33,8 @@ namespace Modules.Launches.Endpoints.Launches
                     ), cancellationToken);
 
                 return result.Match(Results.NoContent, ApiResults.Problem);
-            }).RequireAuthorization(LaunchesPermissions.Launches.Schedule);
+            }).WithTags(EndpointsModule.Module)
+            .RequireAuthorization(LaunchesPermissions.Launches.Schedule);
         }
 
         record ScheduleLaunchRequest(

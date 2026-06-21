@@ -12,7 +12,7 @@ namespace Modules.Launches.Application.Sellers.Features.Create
     {
         public async Task<Result> ExecuteAsync(CreateSellerCommand request, CancellationToken cancellationToken = default)
         {
-            var alreadyExists = await sellerRepository.ExistsAsync(request.SellerId, cancellationToken);
+            var alreadyExists = await sellerRepository.ExistsAsync(request.UserId, cancellationToken);
             if (alreadyExists)
             {
                 return Result.Failure(SellerErrors.AlreadyExists(request.UserId, request.SellerId));

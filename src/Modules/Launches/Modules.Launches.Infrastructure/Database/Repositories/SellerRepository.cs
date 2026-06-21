@@ -16,9 +16,9 @@ namespace Modules.Launches.Infrastructure.Database.Repositories
             context.Sellers.Update(seller);
         }
 
-        public Task<bool> ExistsAsync(Guid sellerId, CancellationToken cancellationToken)
+        public Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken)
         {
-            return context.Sellers.AnyAsync(s => s.Id == sellerId, cancellationToken);
+            return context.Sellers.AnyAsync(s => s.UserId == userId, cancellationToken);
         }
 
         public Task<Seller?> GetBySellerIdAsync(Guid sellerId, CancellationToken cancellationToken)

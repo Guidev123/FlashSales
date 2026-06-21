@@ -27,7 +27,8 @@ namespace Modules.Launches.Endpoints.Launches
                     ), cancellationToken);
 
                 return result.Match(Results.NoContent, ApiResults.Problem);
-            }).RequireAuthorization(LaunchesPermissions.Launches.Cancel);
+            }).WithTags(EndpointsModule.Module)
+            .RequireAuthorization(LaunchesPermissions.Launches.Cancel);
         }
     }
 }

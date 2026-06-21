@@ -71,8 +71,6 @@ export default function SellerLaunchesPage() {
   const navigate = useNavigate()
   const apiFetch = useApiFetch()
 
-  const sellerId = auth.user?.profile?.sub
-
   const [launches, setLaunches] = useState([])
   const [loading,  setLoading]  = useState(true)
   const [error,    setError]    = useState('')
@@ -80,7 +78,6 @@ export default function SellerLaunchesPage() {
   const [meta,     setMeta]     = useState(null)
 
   useEffect(() => {
-    if (!sellerId) return
     let cancelled = false
 
     async function load() {
@@ -88,7 +85,7 @@ export default function SellerLaunchesPage() {
       setError('')
       try {
         const res = await apiFetch(
-          `${import.meta.env.VITE_API_URL}/api/v1/launches/seller/${sellerId}?page=${page}&size=12`,
+          `${import.meta.env.VITE_API_URL}/api/v1/launches/seller?page=${page}&size=12`,
           { headers: { Authorization: `Bearer ${auth.user.access_token}` } }
         )
         if (!res || cancelled) return
@@ -105,7 +102,7 @@ export default function SellerLaunchesPage() {
 
     load()
     return () => { cancelled = true }
-  }, [auth.user?.access_token, sellerId, page])
+  }, [auth.user?.access_token, page])
 
   return (
     <div className={styles.page}>

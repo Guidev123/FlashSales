@@ -8,7 +8,7 @@ namespace Modules.Launches.Domain.Sellers.Repositories
 
         Task<Seller?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken);
 
-        Task<bool> ExistsAsync(Guid sellerId, CancellationToken cancellationToken);
+        Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken);
 
         void Add(Seller seller);
 
