@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Application\FlashSales.Application.csproj" />
-    <ProjectReference Include="..\Modules.Payments.Domain\Modules.Payments.Domain.csproj" />
-    <ProjectReference Include="..\Modules.Payments.Contracts\Modules.Payments.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

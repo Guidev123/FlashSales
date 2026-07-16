@@ -37,6 +37,7 @@
   </Folder>
   <Folder Name="/src/Modules/Payments/">
     <Project Path="src/Modules/Payments/Modules.Payments.Application/Modules.Payments.Application.csproj" />
+    <Project Path="src/Modules/Payments/Modules.Payments.Contracts/Modules.Payments.Contracts.csproj" />
     <Project Path="src/Modules/Payments/Modules.Payments.Domain/Modules.Payments.Domain.csproj" />
     <Project Path="src/Modules/Payments/Modules.Payments.Endpoints/Modules.Payments.Endpoints.csproj" />
     <Project Path="src/Modules/Payments/Modules.Payments.Infrastructure/Modules.Payments.Infrastructure.csproj" />

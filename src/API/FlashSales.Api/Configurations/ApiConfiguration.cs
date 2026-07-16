@@ -5,6 +5,7 @@ using FlashSales.Endpoints.Endpoints;
 using FlashSales.Infrastructure;
 using Modules.Catalog.Infrastructure;
 using Modules.Launches.Infrastructure;
+using Modules.Payments.Infrastructure;
 using Modules.Users.Infrastructure;
 using Serilog;
 
@@ -12,7 +13,7 @@ namespace FlashSales.Api.Configurations;
 
 public static class ApiConfiguration
 {
-    private static readonly string[] Modules = ["users", "catalog", "launches"];
+    private static readonly string[] Modules = ["users", "catalog", "launches", "payments"];
 
     public static WebApplicationBuilder AddConfiguration(this WebApplicationBuilder builder)
     {
@@ -97,11 +98,13 @@ public static class ApiConfiguration
             [
                 ..UsersModule.Assemblies,
                 ..CatalogModule.Assemblies,
-                ..LaunchesModule.Assemblies
+                ..LaunchesModule.Assemblies,
+                ..PaymentsModule.Assemblies
             ])
             .AddUsersModule(builder.Configuration)
             .AddCatalogModule(builder.Configuration)
-            .AddLaunchesModule(builder.Configuration);
+            .AddLaunchesModule(builder.Configuration)
+            .AddPaymentsModule(builder.Configuration);
 
         return builder;
     }

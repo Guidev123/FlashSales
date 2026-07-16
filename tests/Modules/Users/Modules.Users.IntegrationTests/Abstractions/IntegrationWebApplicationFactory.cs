@@ -51,7 +51,7 @@ namespace Modules.Users.IntegrationTests.Abstractions
 
         private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
             .WithImage("mcr.microsoft.com/azure-storage/azurite:latest")
-            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(10000))
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(10000))
             .Build();
 
         private readonly ServiceBusContainer _serviceBusContainer = new ServiceBusBuilder()

@@ -1,11 +1,14 @@
 ﻿using FlashSales.Domain.DomainObjects;
 using Modules.Payments.Domain.Payments.DomainEvents;
 using Modules.Payments.Domain.Payments.Enums;
+using Modules.Payments.Domain.Payments.Errors;
 
 namespace Modules.Payments.Domain.Payments.Entities
 {
     public sealed class Payment : Entity, IAggregateRoot
     {
+        public const int ORDER_CODE_MAX_LENGTH = 50;
+
         private Payment(
             Guid orderId,
             Guid customerId,
@@ -85,7 +88,12 @@ namespace Modules.Payments.Domain.Payments.Entities
 
         protected override void Validate()
         {
-            throw new NotImplementedException();
+            AssertionConcern.EnsureTrue(OrderId != Guid.Empty, PaymentErrors.OrderIdRequired.Description);
+            AssertionConcern.EnsureTrue(CustomerId != Guid.Empty, PaymentErrors.CustomerIdRequired.Description);
+            AssertionConcern.EnsureTrue(TransactionId != Guid.Empty, PaymentErrors.TransactionIdRequired.Description);
+            AssertionConcern.EnsureGreaterThan(Amount, 0, PaymentErrors.AmountMustBeGreaterThanZero.Description);
+            AssertionConcern.EnsureNotEmpty(OrderCode, PaymentErrors.OrderCodeMustNotBeEmpty.Description);
+            AssertionConcern.EnsureMaxLength(OrderCode, ORDER_CODE_MAX_LENGTH, PaymentErrors.OrderCodeTooLong(ORDER_CODE_MAX_LENGTH).Description);
         }
     }
 }
