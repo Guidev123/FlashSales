@@ -15,21 +15,11 @@ namespace Modules.Payments.Infrastructure.Database.Configurations
             builder.Property(p => p.OrderId)
                 .IsRequired();
 
-            builder.Property(p => p.CustomerId)
-                .IsRequired();
-
-            builder.Property(p => p.TransactionId)
-                .IsRequired();
-
             builder.Property(p => p.Amount)
                 .IsRequired();
 
-            builder.Property(p => p.OrderCode)
-                .HasColumnType($"VARCHAR({Payment.ORDER_CODE_MAX_LENGTH})")
+            builder.Property(p => p.ExpiresAt)
                 .IsRequired();
-
-            builder.Property(p => p.ExternalReference)
-                .HasColumnType("VARCHAR(100)");
 
             builder.Property(p => p.Status)
                 .HasColumnType("VARCHAR(50)")
@@ -39,12 +29,15 @@ namespace Modules.Payments.Infrastructure.Database.Configurations
             builder.Property(p => p.CreatedOn)
                 .IsRequired();
 
-            builder.HasIndex(p => p.TransactionId)
+            builder.HasIndex(p => p.OrderId)
                 .IsUnique();
 
-            builder.HasIndex(p => p.OrderId);
+            builder.HasMany(p => p.Attempts)
+                .WithOne()
+                .HasForeignKey(a => a.PaymentId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(p => new { p.CustomerId, p.CreatedOn });
+            builder.Navigation(p => p.Attempts).HasField("_attempts");
         }
     }
 }

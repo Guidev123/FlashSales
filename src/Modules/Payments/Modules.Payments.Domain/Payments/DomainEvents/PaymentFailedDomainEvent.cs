@@ -1,34 +1,18 @@
-﻿using FlashSales.Domain.DomainObjects;
+using FlashSales.Domain.DomainObjects;
 
 namespace Modules.Payments.Domain.Payments.DomainEvents
 {
     public sealed record PaymentFailedDomainEvent : DomainEvent
     {
-        public static PaymentFailedDomainEvent Create(
-            Guid paymentId,
-            Guid orderId,
-            Guid customerId,
-            Guid transactionId,
-            decimal amount,
-            string reason
-            )
+        public static PaymentFailedDomainEvent Create(Guid paymentId, Guid orderId, decimal amount, string reason)
         {
-            return new PaymentFailedDomainEvent(
-                paymentId,
-                orderId,
-                customerId,
-                transactionId,
-                amount,
-                reason
-                );
+            return new PaymentFailedDomainEvent(paymentId, orderId, amount, reason);
         }
 
-        private PaymentFailedDomainEvent(Guid paymentId, Guid orderId, Guid customerId, Guid transactionId, decimal amount, string? reason = null)
+        private PaymentFailedDomainEvent(Guid paymentId, Guid orderId, decimal amount, string reason)
             : base(paymentId, nameof(PaymentFailedDomainEvent))
         {
             OrderId = orderId;
-            CustomerId = customerId;
-            TransactionId = transactionId;
             Amount = amount;
             Reason = reason;
         }
@@ -36,11 +20,9 @@ namespace Modules.Payments.Domain.Payments.DomainEvents
         private PaymentFailedDomainEvent()
         { }
 
-        public Guid PaymentId { get; }
-        public Guid OrderId { get; }
-        public Guid CustomerId { get; }
-        public Guid TransactionId { get; }
-        public decimal Amount { get; }
-        public string? Reason { get; }
+        public Guid PaymentId { get; set; }
+        public Guid OrderId { get; set; }
+        public decimal Amount { get; set; }
+        public string Reason { get; set; } = null!;
     }
 }

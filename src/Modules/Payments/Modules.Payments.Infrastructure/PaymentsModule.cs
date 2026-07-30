@@ -5,10 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Payments.Application.Abstractions;
+using Modules.Payments.Application.Payments.Services;
 using Modules.Payments.Domain.Payments.Repositories;
 using Modules.Payments.Endpoints;
 using Modules.Payments.Infrastructure.Database;
 using Modules.Payments.Infrastructure.Database.Repositories;
+using Modules.Payments.Infrastructure.Gateway;
+using Modules.Payments.Infrastructure.Jobs;
 using System.Reflection;
 
 namespace Modules.Payments.Infrastructure
@@ -29,7 +32,9 @@ namespace Modules.Payments.Infrastructure
                 .AddData(configuration)
                 .AddOutbox(configuration)
                 .AddInbox(configuration)
-                .AddEndpoints();
+                .AddEndpoints()
+                .AddGateway(configuration)
+                .AddJobs(configuration);
 
             return services;
         }
@@ -67,6 +72,20 @@ namespace Modules.Payments.Infrastructure
         private static IServiceCollection AddEndpoints(this IServiceCollection services)
         {
             services.AddEndpoints(typeof(EndpointsModule).Assembly);
+            return services;
+        }
+
+        private static IServiceCollection AddGateway(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<StripeOptions>(configuration.GetSection(StripeOptions.SectionName));
+            services.AddTransient<IPaymentGatewayService, StripePaymentGatewayService>();
+            return services;
+        }
+
+        private static IServiceCollection AddJobs(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<PaymentsJobsOptions>(configuration.GetSection(PaymentsJobsOptions.SectionName));
+            services.AddHostedService<PaymentReconciliationJob>();
             return services;
         }
     }

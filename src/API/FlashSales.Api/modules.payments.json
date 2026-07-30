@@ -9,6 +9,18 @@
       "IntervalInSeconds": 5,
       "BatchSize": 10,
       "MaxRetryCount": 3
+    },
+    "Stripe": {
+      "ApiKey": "",
+      "WebhookSecret": "",
+      "SuccessUrl": "",
+      "CancelUrl": "",
+      "Currency": "brl",
+      "PaymentMethodType": "card"
+    },
+    "Jobs": {
+      "ReconciliationIntervalInSeconds": 30,
+      "StaleAfterSeconds": 60
     }
   }
 }

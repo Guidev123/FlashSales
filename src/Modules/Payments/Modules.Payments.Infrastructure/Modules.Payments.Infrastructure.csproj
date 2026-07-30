@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Modules.Payments.Endpoints\Modules.Payments.Endpoints.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Stripe.net" Version="52.1.1" />
+  </ItemGroup>
+
 </Project>
