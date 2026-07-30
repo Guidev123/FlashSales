@@ -16,34 +16,13 @@
             ]
           },
           {
-            "Name": "flash-sales.users.user-created",
-            "Subscriptions": [
-              {
-                "Name": "catalog.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.catalog.product-created",
-            "Subscriptions": [
-              {
-                "Name": "launches.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.catalog.product-activated",
-            "Subscriptions": [
-              {
-                "Name": "launches.sub"
-              }
-            ]
-          },
-          {
             "Name": "flash-sales.users.seller-profile-picture-updated",
             "Subscriptions": [
               {
                 "Name": "catalog.sub"
+              },
+              {
+                "Name": "launches.sub"
               }
             ]
           },
@@ -52,8 +31,19 @@
             "Subscriptions": [
               {
                 "Name": "catalog.sub"
+              },
+              {
+                "Name": "launches.sub"
               }
             ]
+          },
+          {
+            "Name": "flash-sales.catalog.product-created",
+            "Subscriptions": []
+          },
+          {
+            "Name": "flash-sales.catalog.product-activated",
+            "Subscriptions": []
           }
         ]
       }
