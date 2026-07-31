@@ -7,9 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Modules.Orders.IntegrationTests" />
+    <InternalsVisibleTo Include="Modules.IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\FlashSales.Infrastructure\FlashSales.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules.Orders.Application\Modules.Orders.Application.csproj" />
+    <ProjectReference Include="..\Modules.Orders.Contracts\Modules.Orders.Contracts.csproj" />
     <ProjectReference Include="..\Modules.Orders.Endpoints\Modules.Orders.Endpoints.csproj" />
+    <ProjectReference Include="..\..\Launches\Modules.Launches.Contracts\Modules.Launches.Contracts.csproj" />
+    <ProjectReference Include="..\..\Payments\Modules.Payments.Contracts\Modules.Payments.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

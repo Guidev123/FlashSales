@@ -47,26 +47,62 @@
           },
           {
             "Name": "flash-sales.launches.launch-activated",
-            "Subscriptions": []
+            "Subscriptions": [
+              {
+                "Name": "orders.sub"
+              }
+            ]
           },
           {
             "Name": "flash-sales.launches.launch-ended",
-            "Subscriptions": []
+            "Subscriptions": [
+              {
+                "Name": "orders.sub"
+              }
+            ]
           },
           {
             "Name": "flash-sales.launches.launch-cancelled",
-            "Subscriptions": []
+            "Subscriptions": [
+              {
+                "Name": "orders.sub"
+              }
+            ]
           },
           {
             "Name": "flash-sales.payments.payment-completed",
-            "Subscriptions": []
+            "Subscriptions": [
+              {
+                "Name": "orders.sub"
+              }
+            ]
           },
           {
             "Name": "flash-sales.payments.payment-failed",
-            "Subscriptions": []
+            "Subscriptions": [
+              {
+                "Name": "orders.sub"
+              }
+            ]
           },
           {
             "Name": "flash-sales.payments.payment-refunded",
+            "Subscriptions": [
+              {
+                "Name": "orders.sub"
+              }
+            ]
+          },
+          {
+            "Name": "flash-sales.orders.order-confirmed",
+            "Subscriptions": []
+          },
+          {
+            "Name": "flash-sales.orders.order-cancelled",
+            "Subscriptions": []
+          },
+          {
+            "Name": "flash-sales.orders.order-refunded",
             "Subscriptions": []
           }
         ]

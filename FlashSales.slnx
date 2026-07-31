@@ -31,6 +31,7 @@
   </Folder>
   <Folder Name="/src/Modules/Orders/">
     <Project Path="src/Modules/Orders/Modules.Orders.Application/Modules.Orders.Application.csproj" />
+    <Project Path="src/Modules/Orders/Modules.Orders.Contracts/Modules.Orders.Contracts.csproj" />
     <Project Path="src/Modules/Orders/Modules.Orders.Domain/Modules.Orders.Domain.csproj" />
     <Project Path="src/Modules/Orders/Modules.Orders.Endpoints/Modules.Orders.Endpoints.csproj" />
     <Project Path="src/Modules/Orders/Modules.Orders.Infrastructure/Modules.Orders.Infrastructure.csproj" />
