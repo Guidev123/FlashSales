@@ -26,6 +26,8 @@ namespace FlashSales.Domain.Results
         public static Result<TValue> Success<TValue>(TValue value) => new(value, true);
 
         public static Result<TValue> Failure<TValue>(Error error) => new(default, false, error);
+
+        public virtual Result WithFailure(Error error) => Failure(error);
     }
 
     public sealed class Result<TValue> : Result
@@ -45,5 +47,7 @@ namespace FlashSales.Domain.Results
 
         public static Result<TValue> ValidationFailure(Error error)
             => new(default, false, error);
+
+        public override Result WithFailure(Error error) => Failure<TValue>(error);
     }
 }

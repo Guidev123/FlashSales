@@ -39,11 +39,19 @@
           },
           {
             "Name": "flash-sales.catalog.product-created",
-            "Subscriptions": []
+            "Subscriptions": [
+              {
+                "Name": "notifications.sub"
+              }
+            ]
           },
           {
             "Name": "flash-sales.catalog.product-activated",
-            "Subscriptions": []
+            "Subscriptions": [
+              {
+                "Name": "notifications.sub"
+              }
+            ]
           }
         ]
       }

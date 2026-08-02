@@ -21,10 +21,6 @@ namespace FlashSales.Application.Behaviors
             "Database.TransactionFailedError",
             "Failed to commit transaction");
 
-        private static readonly Error SaveChangesFailedError = Error.Problem(
-            "Database.SaveChangesFailedError",
-            "Failed to save changes");
-
         public async Task<TResponse> ExecuteAsync(
             TRequest request,
             RequestDelegate<TResponse> next,
@@ -88,7 +84,7 @@ namespace FlashSales.Application.Behaviors
                         typeof(TRequest).Name, saveChangesResult.Error!.Code);
                 }
 
-                return (TResponse)Result.Failure(saveChangesResult.Error!);
+                return (TResponse)response.WithFailure(saveChangesResult.Error!);
             }
 
             var events = domainEventCollector.Flush();
@@ -108,7 +104,7 @@ namespace FlashSales.Application.Behaviors
                     logger.LogWarning("Commit failed for {RequestType}", typeof(TRequest).Name);
                 }
 
-                return (TResponse)Result.Failure(TransactionFailedError);
+                return (TResponse)response.WithFailure(TransactionFailedError);
             }
 
             if (logger.IsEnabled(LogLevel.Information))

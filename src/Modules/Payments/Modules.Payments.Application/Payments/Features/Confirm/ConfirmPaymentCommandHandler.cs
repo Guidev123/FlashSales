@@ -35,8 +35,6 @@ namespace Modules.Payments.Application.Payments.Features.Confirm
                 return result;
             }
 
-            paymentRepository.Update(payment);
-
             return Result.Success();
         }
     }

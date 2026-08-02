@@ -12,21 +12,9 @@ namespace Modules.Payments.Infrastructure.Database.Repositories
             context.Payments.Add(payment);
         }
 
-        public void Update(Payment payment)
-        {
-            foreach (var attempt in payment.Attempts)
-            {
-                if (context.Entry(attempt).State == EntityState.Detached)
-                    context.Add(attempt);
-            }
-
-            context.Payments.Update(payment);
-        }
-
         public Task<Payment?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
             return context.Payments
-                .AsNoTrackingWithIdentityResolution()
                 .Include(p => p.Attempts)
                 .FirstOrDefaultAsync(p => p.OrderId == orderId, cancellationToken);
         }
@@ -34,7 +22,6 @@ namespace Modules.Payments.Infrastructure.Database.Repositories
         public Task<Payment?> GetByAttemptIdAsync(Guid attemptId, CancellationToken cancellationToken = default)
         {
             return context.Payments
-                .AsNoTrackingWithIdentityResolution()
                 .Include(p => p.Attempts)
                 .FirstOrDefaultAsync(p => p.Attempts.Any(a => a.Id == attemptId), cancellationToken);
         }

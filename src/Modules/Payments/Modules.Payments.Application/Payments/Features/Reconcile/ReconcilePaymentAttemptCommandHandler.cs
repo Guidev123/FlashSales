@@ -47,8 +47,6 @@ namespace Modules.Payments.Application.Payments.Features.Reconcile
                 return result;
             }
 
-            paymentRepository.Update(payment);
-
             return Result.Success();
         }
     }
