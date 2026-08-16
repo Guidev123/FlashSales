@@ -185,6 +185,15 @@ namespace Modules.Catalog.Infrastructure.Database.Repositories
             return context.Categories.AsNoTracking().CountAsync(cancellationToken);
         }
 
+        public Task<int> GetTotalCountAsync(Guid? sellerId, CancellationToken cancellationToken = default)
+        {
+            var query = context.Products.AsNoTracking();
+            if (sellerId.HasValue)
+                query = query.Where(p => p.SellerId == sellerId.Value);
+
+            return query.CountAsync(cancellationToken);
+        }
+
         public Task<int> GetTotalCountAsync(CancellationToken cancellationToken = default)
         {
             return context.Products.AsNoTracking().CountAsync(cancellationToken);

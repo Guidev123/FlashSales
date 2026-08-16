@@ -38,22 +38,6 @@
             ]
           },
           {
-            "Name": "flash-sales.catalog.product-created",
-            "Subscriptions": [
-              {
-                "Name": "notifications.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.catalog.product-activated",
-            "Subscriptions": [
-              {
-                "Name": "notifications.sub"
-              }
-            ]
-          },
-          {
             "Name": "flash-sales.launches.launch-activated",
             "Subscriptions": [
               {
@@ -98,30 +82,6 @@
             "Subscriptions": [
               {
                 "Name": "orders.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.orders.order-confirmed",
-            "Subscriptions": [
-              {
-                "Name": "notifications.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.orders.order-cancelled",
-            "Subscriptions": [
-              {
-                "Name": "notifications.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.orders.order-refunded",
-            "Subscriptions": [
-              {
-                "Name": "notifications.sub"
               }
             ]
           }

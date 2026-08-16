@@ -36,22 +36,6 @@
                 "Name": "launches.sub"
               }
             ]
-          },
-          {
-            "Name": "flash-sales.catalog.product-created",
-            "Subscriptions": [
-              {
-                "Name": "notifications.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.catalog.product-activated",
-            "Subscriptions": [
-              {
-                "Name": "notifications.sub"
-              }
-            ]
           }
         ]
       }

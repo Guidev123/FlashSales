@@ -24,11 +24,6 @@
     <Project Path="src/Modules/Launches/Modules.Launches.Endpoints/Modules.Launches.Endpoints.csproj" />
     <Project Path="src/Modules/Launches/Modules.Launches.Infrastructure/Modules.Launches.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/src/Modules/Notifications/">
-    <Project Path="src/Modules/Notifications/Modules.Notifications.Core/Modules.Notifications.Core.csproj" />
-    <Project Path="src/Modules/Notifications/Modules.Notifications.Endpoints/Modules.Notifications.Endpoints.csproj" />
-    <Project Path="src/Modules/Notifications/Modules.Notifications.Infrastructure/Modules.Notifications.Infrastructure.csproj" />
-  </Folder>
   <Folder Name="/src/Modules/Orders/">
     <Project Path="src/Modules/Orders/Modules.Orders.Application/Modules.Orders.Application.csproj" />
     <Project Path="src/Modules/Orders/Modules.Orders.Contracts/Modules.Orders.Contracts.csproj" />

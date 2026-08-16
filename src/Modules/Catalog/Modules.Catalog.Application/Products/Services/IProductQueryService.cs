@@ -10,6 +10,8 @@ namespace Modules.Catalog.Application.Products.Services
 
         Task<ProductResponse?> GetAsync(Guid productId, CancellationToken cancellationToken = default);
 
+        Task<int> GetTotalCountAsync(Guid? sellerId, CancellationToken cancellationToken = default);
+
         Task<int> GetTotalCountAsync(CancellationToken cancellationToken = default);
 
         Task<IReadOnlyCollection<CategoryResponse>> GetCategoriesAsync(int page, int size, CancellationToken cancellationToken = default);

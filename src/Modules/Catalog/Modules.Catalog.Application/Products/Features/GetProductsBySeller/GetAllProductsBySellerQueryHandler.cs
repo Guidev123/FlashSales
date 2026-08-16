@@ -22,7 +22,7 @@ namespace Modules.Catalog.Application.Products.Features.GetProductsBySeller
 
             var items = await productQueryService.GetAllBySellerAsync(seller.Id, request.Page, request.Size, cancellationToken);
 
-            var totalCount = await productQueryService.GetTotalCountAsync(cancellationToken);
+            var totalCount = await productQueryService.GetTotalCountAsync(seller.Id, cancellationToken);
 
             var pagedResult = new PagedResult<ProductResponse>(
                 items,
