@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using MidR.Interfaces;
 using Modules.Catalog.Application.Abstractions;
 using Modules.Catalog.Infrastructure.Database;
+using Modules.Orders.Application.Abstractions;
+using Modules.Orders.Infrastructure.Database;
+using Modules.Payments.Infrastructure.Database;
 using Modules.Users.Application.Abstractions;
 using Modules.Users.Infrastructure.Database;
 
@@ -20,6 +23,8 @@ namespace Modules.IntegrationTests.Abstractions
         protected readonly IMediator Mediator;
         internal readonly CatalogDbContext CatalogDbContext;
         internal readonly UsersDbContext UsersDbContext;
+        internal readonly OrdersDbContext OrdersDbContext;
+        internal readonly PaymentsDbContext PaymentsDbContext;
         protected static readonly Faker Faker = new();
 
         protected readonly IntegrationWebApplicationFactory Factory;
@@ -31,6 +36,8 @@ namespace Modules.IntegrationTests.Abstractions
             Mediator = _serviceScope.ServiceProvider.GetRequiredService<IMediator>();
             CatalogDbContext = _serviceScope.ServiceProvider.GetRequiredService<CatalogDbContext>();
             UsersDbContext = _serviceScope.ServiceProvider.GetRequiredService<UsersDbContext>();
+            OrdersDbContext = _serviceScope.ServiceProvider.GetRequiredService<OrdersDbContext>();
+            PaymentsDbContext = _serviceScope.ServiceProvider.GetRequiredService<PaymentsDbContext>();
         }
 
         public Task InitializeAsync() => Factory.ResetDatabaseAsync();
@@ -74,6 +81,17 @@ namespace Modules.IntegrationTests.Abstractions
             var outboxRepository = sp.GetRequiredService<ModuleOutboxRepository<IUsersUnitOfWork>>();
             await unitOfWork.BeginTransactionAsync(cancellationToken);
             await outboxRepository.InsertAsync(domainEvent, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+        }
+
+        protected async Task InsertOrdersInboxMessageAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
+        {
+            using var scope = Factory.Services.CreateScope();
+            var sp = scope.ServiceProvider;
+            var unitOfWork = sp.GetRequiredService<IOrdersUnitOfWork>();
+            var inboxRepository = sp.GetRequiredService<ModuleInboxRepository<IOrdersUnitOfWork>>();
+            await unitOfWork.BeginTransactionAsync(cancellationToken);
+            await inboxRepository.InsertAsync(integrationEvent, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
         }
     }

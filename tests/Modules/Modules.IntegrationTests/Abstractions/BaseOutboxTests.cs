@@ -129,51 +129,6 @@ namespace Modules.IntegrationTests.Abstractions
             outboxMessage.ProcessedOn.Should().Be(firstProcessedOn);
         }
 
-        [Fact]
-        public async Task OutboxMessageConsumer_HasCorrectIds_AfterSuccessfulDrain()
-        {
-            // Arrange
-            await SeedAsync();
-
-            // Act
-            await DrainOutboxAsync();
-
-            // Assert
-            var outboxMessage = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessage>().SingleAsync();
-            var consumer = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessageConsumer>().SingleAsync();
-
-            consumer.OutboxMessageId.Should().Be(outboxMessage.Id);
-            consumer.OutboxMessageId.Should().NotBe(outboxMessage.CorrelationId);
-            consumer.Name.Should().NotBeNullOrEmpty();
-        }
-
-        [Fact]
-        public async Task OutboxIdempotencyBehavior_SkipsHandler_WhenConsumerRecordExistsFromPreviousCrashedDrain()
-        {
-            // Arrange — drain successfully; OutboxMessageConsumers row is committed (autocommit)
-            await SeedAsync();
-            await DrainOutboxAsync();
-
-            var consumersBefore = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessageConsumer>().CountAsync();
-
-            // Simulate crash-after-handler-but-before-outer-commit: reset ProcessedOn
-            await using var connection = new NpgsqlConnection(Factory.GetConnectionString());
-            await connection.OpenAsync();
-            await using var reset = new NpgsqlCommand(
-                $"""UPDATE {Schema}."OutboxMessages" SET "ProcessedOn" = NULL""", connection);
-            await reset.ExecuteNonQueryAsync();
-
-            // Act — second drain: IsProcessedAsync returns true → handler skipped
-            await DrainOutboxAsync();
-
-            // Assert
-            var outboxMessage = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessage>().SingleAsync();
-            outboxMessage.ProcessedOn.Should().NotBeNull();
-
-            var consumersAfter = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessageConsumer>().CountAsync();
-            consumersAfter.Should().Be(consumersBefore);
-        }
-
         // ── Batch ─────────────────────────────────────────────────────────────
 
         [Fact]
@@ -194,9 +149,6 @@ namespace Modules.IntegrationTests.Abstractions
                 m.ProcessedOn.Should().NotBeNull();
                 m.IsPermanentFailure.Should().BeFalse();
             });
-
-            var consumerCount = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessageConsumer>().CountAsync();
-            consumerCount.Should().Be(3);
         }
 
         // ── Cancellation / infra failure ──────────────────────────────────────
@@ -240,6 +192,100 @@ namespace Modules.IntegrationTests.Abstractions
             outboxMessage.ProcessedOn.Should().NotBeNull();
         }
 
+        // ── Correlation ID flow ───────────────────────────────────────────────
+
+        [Fact]
+        public async Task OutboxMessage_CorrelationId_MatchesDomainEventCorrelationId_And_IdIsDifferent()
+        {
+            // Arrange
+            await SeedAsync();
+
+            // Assert
+            var outboxMessage = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessage>().SingleAsync();
+            var content = JObject.Parse(outboxMessage.Content);
+            var correlationIdInJson = Guid.Parse(content["CorrelationId"]!.ToString());
+
+            outboxMessage.CorrelationId.Should().Be(correlationIdInJson);
+            outboxMessage.Id.Should().NotBe(outboxMessage.CorrelationId);
+        }
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+
+        protected async Task CorruptOutboxTypeAsync()
+        {
+            await using var connection = new NpgsqlConnection(Factory.GetConnectionString());
+            await connection.OpenAsync();
+            await using var corrupt = new NpgsqlCommand(
+                $"""UPDATE {Schema}."OutboxMessages" SET "Content" = jsonb_set("Content", ARRAY['$type'], '"NonExistent.Type, NonExistent"') """,
+                connection);
+            await corrupt.ExecuteNonQueryAsync();
+        }
+    }
+
+    public abstract class BaseOutboxConsumerTrackingTests(IntegrationWebApplicationFactory factory)
+        : BaseOutboxTests(factory)
+    {
+        [Fact]
+        public async Task OutboxMessageConsumer_HasCorrectIds_AfterSuccessfulDrain()
+        {
+            // Arrange
+            await SeedAsync();
+
+            // Act
+            await DrainOutboxAsync();
+
+            // Assert
+            var outboxMessage = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessage>().SingleAsync();
+            var consumer = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessageConsumer>().SingleAsync();
+
+            consumer.OutboxMessageId.Should().Be(outboxMessage.Id);
+            consumer.OutboxMessageId.Should().NotBe(outboxMessage.CorrelationId);
+            consumer.Name.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task OutboxIdempotencyBehavior_SkipsHandler_WhenConsumerRecordExistsFromPreviousCrashedDrain()
+        {
+            // Arrange — drain successfully; OutboxMessageConsumers row is committed (autocommit)
+            await SeedAsync();
+            await DrainOutboxAsync();
+
+            var consumersBefore = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessageConsumer>().CountAsync();
+            consumersBefore.Should().Be(1);
+
+            // Simulate crash-after-handler-but-before-outer-commit: reset ProcessedOn
+            await using var connection = new NpgsqlConnection(Factory.GetConnectionString());
+            await connection.OpenAsync();
+            await using var reset = new NpgsqlCommand(
+                $"""UPDATE {Schema}."OutboxMessages" SET "ProcessedOn" = NULL""", connection);
+            await reset.ExecuteNonQueryAsync();
+
+            // Act — second drain: IsProcessedAsync returns true → handler skipped
+            await DrainOutboxAsync();
+
+            // Assert
+            var outboxMessage = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessage>().SingleAsync();
+            outboxMessage.ProcessedOn.Should().NotBeNull();
+
+            var consumersAfter = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessageConsumer>().CountAsync();
+            consumersAfter.Should().Be(consumersBefore);
+        }
+
+        [Fact]
+        public async Task Batch_ProcessesAllMessages_CreatesConsumerRecordForEach()
+        {
+            // Arrange
+            for (var i = 0; i < 3; i++)
+                await SeedAsync();
+
+            // Act
+            await DrainOutboxAsync();
+
+            // Assert
+            var consumerCount = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessageConsumer>().CountAsync();
+            consumerCount.Should().Be(3);
+        }
+
         // ── Concurrency ───────────────────────────────────────────────────────
 
         [Fact]
@@ -259,23 +305,6 @@ namespace Modules.IntegrationTests.Abstractions
             outboxMessage.ProcessedOn.Should().NotBeNull();
         }
 
-        // ── Correlation ID flow ───────────────────────────────────────────────
-
-        [Fact]
-        public async Task OutboxMessage_CorrelationId_MatchesDomainEventCorrelationId_And_IdIsDifferent()
-        {
-            // Arrange
-            await SeedAsync();
-
-            // Assert
-            var outboxMessage = await ModuleDbContext.Set<FlashSales.Application.Outbox.OutboxMessage>().SingleAsync();
-            var content = JObject.Parse(outboxMessage.Content);
-            var correlationIdInJson = Guid.Parse(content["CorrelationId"]!.ToString());
-
-            outboxMessage.CorrelationId.Should().Be(correlationIdInJson);
-            outboxMessage.Id.Should().NotBe(outboxMessage.CorrelationId);
-        }
-
         [Fact]
         public async Task OutboxMessageConsumer_OutboxMessageId_IsOutboxMessageId_NotCorrelationId()
         {
@@ -291,18 +320,6 @@ namespace Modules.IntegrationTests.Abstractions
 
             consumer.OutboxMessageId.Should().Be(outboxMessage.Id);
             consumer.OutboxMessageId.Should().NotBe(outboxMessage.CorrelationId);
-        }
-
-        // ── Helpers ───────────────────────────────────────────────────────────
-
-        private async Task CorruptOutboxTypeAsync()
-        {
-            await using var connection = new NpgsqlConnection(Factory.GetConnectionString());
-            await connection.OpenAsync();
-            await using var corrupt = new NpgsqlCommand(
-                $"""UPDATE {Schema}."OutboxMessages" SET "Content" = jsonb_set("Content", ARRAY['$type'], '"NonExistent.Type, NonExistent"') """,
-                connection);
-            await corrupt.ExecuteNonQueryAsync();
         }
     }
 }

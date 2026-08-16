@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Modules.Launches.IntegrationTests" />
+    <InternalsVisibleTo Include="Modules.Orders.IntegrationTests" />
     <InternalsVisibleTo Include="Modules.IntegrationTests" />
   </ItemGroup>
 

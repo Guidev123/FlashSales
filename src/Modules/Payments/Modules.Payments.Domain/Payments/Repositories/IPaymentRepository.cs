@@ -6,6 +6,8 @@ namespace Modules.Payments.Domain.Payments.Repositories
     {
         void Add(Payment payment);
 
+        void Update(Payment payment);
+
         Task<Payment?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default);
 
         Task<Payment?> GetByAttemptIdAsync(Guid attemptId, CancellationToken cancellationToken = default);

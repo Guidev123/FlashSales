@@ -31,6 +31,7 @@ namespace Modules.Catalog.IntegrationTests.Abstractions
         private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
             .WithImage("mcr.microsoft.com/azure-storage/azurite:latest")
             .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(10000))
+            .WithCommand("--skipApiVersionCheck")
             .Build();
 
         private readonly ServiceBusContainer _serviceBusContainer = new ServiceBusBuilder()

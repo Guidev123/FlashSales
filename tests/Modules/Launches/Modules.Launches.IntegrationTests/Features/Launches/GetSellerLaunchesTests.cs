@@ -30,11 +30,8 @@ namespace Modules.Launches.IntegrationTests.Features.Launches
             var seller2LaunchResult = await _mediator.SendAsync(new CreateLaunchCommand(seller2.UserId, Guid.NewGuid(),
                 _faker.Commerce.ProductName(), _faker.Commerce.ProductDescription()));
 
-            // Need the Seller entity Id (not UserId) — look it up from the db
-            var seller2Entity = _dbContext.Sellers.First(s => s.UserId == seller2.UserId);
-
             // Act
-            var result = await _mediator.SendAsync(new GetSellerLaunchesQuery(seller2Entity.Id, Page: 1, Size: 10));
+            var result = await _mediator.SendAsync(new GetSellerLaunchesQuery(seller2.UserId, Page: 1, Size: 10));
 
             // Assert
             result.IsSuccess.Should().BeTrue();
@@ -47,10 +44,9 @@ namespace Modules.Launches.IntegrationTests.Features.Launches
         {
             // Arrange
             var seller = await SellerHelper.CreateAsync(_factory, _faker);
-            var sellerEntity = _dbContext.Sellers.First(s => s.UserId == seller.UserId);
 
             // Act
-            var result = await _mediator.SendAsync(new GetSellerLaunchesQuery(sellerEntity.Id, Page: 1, Size: 10));
+            var result = await _mediator.SendAsync(new GetSellerLaunchesQuery(seller.UserId, Page: 1, Size: 10));
 
             // Assert
             result.IsSuccess.Should().BeTrue();

@@ -12,6 +12,23 @@ namespace Modules.Payments.Infrastructure.Database.Repositories
             context.Payments.Add(payment);
         }
 
+        public void Update(Payment payment)
+        {
+            var paymentEntry = context.Entry(payment);
+
+            if (paymentEntry.State == EntityState.Added)
+                return;
+
+            foreach (var attempt in payment.Attempts)
+            {
+                var entry = context.Entry(attempt);
+                if (entry.State != EntityState.Unchanged)
+                    entry.State = EntityState.Added;
+            }
+
+            paymentEntry.State = EntityState.Modified;
+        }
+
         public Task<Payment?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
             return context.Payments

@@ -47,6 +47,8 @@ namespace Modules.Payments.Application.Payments.Features.Checkout
 
             attempt.AttachGatewaySession(sessionResult.Value.SessionId);
 
+            paymentRepository.Update(payment);
+
             return new CheckoutPaymentResponse(payment.Id, attempt.Id, sessionResult.Value.CheckoutUrl);
         }
     }

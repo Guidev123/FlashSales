@@ -1,0 +1,9 @@
+{
+  "Orders": {
+    "Jobs": {
+      "ExpirationSweepIntervalInSeconds": 30,
+      "SagaSweepIntervalInSeconds": 30,
+      "SagaStaleAfterSeconds": 60
+    }
+  }
+}

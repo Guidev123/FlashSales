@@ -28,11 +28,12 @@ namespace Modules.Launches.Infrastructure.Database.Repositories
         {
             foreach (var reservation in launch.StockReservations)
             {
-                if (context.Entry(reservation).State == EntityState.Detached)
-                    context.Add(reservation);
+                var entry = context.Entry(reservation);
+                if (entry.State != EntityState.Unchanged)
+                    entry.State = EntityState.Added;
             }
 
-            context.Launches.Update(launch);
+            context.Entry(launch).State = EntityState.Modified;
         }
 
         public async Task<IReadOnlyCollection<Guid>> GetScheduledReadyToActivateAsync(CancellationToken cancellationToken)

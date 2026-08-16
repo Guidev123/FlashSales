@@ -5,39 +5,6 @@
         "Name": "sbemulatorns",
         "Topics": [
           {
-            "Name": "flash-sales.users.seller-activated",
-            "Subscriptions": [
-              {
-                "Name": "catalog.sub"
-              },
-              {
-                "Name": "launches.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.users.seller-profile-picture-updated",
-            "Subscriptions": [
-              {
-                "Name": "catalog.sub"
-              },
-              {
-                "Name": "launches.sub"
-              }
-            ]
-          },
-          {
-            "Name": "flash-sales.users.user-profile-updated",
-            "Subscriptions": [
-              {
-                "Name": "catalog.sub"
-              },
-              {
-                "Name": "launches.sub"
-              }
-            ]
-          },
-          {
             "Name": "flash-sales.launches.launch-activated",
             "Subscriptions": [
               {

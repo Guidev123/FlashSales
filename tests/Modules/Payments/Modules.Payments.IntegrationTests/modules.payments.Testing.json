@@ -1,0 +1,16 @@
+{
+  "Payments": {
+    "Jobs": {
+      "ReconciliationIntervalInSeconds": 30,
+      "StaleAfterSeconds": 60
+    },
+    "Stripe": {
+      "ApiKey": "sk_test_fake",
+      "WebhookSecret": "whsec_fake",
+      "SuccessUrl": "https://test.flashsales.local/{orderCode}/success",
+      "CancelUrl": "https://test.flashsales.local/{orderCode}/cancel",
+      "Currency": "brl",
+      "PaymentMethodType": "card"
+    }
+  }
+}
