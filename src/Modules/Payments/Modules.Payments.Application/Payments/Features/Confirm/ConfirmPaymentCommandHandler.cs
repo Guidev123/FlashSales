@@ -8,11 +8,9 @@ namespace Modules.Payments.Application.Payments.Features.Confirm
 {
     internal sealed class ConfirmPaymentCommandHandler(
         IPaymentRepository paymentRepository,
-        IPaymentGatewayService paymentGatewayService
+        PaymentOutcomeProcessor processor
         ) : ICommandHandler<ConfirmPaymentCommand>
     {
-        private readonly PaymentOutcomeProcessor _processor = new(paymentGatewayService);
-
         public async Task<Result> ExecuteAsync(ConfirmPaymentCommand request, CancellationToken cancellationToken = default)
         {
             var payment = await paymentRepository.GetByAttemptIdAsync(request.AttemptId, cancellationToken);
@@ -21,7 +19,7 @@ namespace Modules.Payments.Application.Payments.Features.Confirm
                 return Result.Failure(PaymentErrors.AttemptNotFound(request.AttemptId));
             }
 
-            var result = await _processor.ApplyAsync(
+            var result = await processor.ApplyAsync(
                 payment,
                 request.AttemptId,
                 request.Outcome,

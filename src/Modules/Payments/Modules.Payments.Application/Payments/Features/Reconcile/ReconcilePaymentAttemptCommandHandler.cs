@@ -8,11 +8,10 @@ namespace Modules.Payments.Application.Payments.Features.Reconcile
 {
     internal sealed class ReconcilePaymentAttemptCommandHandler(
         IPaymentRepository paymentRepository,
-        IPaymentGatewayService paymentGatewayService
+        IPaymentGatewayService paymentGatewayService,
+        PaymentOutcomeProcessor processor
         ) : ICommandHandler<ReconcilePaymentAttemptCommand>
     {
-        private readonly PaymentOutcomeProcessor _processor = new(paymentGatewayService);
-
         public async Task<Result> ExecuteAsync(ReconcilePaymentAttemptCommand request, CancellationToken cancellationToken = default)
         {
             var payment = await paymentRepository.GetByAttemptIdAsync(request.AttemptId, cancellationToken);
@@ -33,7 +32,7 @@ namespace Modules.Payments.Application.Payments.Features.Reconcile
                 return checkResult;
             }
 
-            var result = await _processor.ApplyAsync(
+            var result = await processor.ApplyAsync(
                 payment,
                 request.AttemptId,
                 checkResult.Value.Outcome,

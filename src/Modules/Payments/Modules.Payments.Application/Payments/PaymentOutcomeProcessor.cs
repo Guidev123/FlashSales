@@ -5,7 +5,7 @@ using Modules.Payments.Domain.Payments.Entities;
 
 namespace Modules.Payments.Application.Payments
 {
-    internal sealed class PaymentOutcomeProcessor(IPaymentGatewayService paymentGatewayService)
+    public sealed class PaymentOutcomeProcessor(IPaymentGatewayService paymentGatewayService)
     {
         public async Task<Result> ApplyAsync(
             Payment payment,

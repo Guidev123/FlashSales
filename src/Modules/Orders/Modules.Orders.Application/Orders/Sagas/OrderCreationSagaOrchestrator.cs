@@ -10,7 +10,7 @@ using Modules.Payments.Contracts;
 
 namespace Modules.Orders.Application.Orders.Sagas
 {
-    internal sealed class OrderCreationSagaOrchestrator(
+    public sealed class OrderCreationSagaOrchestrator(
         IOrderRepository orderRepository,
         IOrderCreationSagaRepository sagaRepository,
         IOrdersUnitOfWork unitOfWork,

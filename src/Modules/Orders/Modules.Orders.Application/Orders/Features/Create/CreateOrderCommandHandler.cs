@@ -1,15 +1,11 @@
-using FlashSales.Application.Abstractions;
 using FlashSales.Application.Messaging;
 using FlashSales.Domain.Results;
-using Modules.Launches.Contracts;
-using Modules.Orders.Application.Abstractions;
 using Modules.Orders.Application.Orders.Sagas;
 using Modules.Orders.Application.Orders.Services;
 using Modules.Orders.Domain.Launches.Enums;
 using Modules.Orders.Domain.Launches.Repositories;
 using Modules.Orders.Domain.Orders.Entities;
 using Modules.Orders.Domain.Orders.Errors;
-using Modules.Orders.Domain.Orders.Repositories;
 using Modules.Payments.Contracts;
 
 namespace Modules.Orders.Application.Orders.Features.Create
@@ -17,17 +13,10 @@ namespace Modules.Orders.Application.Orders.Features.Create
     internal sealed class CreateOrderCommandHandler(
         ILaunchRepository launchRepository,
         IOrderQueryService orderQueryService,
-        IOrderRepository orderRepository,
-        IOrderCreationSagaRepository sagaRepository,
-        IOrdersUnitOfWork unitOfWork,
-        ILaunchesPublicApi launchesPublicApi,
-        IPaymentsPublicApi paymentsPublicApi
+        OrderCreationSagaOrchestrator orchestrator
         ) : ICommandHandler<CreateOrderCommand, CreateOrderResponse>
     {
         private const int GlobalUnitLimit = 5;
-
-        private readonly OrderCreationSagaOrchestrator _orchestrator = new(
-            orderRepository, sagaRepository, unitOfWork, launchesPublicApi, paymentsPublicApi);
 
         public async Task<Result<CreateOrderResponse>> ExecuteAsync(CreateOrderCommand request, CancellationToken cancellationToken = default)
         {
@@ -63,7 +52,7 @@ namespace Modules.Orders.Application.Orders.Features.Create
                 launch.DiscountedPrice
                 );
 
-            var result = await _orchestrator.StartAsync(
+            var result = await orchestrator.StartAsync(
                 order,
                 request.CustomerId,
                 request.CustomerEmail,

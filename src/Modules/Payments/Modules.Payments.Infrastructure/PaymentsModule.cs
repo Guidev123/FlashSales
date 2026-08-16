@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Payments.Application.Abstractions;
+using Modules.Payments.Application.Payments;
 using Modules.Payments.Application.Payments.Services;
 using Modules.Payments.Contracts;
 using Modules.Payments.Domain.Payments.Repositories;
@@ -24,7 +25,7 @@ namespace Modules.Payments.Infrastructure
         [
             Application.AssemblyReference.Assembly,
             Domain.AssemblyReference.Assembly,
-            Contracts.AssemblyReference.Assembly,
+            AssemblyReference.Assembly,
             Assembly.GetExecutingAssembly(),
         ];
 
@@ -37,7 +38,8 @@ namespace Modules.Payments.Infrastructure
                 .AddEndpoints()
                 .AddGateway(configuration)
                 .AddJobs(configuration)
-                .AddPublicApi();
+                .AddPublicApi()
+                .AddServices();
 
             return services;
         }
@@ -95,6 +97,13 @@ namespace Modules.Payments.Infrastructure
         private static IServiceCollection AddPublicApi(this IServiceCollection services)
         {
             services.AddTransient<IPaymentsPublicApi, PaymentsPublicApi>();
+            return services;
+        }
+
+        private static IServiceCollection AddServices(this IServiceCollection services)
+        {
+            services.AddTransient<PaymentOutcomeProcessor>();
+
             return services;
         }
     }

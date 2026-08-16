@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Orders.Application.Abstractions;
+using Modules.Orders.Application.Orders.Sagas;
 using Modules.Orders.Application.Orders.Services;
 using Modules.Orders.Domain.Launches.Repositories;
 using Modules.Orders.Domain.Orders.Repositories;
@@ -35,7 +36,8 @@ namespace Modules.Orders.Infrastructure
                 .AddOutbox(configuration)
                 .AddInbox(configuration)
                 .AddEndpoints()
-                .AddJobs(configuration);
+                .AddJobs(configuration)
+                .AddSagasOrchestrators();
 
             return services;
         }
@@ -90,6 +92,13 @@ namespace Modules.Orders.Infrastructure
             services.Configure<OrdersJobsOptions>(configuration.GetSection(OrdersJobsOptions.SectionName));
             services.AddHostedService<OrderExpirySweepJob>();
             services.AddHostedService<OrderSagaSweepJob>();
+            return services;
+        }
+
+        private static IServiceCollection AddSagasOrchestrators(this IServiceCollection services)
+        {
+            services.AddScoped<OrderCreationSagaOrchestrator>();
+
             return services;
         }
     }

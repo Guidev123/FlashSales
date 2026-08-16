@@ -12,10 +12,12 @@ services:
       KC_DB_PASSWORD: keycloak_pass
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin_pass
+      KC_IMPORT: true
     ports:
       - "8080:8080"
     volumes:
-      - ../src/Web/keycloak/themes:/opt/keycloak/themes
+      - ./keycloak/themes:/opt/keycloak/themes
+      - ./keycloak/data/import:/opt/keycloak/data/import
     depends_on:
       keycloak-postgres:
         condition: service_healthy
@@ -153,7 +155,11 @@ services:
       - backend
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/5672' 2>/dev/null && echo ok || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "bash -c '</dev/tcp/localhost/5672' 2>/dev/null && echo ok || exit 1",
+        ]
       start_period: 30s
       interval: 10s
       timeout: 5s

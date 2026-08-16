@@ -74,7 +74,7 @@ namespace Modules.Orders.Infrastructure.Database.Repositories
             return rows.Select(MapToResponse).ToList().AsReadOnly();
         }
 
-        public async Task<int> GetByCustomerTotalCountAsync(Guid customerId, CancellationToken cancellationToken = default)
+        public Task<int> GetByCustomerTotalCountAsync(Guid customerId, CancellationToken cancellationToken = default)
         {
             const string sql = """
                 SELECT COUNT(*)
@@ -82,10 +82,10 @@ namespace Modules.Orders.Infrastructure.Database.Repositories
                 WHERE o."CustomerId" = @CustomerId
                 """;
 
-            return await unitOfWork.Connection.ExecuteScalarAsync<int>(sql, new { CustomerId = customerId });
+            return unitOfWork.Connection.ExecuteScalarAsync<int>(sql, new { CustomerId = customerId });
         }
 
-        public async Task<bool> HasActiveOrderAsync(Guid customerId, Guid launchId, CancellationToken cancellationToken = default)
+        public Task<bool> HasActiveOrderAsync(Guid customerId, Guid launchId, CancellationToken cancellationToken = default)
         {
             const string sql = """
                 SELECT EXISTS (
@@ -97,10 +97,10 @@ namespace Modules.Orders.Infrastructure.Database.Repositories
                 )
                 """;
 
-            return await unitOfWork.Connection.ExecuteScalarAsync<bool>(sql, new { CustomerId = customerId, LaunchId = launchId });
+            return unitOfWork.Connection.ExecuteScalarAsync<bool>(sql, new { CustomerId = customerId, LaunchId = launchId });
         }
 
-        public async Task<int> GetConfirmedQuantityAsync(Guid customerId, Guid launchId, CancellationToken cancellationToken = default)
+        public Task<int> GetConfirmedQuantityAsync(Guid customerId, Guid launchId, CancellationToken cancellationToken = default)
         {
             const string sql = """
                 SELECT COALESCE(SUM(o."Quantity"), 0)
@@ -110,7 +110,7 @@ namespace Modules.Orders.Infrastructure.Database.Repositories
                   AND o."Status" = 'Confirmed'
                 """;
 
-            return await unitOfWork.Connection.ExecuteScalarAsync<int>(sql, new { CustomerId = customerId, LaunchId = launchId });
+            return unitOfWork.Connection.ExecuteScalarAsync<int>(sql, new { CustomerId = customerId, LaunchId = launchId });
         }
 
         private static OrderResponse MapToResponse(dynamic row)
